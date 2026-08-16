@@ -1,283 +1,119 @@
-# QuantLab — Progress Ledger
+# QuantLab — Academic Progress Ledger
 
-**Project**: QuantLab — Realistic Backtesting Engine
-**Team**: Aayush (A) | Meet (M)
-**Timeline**: Aug 14 – Sep 11, 2026
-
-> Update this file daily. Commit after each update.
+**Project**: QuantLab — Realistic Backtesting Engine & Overfitting Diagnostic Platform  
+**Team**: Aayush Avinash Bankar (Leader) & Meet Jayeshbhai Patel  
+**Timeline**: Aug 16 – Sep 11, 2026 (27 Days)  
+**GTU Syllabus**: DI05000341 (Minor Project)  
 
 ---
 
-## Legend
-
-- ✅ Done
-- 🔄 In Progress
+## 📌 Task Status Legend
 - ❌ Not Started
-- ⏭️ Skipped
-- 🐛 Blocked
+- 🔄 In Progress
+- ✅ Completed
+- 🐛 Blocked / Debugging
 
 ---
 
-## Phase 1 — Foundation (Aug 14–20)
+## Phase 1 — Unit 1 & Unit 2: Literature Study, Market Data, Alternatives & Design (Aug 16 – Aug 20)
+*Target: Seminar 1 Milestone (10 Marks) — 100% Research & Academic Specifications (NO CODE)*
 
-### Day 1 — Thu, Aug 14
+### Day 1 — Sun, Aug 16 (TODAY) — Foundational Research & Specifications Task Pool
+*Shared Task Pool for Aayush & Meet to review, split, and complete by EOD:*
 
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Literature study: look-ahead bias, overfitting, survivorship bias | ❌ | |
-| M | Set up repo structure, requirements.txt, .gitignore, pytest skeleton | ❌ | |
-
-### Day 2 — Fri, Aug 15
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Study 3 strategies in depth, document formulas & signal rules | ❌ | |
-| M | Design engine classes on paper: Order, Position, Portfolio, CostModel, BacktestEngine | ❌ | |
-
-### Day 3 — Sat, Aug 16
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Write `src/data/fetch.py` — yfinance OHLCV download, test with 3 stocks | ❌ | |
-| M | Implement `Order` dataclass + `Position` class | ❌ | |
-
-### Day 4 — Sun, Aug 17
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Finalize stock universe (10–15 tickers), test data availability | ❌ | |
-| M | Study event-driven loop design, write pseudocode for `BacktestEngine.run()` | ❌ | |
-
-### Day 5 — Mon, Aug 18
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Write `src/data/clean.py` — drop missing, adjusted close, validate | ❌ | |
-| M | Implement `Portfolio` class — cash, positions, apply_order, total_value | ❌ | |
-
-### Day 6 — Tue, Aug 19
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Write `tests/test_data.py` — unit tests for data cleaning | ❌ | |
-| M | Implement `CostModel` class — transaction_cost_pct, slippage_pct, apply() | ❌ | |
-
-### Day 7 — Wed, Aug 20
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Write `src/strategies/base.py` — Strategy abstract base class | ❌ | |
-| M | Write `tests/test_engine.py` + `tests/test_cost_model.py` | ❌ | |
-
-### 🔄 Checkpoint 1 — Wed, Aug 20
-
-| Check | Status |
-|---|---|
-| Data schema agreed (date, symbol, O, H, L, C, volume) | ❌ |
-| Cleaned data output matches engine input format | ❌ |
-| All tests pass (`pytest`) | ❌ |
-| Git repo has clean commits from both | ❌ |
+| Task ID | Task Title & Detailed Scope | Target Deliverable | Status | Assigned To |
+|---|---|---|---|---|
+| **D1-1** | **Literature Survey on Backtest Biases & Friction**<br>• Research & synthesize: (1) Look-Ahead Bias (Bailey et al. 2014), (2) Data Snooping / Overfitting (White 2000), (3) Survivorship Bias (Brown et al. 1992), and (4) Transaction Friction Drag (Kissell & Glantz 2003).<br>• Include formal citations, mathematical definitions of each bias, and explicit mitigation strategies for QuantLab. | `docs/literature_review.md` | ❌ | Open |
+| **D1-2** | **SEBI 2024 Retail Trader Data Analysis & Problem Formulation**<br>• Analyze official SEBI 2023–2024 study on Indian retail traders (93% active traders losing money, ₹1.81L Cr lost).<br>• Formulate core Problem Statement, background, and formal Research Questions (RQ1: Cost Drag, RQ2: In-Sample vs Out-of-Sample Decay, RQ3: False Discovery via Multi-Testing).<br>• Define Null ($H_0$) and Alternative ($H_1$) hypotheses. | `docs/problem_statement.md` | ❌ | Open |
+| **D1-3** | **Indian Statutory Equity Delivery Cost & Microstructure Formulation**<br>• Extract exact NSE/SEBI statutory circulars for Indian equity delivery: Brokerage (₹20 / 0.03%), STT (0.10% buy & sell), NSE Turnover (0.00345%), GST (18% on brokerage+turnover), Stamp Duty (0.015% buy), and Slippage (0.05%).<br>• Formulate complete LaTeX equations for round-trip cash flows and effective fill prices.<br>• Provide a step-by-step hand-calculated numerical example (₹1,00,000 trade) to verify paisa-level accuracy for Unit 3 testing. | `docs/mathematical_specifications.md` | ❌ | Open |
+| **D1-4** | **Stock Universe Selection & Benchmark Justification**<br>• Select and justify 10 liquid Indian equities across major sectors (Energy: RELIANCE, IT: TCS/INFY, Banking: HDFCBANK/ICICIBANK/SBIN, FMCG: ITC/HINDUNILVR, Infra: LT, Telecom: BHARTIARTL).<br>• Document Average Daily Volume (ADV > 1M shares) to justify zero market impact assumption.<br>• Justify `^NSEI` (Nifty 50 Index) as the benchmark for market Beta and risk-adjusted Alpha.<br>• Define In-Sample (2019–2022) vs Out-of-Sample (2023–2024) date window rationale. | `docs/stock_universe.md` | ❌ | Open |
 
 ---
 
-## Phase 2 — Core Build (Aug 21–31)
-
-### Day 8 — Thu, Aug 21
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Implement `SMACrossoverStrategy` — signal generation | ❌ | |
-| M | Implement `BacktestEngine.run()` — core event-driven loop | ❌ | |
-
-### Day 9 — Fri, Aug 22
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Visually validate SMA signals — plot price + buy/sell markers | ❌ | |
-| M | Connect engine to Portfolio + CostModel, test with dummy signals | ❌ | |
-
-### Day 10 — Sat, Aug 23
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Implement `RSIMeanReversionStrategy` | ❌ | |
-| M | Integrate SMA strategy with engine → first real equity curve | ❌ | |
-
-### Day 11 — Sun, Aug 24 (Buffer)
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Debug Days 8–10 issues, review Meet's engine code | ❌ | |
-| M | Debug Days 8–10 issues, review Aayush's strategy code | ❌ | |
-
-### Day 12 — Mon, Aug 25
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Implement `MomentumStrategy`, validate RSI signals visually | ❌ | |
-| M | Add `equity_curve` to Portfolio, run RSI through engine | ❌ | |
-
-### Day 13 — Tue, Aug 26
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Validate Momentum signals, write `tests/test_strategies.py` | ❌ | |
-| M | Run Momentum through engine, fix integration bugs | ❌ | |
-
-### Day 14 — Wed, Aug 27
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Fix any strategy bugs from checkpoint | ❌ | |
-| M | Fix any engine bugs from checkpoint | ❌ | |
-
-### 🔄 Checkpoint 2 — Wed, Aug 27
-
-| Check | Status |
-|---|---|
-| SMA runs end-to-end → plausible equity curve | ❌ |
-| RSI runs end-to-end → plausible equity curve | ❌ |
-| Momentum runs end-to-end → plausible equity curve | ❌ |
-| All unit tests pass | ❌ |
-| 2–3 trades manually verified against price charts | ❌ |
-
-### Day 15 — Thu, Aug 28
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Run all 3 strategies on full stock universe, log results | ❌ | |
-| M | Implement `total_return()` and `cagr()` in metrics.py | ❌ | |
-
-### Day 16 — Fri, Aug 29
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Design IS/OOS split dates, document rationale | ❌ | |
-| M | Implement `sharpe_ratio()`, `max_drawdown()`, `win_rate()` + tests | ❌ | |
-
-### Day 17 — Sat, Aug 30
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Implement `split_data()` for IS/OOS | ❌ | |
-| M | Start Streamlit dashboard — basic layout + sidebar controls | ❌ | |
-
-### Day 18 — Sun, Aug 31
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Test IS/OOS split with SMA, first comparison | ❌ | |
-| M | Dashboard: connect to engine, strategy → run → equity curve | ❌ | |
+### Day 2 — Mon, Aug 17: Technical Strategies & Literature Review Assembly
+| Task ID | Task Description | Deliverable | Status | Owner |
+|---|---|---|---|---|
+| D2-1 | Literature Survey: SMA Crossover (Brock 1992), RSI (Wilder 1978), Momentum (Jegadeesh 1993) | Strategy theory notes | ❌ | |
+| D2-2 | Comprehensive Literature Review Assembly | `docs/literature_review.md` complete | ❌ | |
+| D2-3 | Problem Statement & Objectives Document Finalization | `docs/problem_statement.md` complete | ❌ | |
 
 ---
 
-## Phase 3 — Experiments + Dashboard (Sep 1–7)
-
-### Day 19 — Mon, Sep 1
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Parameter sensitivity for SMA (5 param combos), log results | ❌ | |
-| M | Dashboard: add cost toggle, connect to CostModel | ❌ | |
-
-### Day 20 — Tue, Sep 2
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Parameter sensitivity for RSI + Momentum, log results | ❌ | |
-| M | Dashboard: add metrics table below equity curve | ❌ | |
-
-### Day 21 — Wed, Sep 3
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Implement experiment logging to `experiments/experiment_log.csv` | ❌ | |
-| M | Dashboard: add drawdown chart + strategy comparison table | ❌ | |
-
-### Day 22 — Thu, Sep 4
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Run COMPLETE 12-cell experiment matrix, fix data issues | ❌ | |
-| M | Dashboard bug fixes, ensure all chart combos render | ❌ | |
-
-### 🔄 Checkpoint 3 — Thu, Sep 4
-
-| Check | Status |
-|---|---|
-| 12-cell experiment matrix (3 strats × 2 costs × 2 periods) complete | ❌ |
-| All 12 runs display on dashboard | ❌ |
-| experiment_log.csv has all entries | ❌ |
-| Cost toggle visually shows impact | ❌ |
-| IS vs OOS comparison visible | ❌ |
-
-### Day 23 — Fri, Sep 5
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Analyze results: write observations for RQ1–RQ4 | ❌ | |
-| M | Dashboard polish: colors, labels, responsive layout, IS/OOS view | ❌ | |
-
-### Day 24 — Sat, Sep 6
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Run final experiments, capture all screenshots for report | ❌ | |
-| M | Add metric formula tooltips to dashboard, final testing | ❌ | |
-
-### Day 25 — Sun, Sep 7 (Buffer)
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| A | Catch up on any incomplete Phase 3 tasks | ❌ | |
-| M | Catch up on any incomplete Phase 3 tasks | ❌ | |
+### Day 3 — Tue, Aug 18: Unit 2 Alternatives & Feasibility Study
+| Task ID | Task Description | Deliverable | Status | Owner |
+|---|---|---|---|---|
+| D3-1 | Alternative Architecture Matrix (Event-Driven vs Vectorized) | Architecture tradeoff table | ❌ | |
+| D3-2 | Alternative Tool Tradeoff Matrix (Custom vs Backtrader/Lean/Vectorbt) | Tool comparison matrix | ❌ | |
+| D3-3 | Zero-Budget Hardware & Compute Feasibility Analysis | `docs/alternative_solutions_and_feasibility.md` | ❌ | |
 
 ---
 
-## Phase 4 — Report + Viva (Sep 8–11)
+### Day 4 — Wed, Aug 19: Unit 2 Formal SRS & Mathematical Contracts
+| Task ID | Task Description | Deliverable | Status | Owner |
+|---|---|---|---|---|
+| D4-1 | Formal Software Requirements Specification (SRS) (12 FRs + 6 NFRs) | `docs/srs.md` | ❌ | |
+| D4-2 | LaTeX Formulations for Metrics (Sharpe, DSR, Sortino, Calmar, Drawdown) | `docs/mathematical_specifications.md` complete | ❌ | |
+| D4-3 | In-Sample / Out-of-Sample Partitioning Design Specification | Split date contract | ❌ | |
 
-### Day 26 — Mon, Sep 8
+---
 
-| Owner | Task | Status | Notes |
+### Day 5 — Thu, Aug 20 — 🔄 CHECKPOINT 1 (Seminar 1 Milestone - 10 Marks)
+| Checkpoint Verification Item | Status | Verification Method |
+|---|---|---|
+| Literature Review & Problem Statement fully documented | ❌ | Review `docs/literature_review.md` |
+| Alternatives & Feasibility Study approved | ❌ | Review `docs/alternative_solutions_and_feasibility.md` |
+| Formal SRS and Mathematical Specifications frozen | ❌ | Review `docs/srs.md` & `docs/mathematical_specifications.md` |
+| Seminar 1 presentation slide deck ready | ❌ | Slides check |
+
+---
+
+## Phase 2 — Unit 3: Implementation, Simulation & Testing (Aug 21 – Aug 28)
+*Target: Seminar 2 Milestone (10 Marks)*
+
+| Day | Task Summary | Deliverable | Status |
 |---|---|---|---|
-| A | Write report: Problem Statement, Literature Review, Data, Strategies, Results | ❌ | |
-| M | Write report: Architecture, Engine, Cost Model, Metrics, Dashboard, Testing | ❌ | |
+| Day 6 (Aug 21) | Scaffolding, deps, `fetch.py` | `src/data/fetch.py` | ❌ |
+| Day 7 (Aug 22) | Data cleaner & universe module | `src/data/clean.py`, `src/data/universe.py` | ❌ |
+| Day 8 (Aug 23) | Events, Order, Position classes | `src/engine/events.py`, `order.py`, `position.py` | ❌ |
+| Day 9 (Aug 24) | Indian CostModel & Portfolio | `src/engine/cost_model.py`, `portfolio.py` | ❌ |
+| Day 10 (Aug 25) | Zero Look-Ahead Event Loop (t+1 Open fills) | `src/engine/backtest_engine.py` | ❌ |
+| Day 11 (Aug 26) | 3 Strategies (SMA, RSI, Momentum) | `src/strategies/` modules | ❌ |
+| Day 12 (Aug 27) | Analytics & Metrics Engine | `src/analytics/metrics.py` | ❌ |
+| Day 13 (Aug 28) | **🔄 CHECKPOINT 2 (Seminar 2 Milestone)** | 100% Pytest suite passing green | ❌ |
 
-### Day 27 — Tue, Sep 9
+---
 
-| Owner | Task | Status | Notes |
+## Phase 3 — Unit 4: Modification & Redesign Based on Results (Aug 29 – Sep 04)
+*Target: Seminar 3 Milestone (10 Marks) — Unit 4 Redesign*
+
+| Day | Task Summary | Deliverable | Status |
 |---|---|---|---|
-| A | Write: Conclusion, Limitations, Future Work. Insert charts | ❌ | |
-| M | Write: Introduction, ToC, References. Cross-review Aayush's sections | ❌ | |
+| Day 14 (Aug 29) | Full IS vs OOS Backtest Matrix | Isolate parameter decay & cost friction | ❌ |
+| Day 15 (Aug 30) | **Unit 4 Redesign**: Deflated Sharpe Ratio (DSR) | `src/analytics/deflated_sharpe.py` | ❌ |
+| Day 16 (Aug 31) | **Unit 4 Redesign**: 2D Stability Surfaces | `src/analytics/validation.py` | ❌ |
+| Day 17 (Sep 01) | Streamlit Master Dashboard App | `src/dashboard/app.py` | ❌ |
+| Day 18 (Sep 02) | "Profit Mirage" Waterfall & 2D Heatmaps | `src/dashboard/components.py` | ❌ |
+| Day 19 (Sep 03) | Automated Experiment Matrix Logger | `experiments/experiment_log.csv` | ❌ |
+| Day 20 (Sep 04) | **🔄 CHECKPOINT 3 (Seminar 3 Milestone)** | 12-cell matrix complete, Unit 4 redesign demonstrated | ❌ |
 
-### Day 28 — Wed, Sep 10
+---
 
-| Owner | Task | Status | Notes |
+## Phase 4 — Unit 5: Final Report Assembly, Viva Preparation & ESE Defense (Sep 05 – Sep 11)
+*Target: Seminar 4 (20 Marks) & GTU ESE Viva (50 Marks) — Total 70 Marks*
+
+| Day | Task Summary | Deliverable | Status |
 |---|---|---|---|
-| Both | Finalize report — merge, proofread, format | ❌ | |
-| Both | Viva rehearsal — each explains the other's subsystem | ❌ | |
-
-### Day 29 — Thu, Sep 11 🎯
-
-| Owner | Task | Status | Notes |
-|---|---|---|---|
-| Both | Final review, run dashboard one last time | ❌ | |
-| Both | **SUBMIT** | ❌ | |
-
-### 🔄 Checkpoint 4 (Final) — Sep 11
-
-| Check | Status |
-|---|---|
-| Code complete and working | ❌ |
-| Dashboard runs without errors | ❌ |
-| Report complete and proofread | ❌ |
-| Both can explain each other's subsystem | ❌ |
-| Submitted | ❌ |
+| Day 21 (Sep 05) | Comprehensive Project Report Outline | `docs/final_report_draft.md` | ❌ |
+| Day 22 (Sep 06) | Empirical Results, Tables & Discussion | Report results section | ❌ |
+| Day 23 (Sep 07) | Assemble Complete GTU Report (Units 1–5) | Formal GTU project documentation | ❌ |
+| Day 24 (Sep 08) | Peer Cross-Review & Proofreading | Final code & report polish | ❌ |
+| Day 25 (Sep 09) | Viva Voce Defense Rehearsal #1 | 10 critical viva questions | ❌ |
+| Day 26 (Sep 10) | Viva Voce Defense Rehearsal #2 | Cross-defense & live demo dry-run | ❌ |
+| Day 27 (Sep 11) | **🎯 FINAL SUBMISSION & ESE VIVA** | 100/100 Distinction Defense | ❌ |
 
 ---
 
 ## Change Log
-
-| Date | What Changed | Who |
+| Date | Change Summary | Author |
 |---|---|---|
-| Aug 14 | Ledger created | — |
+| Aug 16, 2026 | Refined Day 1 study tasks with deep, unambiguous scope and deliverables. Removed internal agent configuration tasks from student project ledger. | Aayush & Meet |
