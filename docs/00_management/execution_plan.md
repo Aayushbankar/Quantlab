@@ -46,21 +46,21 @@ In accordance with GTU Syllabus DI05000341 and academic engineering standards, *
 *Target: Seminar 1 Milestone (10 Marks) — 100% Research & Academic Specifications (NO CODE)*
 
 - **Day 1 (Sun, Aug 16 - TODAY)**:
-  - **Task D1-1**: Academic Literature Survey on Backtest Biases (Look-Ahead, Overfitting, Survivorship, Cost Friction). Deliverable: `docs/literature_review.md`.
-  - **Task D1-2**: Empirical Market Grounding & Problem Statement (SEBI 2024 ₹1.81L Cr Retail Loss Data Analysis). Deliverable: `docs/problem_statement.md`.
-  - **Task D1-3**: Indian Statutory Equity Delivery Cost & Microstructure Formulation (STT, GST, Stamp Duty, Slippage Math). Deliverable: `docs/mathematical_specifications.md`.
-  - **Task D1-4**: Stock Universe Selection & Benchmark Justification (10 Diverse NSE Equities + Nifty 50 Benchmark). Deliverable: `docs/stock_universe.md`.
+  - **Task D1-1**: Academic Literature Survey on Backtest Biases (Look-Ahead, Overfitting, Survivorship, Cost Friction). Deliverable: `docs/01_unit1_literature/literature_review.md`.
+  - **Task D1-2**: Empirical Market Grounding & Problem Statement (SEBI 2024 ₹1.81L Cr Retail Loss Data Analysis). Deliverable: `docs/01_unit1_literature/problem_statement.md`.
+  - **Task D1-3**: Indian Statutory Equity Delivery Cost & Microstructure Formulation (STT, GST, Stamp Duty, Slippage Math). Deliverable: `docs/02_unit2_specifications/mathematical_specifications.md`.
+  - **Task D1-4**: Stock Universe Selection & Benchmark Justification (10 Diverse NSE Equities + Nifty 50 Benchmark). Deliverable: `docs/02_unit2_specifications/stock_universe.md`.
 - **Day 2 (Mon, Aug 17)**:
   - Technical Strategies Literature Survey: SMA Crossover (Brock 1992), RSI (Wilder 1978), Momentum (Jegadeesh 1993).
-  - Assemble Complete Unit 1 Literature Review Document in `docs/literature_review.md`.
-  - Finalize Formal Research Hypotheses ($H_0$ and $H_1$) in `docs/problem_statement.md`.
+  - Assemble Complete Unit 1 Literature Review Document in `docs/01_unit1_literature/literature_review.md`.
+  - Finalize Formal Research Hypotheses ($H_0$ and $H_1$) in `docs/01_unit1_literature/problem_statement.md`.
 - **Day 3 (Tue, Aug 18)**:
   - Unit 2 Alternative Solutions Matrix: Event-Driven vs Vectorized; Custom From-Scratch vs Backtrader/Lean/Vectorbt (tradeoff analysis).
   - Feasibility & Hardware Constraints: Zero-cost budget, student laptop compute, free public data sources.
-  - Draft `docs/alternative_solutions_and_feasibility.md`.
+  - Draft `docs/02_unit2_specifications/alternative_solutions_and_feasibility.md`.
 - **Day 4 (Wed, Aug 19)**:
-  - Unit 2 Formal SRS: 12 Functional Requirements (FR-1 to FR-12) & 6 Non-Functional Requirements (NFR-1 to NFR-6) in `docs/srs.md`.
-  - LaTeX Metric Formulations: Sharpe, Sortino, Calmar, Max Drawdown, and López de Prado's Deflated Sharpe Ratio (DSR) in `docs/mathematical_specifications.md`.
+  - Unit 2 Formal SRS: 12 Functional Requirements (FR-1 to FR-12) & 6 Non-Functional Requirements (NFR-1 to NFR-6) in `docs/02_unit2_specifications/srs.md`.
+  - LaTeX Metric Formulations: Sharpe, Sortino, Calmar, Max Drawdown, and López de Prado's Deflated Sharpe Ratio (DSR) in `docs/02_unit2_specifications/mathematical_specifications.md`.
   - In-Sample (2019–2022) vs Out-of-Sample (2023–2024) Date Partitioning Design.
 - **Day 5 (Thu, Aug 20) — 🔄 SYNC CHECKPOINT 1 (Seminar 1 Milestone - 10 Marks)**:
   - Review all Unit 1 & Unit 2 academic documents.

@@ -323,8 +323,12 @@ quantlab/
 ├── experiments/
 │   └── experiment_log.csv        # FR-12 reproducibility log
 ├── docs/
-│   ├── QuantLab_Project_Documentation.md   # this file
-│   └── final_report.md / .docx
+│   ├── 00_management/           # LEDGER.md, execution_plan.md
+│   ├── 01_unit1_literature/     # problem_statement.md, literature_review.md
+│   ├── 02_unit2_specifications/ # mathematical_specifications.md, stock_universe.md, srs.md
+│   ├── 03_unit3_testing/        # test_plan.md, golden_fixtures.md
+│   ├── 04_unit4_redesign/       # out_of_sample_decay.md, parameter_stability.md
+│   └── 05_unit5_defense/        # final_report.md, viva_master_guide.md
 └── requirements.txt
 ```
 
