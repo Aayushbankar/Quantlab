@@ -23,7 +23,7 @@
 
 | Task ID | Task Title & Detailed Scope | Target Deliverable | Status | Assigned To |
 |---|---|---|---|---|
-| **D1-1** | **Literature Survey on Backtest Biases & Friction**<br>• Research & synthesize: (1) Look-Ahead Bias (Bailey et al. 2014), (2) Data Snooping / Overfitting (White 2000), (3) Survivorship Bias (Brown et al. 1992), and (4) Transaction Friction Drag (Kissell & Glantz 2003).<br>• Include formal citations, mathematical definitions of each bias, and explicit mitigation strategies for QuantLab. | `docs/01_unit1_literature/literature_review.md` | ❌ | Open |
+| **D1-1** | **Literature Survey on Backtest Biases & Friction**<br>• Research & synthesize: (1) Look-Ahead Bias (Bailey et al. 2014), (2) Data Snooping / Overfitting (White 2000), (3) Survivorship Bias (Brown et al. 1992), and (4) Transaction Friction Drag (Kissell & Glantz 2003).<br>• Include formal citations, mathematical definitions of each bias, and explicit mitigation strategies for QuantLab. | `docs/01_unit1_literature/literature_review.md` | ✅ | Completed |
 | **D1-2** | **SEBI 2024 Retail Trader Data Analysis & Problem Formulation**<br>• Analyze official SEBI 2023–2024 study on Indian retail traders (93% active traders losing money, ₹1.81L Cr lost).<br>• Formulate core Problem Statement, background, and formal Research Questions (RQ1: Cost Drag, RQ2: In-Sample vs Out-of-Sample Decay, RQ3: False Discovery via Multi-Testing).<br>• Define Null ($H_0$) and Alternative ($H_1$) hypotheses. | `docs/01_unit1_literature/problem_statement.md` | ✅ | Completed |
 | **D1-3** | **Indian Statutory Equity Delivery Cost & Microstructure Formulation**<br>• Extract exact NSE/SEBI statutory circulars for Indian equity delivery: Brokerage (₹20 / 0.03%), STT (0.10% buy & sell), NSE Turnover (0.00345%), GST (18% on brokerage+turnover), Stamp Duty (0.015% buy), and Slippage (0.05%).<br>• Formulate complete LaTeX equations for round-trip cash flows and effective fill prices.<br>• Provide a step-by-step hand-calculated numerical example (₹1,00,000 trade) to verify paisa-level accuracy for Unit 3 testing. | `docs/02_unit2_specifications/mathematical_specifications.md` | ✅ | Completed |
 | **D1-4** | **Stock Universe Selection & Benchmark Justification**<br>• Select and justify 10 liquid Indian equities across major sectors (Energy: RELIANCE, IT: TCS/INFY, Banking: HDFCBANK/ICICIBANK/SBIN, FMCG: ITC/HINDUNILVR, Infra: LT, Telecom: BHARTIARTL).<br>• Document Average Daily Volume (ADV > 1M shares) to justify zero market impact assumption.<br>• Justify `^NSEI` (Nifty 50 Index) as the benchmark for market Beta and risk-adjusted Alpha.<br>• Define In-Sample (2019–2022) vs Out-of-Sample (2023–2024) date window rationale. | `docs/02_unit2_specifications/stock_universe.md` | ✅ | Completed |
@@ -33,37 +33,37 @@
 ### Day 2 — Mon, Aug 17: Technical Strategies & Literature Review Assembly
 | Task ID | Task Description | Deliverable | Status | Owner |
 |---|---|---|---|---|
-| D2-1 | Literature Survey: SMA Crossover (Brock 1992), RSI (Wilder 1978), Momentum (Jegadeesh 1993) | Strategy theory notes | ❌ | |
-| D2-2 | Comprehensive Literature Review Assembly | `docs/01_unit1_literature/literature_review.md` complete | ❌ | |
-| D2-3 | Problem Statement & Objectives Document Finalization | `docs/01_unit1_literature/problem_statement.md` complete | ❌ | |
+| D2-1 | Literature Survey: SMA Crossover (Brock 1992), RSI (Wilder 1978), Momentum (Jegadeesh 1993) | Strategy theory notes | ✅ | Completed |
+| D2-2 | Comprehensive Literature Review Assembly | `docs/01_unit1_literature/literature_review.md` complete | ✅ | Completed |
+| D2-3 | Problem Statement & Objectives Document Finalization | `docs/01_unit1_literature/problem_statement.md` complete | ✅ | Completed |
 
 ---
 
 ### Day 3 — Tue, Aug 18: Unit 2 Alternatives & Feasibility Study
 | Task ID | Task Description | Deliverable | Status | Owner |
 |---|---|---|---|---|
-| D3-1 | Alternative Architecture Matrix (Event-Driven vs Vectorized) | Architecture tradeoff table | ❌ | |
-| D3-2 | Alternative Tool Tradeoff Matrix (Custom vs Backtrader/Lean/Vectorbt) | Tool comparison matrix | ❌ | |
-| D3-3 | Zero-Budget Hardware & Compute Feasibility Analysis | `docs/02_unit2_specifications/alternative_solutions_and_feasibility.md` | ❌ | |
+| D3-1 | Alternative Architecture Matrix (Event-Driven vs Vectorized) | Architecture tradeoff table | ✅ | Completed |
+| D3-2 | Alternative Tool Tradeoff Matrix (Custom vs Backtrader/Lean/Vectorbt) | Tool comparison matrix | ✅ | Completed |
+| D3-3 | Zero-Budget Hardware & Compute Feasibility Analysis | `docs/02_unit2_specifications/alternative_solutions_and_feasibility.md` | ✅ | Completed |
 
 ---
 
 ### Day 4 — Wed, Aug 19: Unit 2 Formal SRS & Mathematical Contracts
 | Task ID | Task Description | Deliverable | Status | Owner |
 |---|---|---|---|---|
-| D4-1 | Formal Software Requirements Specification (SRS) (12 FRs + 6 NFRs) | `docs/02_unit2_specifications/srs.md` | ❌ | |
-| D4-2 | LaTeX Formulations for Metrics (Sharpe, DSR, Sortino, Calmar, Drawdown) | `docs/02_unit2_specifications/mathematical_specifications.md` complete | ❌ | |
-| D4-3 | In-Sample / Out-of-Sample Partitioning Design Specification | Split date contract | ❌ | |
+| D4-1 | Formal Software Requirements Specification (SRS) (12 FRs + 6 NFRs) | `docs/02_unit2_specifications/srs.md` | ✅ | Completed |
+| D4-2 | LaTeX Formulations for Metrics (Sharpe, DSR, Sortino, Calmar, Drawdown) | `docs/02_unit2_specifications/mathematical_specifications.md` complete | ✅ | Completed |
+| D4-3 | In-Sample / Out-of-Sample Partitioning Design Specification | Split date contract | ✅ | Completed |
 
 ---
 
 ### Day 5 — Thu, Aug 20 — 🔄 CHECKPOINT 1 (Seminar 1 Milestone - 10 Marks)
 | Checkpoint Verification Item | Status | Verification Method |
 |---|---|---|
-| Literature Review & Problem Statement fully documented | ❌ | Review `docs/01_unit1_literature/literature_review.md` |
-| Alternatives & Feasibility Study approved | ❌ | Review `docs/02_unit2_specifications/alternative_solutions_and_feasibility.md` |
-| Formal SRS and Mathematical Specifications frozen | ❌ | Review `docs/02_unit2_specifications/srs.md` & `docs/02_unit2_specifications/mathematical_specifications.md` |
-| Seminar 1 presentation slide deck ready | ❌ | Slides check |
+| Literature Review & Problem Statement fully documented | ✅ | Review `docs/01_unit1_literature/literature_review.md` & `problem_statement.md` |
+| Alternatives & Feasibility Study approved | ✅ | Review `docs/02_unit2_specifications/alternative_solutions_and_feasibility.md` |
+| Formal SRS and Mathematical Specifications frozen | ✅ | Review `docs/02_unit2_specifications/srs.md` & `mathematical_specifications.md` |
+| Seminar 1 presentation slide deck ready | ✅ | Review `docs/05_unit5_defense/faculty_presentation_deck.md` |
 
 ---
 
