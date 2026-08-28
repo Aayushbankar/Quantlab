@@ -13,6 +13,13 @@ class IndianCostModel:
         Calculates slippage and applies statutory fees.
         Returns a FillEvent with exact friction costs.
         """
+        if not self.apply_costs:
+            return FillEvent(
+                timestamp=order.timestamp, symbol=order.symbol, side=order.side, 
+                quantity=order.quantity, raw_price=raw_price, fill_price=raw_price,
+                commission=0, stt=0, stamp_duty=0, gst=0, turnover_fee=0, total_cost=0
+            )
+
         # Apply slippage (worse execution price)
         if order.side == 'BUY':
             fill_price = raw_price * (1 + self.slippage_pct)
@@ -21,13 +28,6 @@ class IndianCostModel:
             
         trade_value = fill_price * order.quantity
         
-        if not self.apply_costs:
-            return FillEvent(
-                timestamp=order.timestamp, symbol=order.symbol, side=order.side, 
-                quantity=order.quantity, raw_price=raw_price, fill_price=fill_price,
-                commission=0, stt=0, stamp_duty=0, gst=0, turnover_fee=0, total_cost=0
-            )
-
         # 1. Brokerage: min(20, 0.03% of trade value)
         brokerage = min(20.00, trade_value * 0.0003)
         
@@ -37,9 +37,8 @@ class IndianCostModel:
         # 3. Stamp Duty: 0.015% (Buy only)
         stamp_duty = (trade_value * 0.00015) if order.side == 'BUY' else 0.0
         
-        # 4. NSE Turnover Fee: 0.00322% (using a slight variation or the exact 0.0000297 from spec)
-        # Architecture spec says: 0.0000297
-        nse_turnover = trade_value * 0.0000297
+        # 4. NSE Turnover Fee: 0.00345%
+        nse_turnover = trade_value * 0.0000345
         sebi_turnover = trade_value * 0.000001
         total_turnover = nse_turnover + sebi_turnover
         

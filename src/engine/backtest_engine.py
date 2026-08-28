@@ -35,27 +35,26 @@ class BacktestEngine:
             self._execute_pending_orders(current_date)
             
             # 2. T CLOSE: Update MTM (Mark-to-Market) and generate new signals
-            daily_events = []
+            current_prices = {}
             for symbol, df in self.data.items():
                 # Get data up to current date (inclusive)
-                # In a real system, we'd feed row by row. Here we simulate it efficiently
                 mask = df['date'] == current_date
                 if not mask.any():
                     continue
                     
                 row = df[mask].iloc[0]
-                market_event = MarketEvent(
-                    timestamp=current_date, symbol=symbol,
-                    open=row['open'], high=row['high'],
-                    low=row['low'], close=row['close'], volume=row['volume']
-                )
-                daily_events.append(market_event)
+                current_prices[symbol] = row['close']
                 
-                # Update portfolio timeindex (MTM based on close)
-                self.portfolio.update_timeindex(market_event)
+            # Update portfolio timeindex ONCE per day
+            self.portfolio.update_timeindex(current_date, current_prices)
+
+            # Sliced data for strategy to prevent look-ahead bias
+            sliced_data = {}
+            for symbol, df in self.data.items():
+                sliced_data[symbol] = df[df['date'] <= current_date]
 
             # Generate signals on T Close
-            signals = self.strategy.generate_signals(current_date, self.data, self.portfolio.positions)
+            signals = self.strategy.generate_signals(current_date, sliced_data, self.portfolio.positions)
             
             # Convert signals to pending orders for T+1 Open
             self._process_signals(signals, current_date)
@@ -75,6 +74,15 @@ class BacktestEngine:
                 
                 # Apply cost model to get exact fill event
                 fill_event = self.cost_model.process_order(order, open_price)
+                
+                # Check cash overdraft for BUY orders
+                if order.side == 'BUY':
+                    estimated_cost = (fill_event.quantity * fill_event.fill_price) + fill_event.total_cost
+                    if estimated_cost > self.portfolio.cash:
+                        # Cancel order if no cash
+                        executed.append(order)
+                        continue
+
                 fill_event.timestamp = current_date
                 
                 # Apply to portfolio
@@ -87,29 +95,26 @@ class BacktestEngine:
     def _process_signals(self, signals: List[SignalEvent], current_date):
         """Converts signals to pending orders."""
         for signal in signals:
-            # Simplistic sizing: invest 10% of current equity per signal
-            # In a real system, a dedicated PositionSizer would handle this
-            current_equity = self.portfolio.cash # simplified, should use total equity
-            target_value = current_equity * 0.10
-            
-            # Get latest close price to estimate quantity
-            df = self.data[signal.symbol]
-            row = df[df['date'] == current_date].iloc[0]
-            est_price = row['close']
-            
-            if est_price <= 0: continue
-            
-            qty = int(target_value / est_price)
-            if qty <= 0: continue
-            
             side = 'BUY' if signal.signal_type == 1 else 'SELL'
             
-            # Check if we have position to sell
-            if side == 'SELL':
+            if side == 'BUY':
+                current_equity = self.portfolio.cash # Using cash to be safe
+                target_value = current_equity * 0.10
+                
+                df = self.data[signal.symbol]
+                row = df[df['date'] == current_date].iloc[0]
+                est_price = row['close']
+                
+                if est_price <= 0: continue
+                
+                qty = int(target_value / est_price)
+                if qty <= 0: continue
+                
+            else: # SELL
                 pos = self.portfolio.positions.get(signal.symbol)
                 if not pos or pos.quantity <= 0:
-                    continue # Ignore sell if no long position
-                qty = min(qty, pos.quantity) # Don't short
+                    continue
+                qty = pos.quantity # Sell entire position
                 
             order = OrderEvent(
                 timestamp=current_date,

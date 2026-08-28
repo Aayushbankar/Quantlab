@@ -11,7 +11,7 @@ class Position:
         if side == 'BUY':
             if self.quantity >= 0:
                 # Adding to long position
-                total_cost_basis = (self.quantity * self.average_entry_price) + (quantity * fill_price)
+                total_cost_basis = (self.quantity * self.average_entry_price) + (quantity * fill_price) + total_cost
                 self.quantity += quantity
                 self.average_entry_price = total_cost_basis / self.quantity
             else:

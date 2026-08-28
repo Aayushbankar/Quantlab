@@ -36,18 +36,22 @@ class Portfolio:
             
         position.update(fill.side, fill.quantity, fill.fill_price, fill.total_cost)
         
-    def update_timeindex(self, event: MarketEvent):
+    def update_timeindex(self, timestamp, current_prices: Dict[str, float]):
         """
-        Records the current total equity at the given market event timestamp.
+        Records the current total equity at the given timestamp.
         """
         total_equity = self.cash
         for symbol, position in self.positions.items():
             if position.quantity > 0:
                 # We use the closing price of the event to mark-to-market
-                total_equity += position.quantity * event.close
+                if symbol in current_prices:
+                    total_equity += position.quantity * current_prices[symbol]
+                else:
+                    # Fallback to entry price if no price available (rare)
+                    total_equity += position.quantity * position.average_entry_price
                 
         self.equity_history.append({
-            'date': event.timestamp,
+            'date': timestamp,
             'cash': self.cash,
             'total_equity': total_equity
         })
