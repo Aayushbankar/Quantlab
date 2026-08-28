@@ -88,13 +88,13 @@
 
 | Day | Task Summary | Deliverable | Status |
 |---|---|---|---|
-| Day 14 (Aug 29) | Full IS vs OOS Backtest Matrix | Isolate parameter decay & cost friction | ❌ |
-| Day 15 (Aug 30) | **Unit 4 Redesign**: Deflated Sharpe Ratio (DSR) | `src/analytics/deflated_sharpe.py` | ❌ |
-| Day 16 (Aug 31) | **Unit 4 Redesign**: 2D Stability Surfaces | `src/analytics/validation.py` | ❌ |
-| Day 17 (Sep 01) | Streamlit Master Dashboard App | `src/dashboard/app.py` | ❌ |
-| Day 18 (Sep 02) | "Profit Mirage" Waterfall & 2D Heatmaps | `src/dashboard/components.py` | ❌ |
+| Day 14 (Aug 29) | Full IS vs OOS Backtest Matrix | Isolate parameter decay & cost friction | ✅ |
+| Day 15 (Aug 30) | **Unit 4 Redesign**: Deflated Sharpe Ratio (DSR) | `src/analytics/deflated_sharpe.py` | ✅ |
+| Day 16 (Aug 31) | **Unit 4 Redesign**: 2D Stability Surfaces | `src/analytics/validation.py` | ✅ |
+| Day 17 (Sep 01) | Streamlit Master Dashboard App | `src/dashboard/app.py` | ✅ |
+| Day 18 (Sep 02) | "Profit Mirage" Waterfall & 2D Heatmaps | `src/dashboard/components.py` | ✅ |
 | Day 19 (Sep 03) | Automated Experiment Matrix Logger | `experiments/experiment_log.csv` | ✅ |
-| Day 20 (Sep 04) | **🔄 CHECKPOINT 3 (Seminar 3 Milestone)** | 12-cell matrix complete, Unit 4 redesign demonstrated | ❌ |
+| Day 20 (Sep 04) | **🔄 CHECKPOINT 3 (Seminar 3 Milestone)** | 12-cell matrix complete, Unit 4 redesign demonstrated | ✅ |
 
 ---
 
