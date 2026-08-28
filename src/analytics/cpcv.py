@@ -17,14 +17,30 @@ class CPCV:
         blocks = np.array_split(indices, self.n_splits)
         test_combinations = list(combinations(range(self.n_splits), self.n_test_splits))
         paths = []
+        
+        embargo_size = int(timeline_length * self.embargo_pct)
+        
         for test_blocks in test_combinations:
-            train_idx = []
             test_idx = []
-            for i in range(self.n_splits):
-                if i in test_blocks:
-                    test_idx.extend(blocks[i])
-                else:
-                    train_idx.extend(blocks[i])
+            for i in test_blocks:
+                test_idx.extend(blocks[i])
+                
+            drop_indices = set(test_idx)
+            for i in test_blocks:
+                block = blocks[i]
+                if len(block) == 0:
+                    continue
+                start = block[0]
+                end = block[-1]
+                
+                # Remove embargo_size samples before the test block
+                for j in range(max(0, start - embargo_size), start):
+                    drop_indices.add(j)
+                # Remove embargo_size samples after the test block
+                for j in range(end + 1, min(timeline_length, end + 1 + embargo_size)):
+                    drop_indices.add(j)
+                    
+            train_idx = [idx for idx in indices if idx not in drop_indices]
             paths.append((np.array(train_idx), np.array(test_idx)))
         return paths
 
