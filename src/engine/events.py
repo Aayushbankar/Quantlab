@@ -29,9 +29,10 @@ class OrderEvent(Event):
     """Signals an order to be executed by the broker/exchange."""
     timestamp: datetime
     symbol: str
-    order_type: str # e.g., 'MKT' for Market
+    order_type: str # 'MKT' or 'LMT'
     side: str # 'BUY' or 'SELL'
     quantity: int
+    limit_price: float = 0.0
 
 @dataclass
 class FillEvent(Event):

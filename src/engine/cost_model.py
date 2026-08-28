@@ -4,14 +4,13 @@ class IndianCostModel:
     """
     Implements statutory Indian equity delivery costs and slippage.
     """
-    def __init__(self, apply_costs: bool = True, slippage_pct: float = 0.0005):
+    def __init__(self, apply_costs: bool = True, gamma: float = 0.1):
         self.apply_costs = apply_costs
-        self.slippage_pct = slippage_pct
+        self.gamma = gamma # Market impact calibration constant
 
-    def process_order(self, order: OrderEvent, raw_price: float) -> FillEvent:
+    def process_order(self, order: OrderEvent, raw_price: float, volatility: float = 0.02, adv: int = 1000000) -> FillEvent:
         """
-        Calculates slippage and applies statutory fees.
-        Returns a FillEvent with exact friction costs.
+        Calculates slippage using Almgren-Chriss Square Root Model and applies statutory fees.
         """
         if not self.apply_costs:
             return FillEvent(
@@ -20,11 +19,19 @@ class IndianCostModel:
                 commission=0, stt=0, stamp_duty=0, gst=0, turnover_fee=0, total_cost=0
             )
 
+        # Almgren-Chriss Square Root Impact Model
+        # dP = gamma * sigma * sqrt(Q / V)
+        q_v_ratio = order.quantity / max(adv, 1) # Prevent div by zero
+        market_impact_pct = self.gamma * volatility * (q_v_ratio ** 0.5)
+        
+        # Cap impact to prevent absurd prices in illiquid edge cases
+        market_impact_pct = min(market_impact_pct, 0.05) 
+
         # Apply slippage (worse execution price)
         if order.side == 'BUY':
-            fill_price = raw_price * (1 + self.slippage_pct)
+            fill_price = raw_price * (1 + market_impact_pct)
         else:
-            fill_price = raw_price * (1 - self.slippage_pct)
+            fill_price = raw_price * (1 - market_impact_pct)
             
         trade_value = fill_price * order.quantity
         

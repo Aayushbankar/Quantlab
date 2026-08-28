@@ -8,5 +8,7 @@ class Order:
     side: str # 'BUY' or 'SELL'
     quantity: int
     timestamp: datetime
+    order_type: str = 'MKT'
+    limit_price: float = 0.0
     price: float = 0.0 # Will be populated upon execution if MKT
     status: str = 'PENDING' # PENDING, FILLED, REJECTED
