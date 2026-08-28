@@ -1,0 +1,5 @@
+\chapter{Statistical Validation}
+\section{Combinatorial Purged Cross-Validation (CPCV)}
+Traditional $k$-fold cross-validation fails in finance due to serial correlation. We implement Combinatorial Purged Cross-Validation (CPCV), partitioning data into $N$ groups and combining them into training and testing sets, while mathematically purging overlapping observations to prevent data leakage.
+\section{Deflated Sharpe Ratio (DSR) and Overfitting}
+To quantify the probability of backtest overfitting (PBO), we utilize the Deflated Sharpe Ratio (DSR). Adjusting for the number of independent trials $N$, skewness $\gamma_3$, and kurtosis $\gamma_4$, the DSR computes the true statistical significance of the strategy's risk-adjusted return against a non-normal baseline expected maximum Sharpe ratio.
