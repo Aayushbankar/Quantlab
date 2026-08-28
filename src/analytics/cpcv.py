@@ -29,7 +29,49 @@ class CPCV:
         return paths
 
     def calculate_pbo(self, strategies_returns: pd.DataFrame) -> float:
-        # Evaluates the rank correlation between IS and OOS performance
-        # FIX: Previously returned a hardcoded mock value of 0.15 which could silently leak into reports.
-        # Now raises NotImplementedError to explicitly force proper implementation before use.
-        raise NotImplementedError("PBO calculation is not yet implemented.")
+        """
+        Calculates the Probability of Backtest Overfitting (PBO).
+        It evaluates the proportion of CPCV paths where the best in-sample strategy
+        underperforms the median strategy out-of-sample.
+        """
+        paths = self.generate_paths(len(strategies_returns))
+        if not paths:
+            return np.nan
+            
+        overfit_count = 0
+        valid_paths = 0
+        
+        for train_idx, test_idx in paths:
+            train_returns = strategies_returns.iloc[train_idx]
+            test_returns = strategies_returns.iloc[test_idx]
+            
+            # Avoid division by zero by adding a tiny epsilon if std is 0
+            train_std = train_returns.std()
+            train_std = train_std.replace(0, 1e-8)
+            sharpe_is = train_returns.mean() / train_std
+            
+            test_std = test_returns.std()
+            test_std = test_std.replace(0, 1e-8)
+            sharpe_oos = test_returns.mean() / test_std
+            
+            # Skip if NaN issues across all strategies
+            if sharpe_is.isna().all() or sharpe_oos.isna().all():
+                continue
+                
+            best_strat = sharpe_is.idxmax()
+            
+            oos_perf_of_best_is = sharpe_oos[best_strat]
+            median_oos_perf = sharpe_oos.median()
+            
+            if pd.isna(oos_perf_of_best_is) or pd.isna(median_oos_perf):
+                continue
+                
+            if oos_perf_of_best_is < median_oos_perf:
+                overfit_count += 1
+                
+            valid_paths += 1
+            
+        if valid_paths == 0:
+            return np.nan
+            
+        return overfit_count / valid_paths
