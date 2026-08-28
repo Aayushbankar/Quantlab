@@ -4,7 +4,7 @@ from src.engine.events import OrderEvent
 from src.engine.cost_model import IndianCostModel
 
 def test_indian_cost_model_buy():
-    model = IndianCostModel(apply_costs=True, slippage_pct=0.0005) # 0.05%
+    model = IndianCostModel(apply_costs=True, gamma=0.1)
     
     order = OrderEvent(
         timestamp=datetime(2023, 1, 1),
@@ -15,24 +15,26 @@ def test_indian_cost_model_buy():
     )
     
     raw_price = 1000.0
-    fill = model.process_order(order, raw_price)
+    # Simulate process_order with vol=0.02 and adv=1000000
+    fill = model.process_order(order, raw_price, volatility=0.02, adv=1000000)
     
-    # Fill price should be raw_price * (1 + 0.0005)
-    assert fill.fill_price == 1000.5
+    # impact_pct = 0.1 * 0.02 * sqrt(100/1000000) = 0.00002
+    # fill_price = 1000 * 1.00002 = 1000.02
+    assert fill.fill_price == pytest.approx(1000.02)
     
-    trade_value = 1000.5 * 100 # 100050.0
+    trade_value = 1000.02 * 100 # 100002.0
     
-    # Brokerage min(20, 100050 * 0.0003) = min(20, 30.015) = 20.0
+    # Brokerage min(20, 100002 * 0.0003) = 20.0
     assert fill.commission == 20.0
     
-    # STT: 100050 * 0.0010 = 100.05
-    assert fill.stt == 100.05
+    # STT: 100002 * 0.0010 = 100.002
+    assert fill.stt == pytest.approx(100.002)
     
-    # Stamp Duty: 100050 * 0.00015 = 15.0075
-    assert fill.stamp_duty == pytest.approx(15.0075)
+    # Stamp Duty: 100002 * 0.00015 = 15.0003
+    assert fill.stamp_duty == pytest.approx(15.0003)
     
-    # Turnover = 100050 * (0.0000345 + 0.000001) = 3.551775
-    assert fill.turnover_fee == pytest.approx(100050.0 * 0.0000355)
+    # Turnover = 100002 * 0.0000355
+    assert fill.turnover_fee == pytest.approx(100002.0 * 0.0000355)
     
-    # GST = (20 + 3.551775) * 0.18
-    assert fill.gst == pytest.approx((20.0 + (100050.0 * 0.0000355)) * 0.18)
+    # GST = (20 + Turnover) * 0.18
+    assert fill.gst == pytest.approx((20.0 + (100002.0 * 0.0000355)) * 0.18)
