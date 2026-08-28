@@ -107,7 +107,10 @@ class BacktestEngine:
             side = 'BUY' if signal.signal_type == 1 else 'SELL'
             
             if side == 'BUY':
-                current_equity = self.portfolio.cash
+                # FIX: Original code sized based on raw cash (self.portfolio.cash).
+                # This causes position sizing to artificially shrink as more capital is deployed.
+                # Correct sizing is 10% of total portfolio equity (cash + open positions MTM).
+                current_equity = self.portfolio.equity_history[-1]['total_equity'] if self.portfolio.equity_history else self.portfolio.cash
                 target_value = current_equity * 0.10
                 
                 df = sliced_data[signal.symbol]

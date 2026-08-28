@@ -24,9 +24,9 @@ def main():
     
     plt.figure(figsize=(12, 5))
     sns.heatmap(returns_matrix, annot=True, fmt=".2%", cmap="RdYlGn", center=0, xticklabels=months, yticklabels=years)
-    plt.title("Strategy Monthly Returns Heatmap (Cost-Adjusted)", fontsize=16, fontweight='bold')
+    plt.title("Strategy Monthly Returns Heatmap (Cost-Adjusted)\n(Illustrative, not derived from live backtest run)", fontsize=16, fontweight='bold')
     plt.tight_layout()
-    plt.savefig(os.path.join(charts_dir, 'monthly_heatmap.png'), dpi=300)
+    plt.savefig(os.path.join(charts_dir, 'monthly_heatmap_SIMULATED.png'), dpi=300)
     plt.close()
 
     # 2. Advanced Equity Curve with Drawdown (Underwater Plot)
@@ -41,17 +41,17 @@ def main():
     ax1.plot(cum_returns, color='blue', linewidth=2, label='Strategy Equity')
     ax1.plot(running_max, color='red', linestyle='--', alpha=0.6, label='High Water Mark')
     ax1.fill_between(range(days), cum_returns, running_max, color='red', alpha=0.1)
-    ax1.set_title("Cumulative Equity Curve & High Water Mark", fontsize=16, fontweight='bold')
+    ax1.set_title("Cumulative Equity Curve & High Water Mark\n(Illustrative, not derived from live backtest run)", fontsize=16, fontweight='bold')
     ax1.set_ylabel("Portfolio Multiplier", fontsize=12)
     ax1.legend(loc="upper left")
     
     ax2.fill_between(range(days), drawdown, 0, color='red', alpha=0.5)
-    ax2.set_title("Underwater Drawdown Plot", fontsize=14, fontweight='bold')
+    ax2.set_title("Underwater Drawdown Plot (Illustrative)", fontsize=14, fontweight='bold')
     ax2.set_ylabel("Drawdown %", fontsize=12)
     ax2.set_xlabel("Trading Days", fontsize=12)
     
     plt.tight_layout()
-    plt.savefig(os.path.join(charts_dir, 'advanced_equity_drawdown.png'), dpi=300)
+    plt.savefig(os.path.join(charts_dir, 'advanced_equity_drawdown_SIMULATED.png'), dpi=300)
     plt.close()
     
     # 3. Market Impact Visualization (Almgren-Chriss)

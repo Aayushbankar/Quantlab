@@ -70,12 +70,12 @@ def main():
         label = f"{row['strategy']} (Costs: {row['apply_costs']})"
         plt.plot(equity_curve, label=label)
         
-    plt.title('Simulated Equity Curve (1 Year)', fontsize=14)
+    plt.title('Simulated Equity Curve (1 Year)\n(Illustrative, not derived from live backtest run)', fontsize=14)
     plt.ylabel('Cumulative Return', fontsize=12)
     plt.xlabel('Days', fontsize=12)
     plt.legend(title='Scenarios', loc='upper left')
     plt.tight_layout()
-    plt.savefig(os.path.join(charts_dir, 'simulated_equity_curve.png'), dpi=300)
+    plt.savefig(os.path.join(charts_dir, 'simulated_equity_curve_SIMULATED.png'), dpi=300)
     plt.close()
 
     print(f"Charts successfully generated in {charts_dir}")

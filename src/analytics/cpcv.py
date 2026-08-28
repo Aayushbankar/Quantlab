@@ -30,4 +30,6 @@ class CPCV:
 
     def calculate_pbo(self, strategies_returns: pd.DataFrame) -> float:
         # Evaluates the rank correlation between IS and OOS performance
-        return 0.15 # Mock PBO
+        # FIX: Previously returned a hardcoded mock value of 0.15 which could silently leak into reports.
+        # Now raises NotImplementedError to explicitly force proper implementation before use.
+        raise NotImplementedError("PBO calculation is not yet implemented.")

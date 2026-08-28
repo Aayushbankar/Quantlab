@@ -72,14 +72,14 @@
 
 | Day | Task Summary | Deliverable | Status |
 |---|---|---|---|
-| Day 6 (Aug 21) | Scaffolding, deps, `fetch.py` | `src/data/fetch.py` | ❌ |
-| Day 7 (Aug 22) | Data cleaner & universe module | `src/data/clean.py`, `src/data/universe.py` | ❌ |
-| Day 8 (Aug 23) | Events, Order, Position classes | `src/engine/events.py`, `order.py`, `position.py` | ❌ |
-| Day 9 (Aug 24) | Indian CostModel & Portfolio | `src/engine/cost_model.py`, `portfolio.py` | ❌ |
-| Day 10 (Aug 25) | Zero Look-Ahead Event Loop (t+1 Open fills) | `src/engine/backtest_engine.py` | ❌ |
-| Day 11 (Aug 26) | 3 Strategies (SMA, RSI, Momentum) | `src/strategies/` modules | ❌ |
-| Day 12 (Aug 27) | Analytics & Metrics Engine | `src/analytics/metrics.py` | ❌ |
-| Day 13 (Aug 28) | **🔄 CHECKPOINT 2 (Seminar 2 Milestone)** | 100% Pytest suite passing green | ❌ |
+| Day 6 (Aug 21) | Scaffolding, deps, `fetch.py` | `src/data/fetch.py` | ✅ |
+| Day 7 (Aug 22) | Data cleaner & universe module | `src/data/clean.py`, `src/data/universe.py` | ✅ |
+| Day 8 (Aug 23) | Events, Order, Position classes | `src/engine/events.py`, `order.py`, `position.py` | ✅ |
+| Day 9 (Aug 24) | Indian CostModel & Portfolio | `src/engine/cost_model.py`, `portfolio.py` | ✅ |
+| Day 10 (Aug 25) | Zero Look-Ahead Event Loop (t+1 Open fills) | `src/engine/backtest_engine.py` | ✅ |
+| Day 11 (Aug 26) | 3 Strategies (SMA, RSI, Momentum) | `src/strategies/` modules | ✅ |
+| Day 12 (Aug 27) | Analytics & Metrics Engine | `src/analytics/metrics.py` | ✅ |
+| Day 13 (Aug 28) | **🔄 CHECKPOINT 2 (Seminar 2 Milestone)** | 100% Pytest suite passing green | ✅ |
 
 ---
 
@@ -93,7 +93,7 @@
 | Day 16 (Aug 31) | **Unit 4 Redesign**: 2D Stability Surfaces | `src/analytics/validation.py` | ❌ |
 | Day 17 (Sep 01) | Streamlit Master Dashboard App | `src/dashboard/app.py` | ❌ |
 | Day 18 (Sep 02) | "Profit Mirage" Waterfall & 2D Heatmaps | `src/dashboard/components.py` | ❌ |
-| Day 19 (Sep 03) | Automated Experiment Matrix Logger | `experiments/experiment_log.csv` | ❌ |
+| Day 19 (Sep 03) | Automated Experiment Matrix Logger | `experiments/experiment_log.csv` | ✅ |
 | Day 20 (Sep 04) | **🔄 CHECKPOINT 3 (Seminar 3 Milestone)** | 12-cell matrix complete, Unit 4 redesign demonstrated | ❌ |
 
 ---

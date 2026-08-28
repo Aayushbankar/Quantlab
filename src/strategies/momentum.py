@@ -29,7 +29,10 @@ class MomentumStrategy(Strategy):
             roc = (price_today - price_n_days_ago) / price_n_days_ago
             
             if roc > self.threshold_pct:
-                signals.append(SignalEvent(timestamp=current_date, symbol=symbol, signal_type=1))
+                # FIX: Previous code emitted a BUY signal every day ROC stayed above threshold.
+                # Added guard to only buy if there is no existing open position for this symbol.
+                if symbol not in positions or positions[symbol].quantity == 0:
+                    signals.append(SignalEvent(timestamp=current_date, symbol=symbol, signal_type=1))
             elif roc < 0:
                 if symbol in positions and positions[symbol].quantity > 0:
                     signals.append(SignalEvent(timestamp=current_date, symbol=symbol, signal_type=-1))

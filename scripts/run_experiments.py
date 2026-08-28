@@ -11,11 +11,11 @@ from src.analytics.metrics import MetricsEngine
 def main():
     print("Running automated experiments matrix...")
     
-    # Minimal data for test
-    symbols = get_universe()[:2]
+    # Full 10-symbol universe
+    symbols = get_universe()
     data_dict = {}
     for sym in symbols:
-        df = fetch_stock_data(sym, "2023-01-01", "2024-01-01")
+        df = fetch_stock_data(sym, "2022-01-01", "2024-01-01") # Get a good amount of data
         if df is not None:
             data_dict[sym] = clean_data(df)
             
@@ -28,26 +28,38 @@ def main():
     
     results = []
     
+    from src.strategies.rsi_mean_reversion import RSIMeanReversionStrategy
+    from src.strategies.momentum import MomentumStrategy
+    
+    strategies_to_test = [
+        ("SMACrossover(20,50)", SMACrossoverStrategy(20, 50)),
+        ("RSIMeanReversion(14,30,70)", RSIMeanReversionStrategy(14, 30, 70)),
+        ("Momentum(20)", MomentumStrategy(20, 0.05))
+    ]
+    
     # Run matrix
-    for apply_costs in [False, True]:
-        strategy = SMACrossoverStrategy(20, 50)
-        engine = BacktestEngine(data_dict, strategy, apply_costs=apply_costs)
-        equity_history = engine.run()
-        
-        metrics = MetricsEngine(equity_history).compute_all()
-        
-        res = {
-            "run_id": datetime.now().strftime("%Y%m%d%H%M%S") + f"_{apply_costs}",
-            "strategy": "SMACrossover(20,50)",
-            "universe": ",".join(symbols),
-            "date_range": "2023-2024",
-            "apply_costs": apply_costs,
-            "cagr": metrics.get("CAGR", 0),
-            "sharpe": metrics.get("Sharpe Ratio", 0)
-        }
-        results.append(res)
+    for strategy_name, strategy_instance in strategies_to_test:
+        for apply_costs in [False, True]:
+            print(f"Running {strategy_name} (Costs: {apply_costs})...")
+            engine = BacktestEngine(data_dict, strategy_instance, apply_costs=apply_costs)
+            equity_history = engine.run()
+            
+            metrics = MetricsEngine(equity_history).compute_all()
+            
+            res = {
+                "run_id": datetime.now().strftime("%Y%m%d%H%M%S") + f"_{apply_costs}_{strategy_name}",
+                "strategy": strategy_name,
+                "universe": "10-Symbol-Universe",
+                "date_range": "2022-2024",
+                "apply_costs": apply_costs,
+                "cagr": metrics.get("CAGR", 0),
+                "sharpe": metrics.get("Sharpe Ratio", 0)
+            }
+            results.append(res)
         
     df_res = pd.DataFrame(results)
+    
+    # If the file exists, we could append, but a full matrix run should just overwrite or append
     df_res.to_csv(log_file, index=False)
     print(f"Saved experiment log to {log_file}")
 
