@@ -26,7 +26,7 @@ def test_engine_zero_look_ahead():
         })
     }
     
-    engine = BacktestEngine(data, DummyStrategy(), initial_cash=1000.0, apply_costs=False)
+    engine = BacktestEngine(data, DummyStrategy(), initial_cash=10000.0, apply_costs=False)
     
     # Run backtest
     equity_history = engine.run()

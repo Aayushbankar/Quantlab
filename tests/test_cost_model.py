@@ -29,10 +29,10 @@ def test_indian_cost_model_buy():
     assert fill.stt == 100.05
     
     # Stamp Duty: 100050 * 0.00015 = 15.0075
-    assert fill.stamp_duty == 15.0075
+    assert fill.stamp_duty == pytest.approx(15.0075)
     
-    # Turnover = 100050 * 0.0000307 = 3.0715
-    assert fill.turnover_fee == 100050.0 * 0.0000307
+    # Turnover = 100050 * (0.0000345 + 0.000001) = 3.551775
+    assert fill.turnover_fee == pytest.approx(100050.0 * 0.0000355)
     
-    # GST = (20 + 3.0715) * 0.18 = 4.15287
-    assert fill.gst == pytest.approx((20.0 + (100050.0 * 0.0000307)) * 0.18)
+    # GST = (20 + 3.551775) * 0.18
+    assert fill.gst == pytest.approx((20.0 + (100050.0 * 0.0000355)) * 0.18)
