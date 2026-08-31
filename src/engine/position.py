@@ -10,20 +10,19 @@ class Position:
         """Updates the position based on a filled order."""
         if side == 'BUY':
             if self.quantity >= 0:
-                # Adding to long position
-                total_cost_basis = (self.quantity * self.average_entry_price) + (quantity * fill_price) + total_cost
+                # Adding to long position (clean execution cost basis)
+                total_cost_basis = (self.quantity * self.average_entry_price) + (quantity * fill_price)
                 self.quantity += quantity
                 self.average_entry_price = total_cost_basis / self.quantity
             else:
-                # Covering a short (Out of scope for this project, but handled for completeness)
-                pass # Simplified for long-only mostly
+                pass # Long-only engine
         elif side == 'SELL':
             if self.quantity > 0:
                 # Closing long position
                 close_qty = min(self.quantity, quantity)
-                pnl = (fill_price - self.average_entry_price) * close_qty
-                self.realized_pnl += pnl - total_cost
-                self.quantity -= quantity
+                gross_pnl = (fill_price - self.average_entry_price) * close_qty
+                self.realized_pnl += gross_pnl - total_cost
+                self.quantity = max(0, self.quantity - quantity)
                 if self.quantity == 0:
                     self.average_entry_price = 0.0
 

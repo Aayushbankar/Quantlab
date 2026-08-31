@@ -92,7 +92,7 @@ QuantLab acknowledges this constraint: our universe comprises 10 mega-cap Indian
 In emerging markets such as India, statutory taxes (Securities Transaction Tax, Stamp Duty, GST) represent a significant, non-negotiable friction [Ministry of Finance, 2020].
 
 #### Mathematical Friction Model
-$$\text{Friction}_{\text{round-trip}} = \text{STT}_{\text{buy+sell}} (0.20\%) + \text{StampDuty}_{\text{buy}} (0.015\%) + \text{Exch+SEBI} (0.0031\%) + \text{GST} (18\%) + \text{Slippage}_{\text{buy+sell}} (0.10\%)$$
+$$\text{Friction}_{\text{round-trip}} = \text{STT}_{\text{buy+sell}} (0.20\%) + \text{StampDuty}_{\text{buy}} (0.015\%) + \text{Exch+SEBI} (0.00307\%) + \text{GST}_{18\% \text{ on (Brokerage+Levies)}} (\approx 0.0045\%) + \text{Slippage}_{\text{buy+sell}} (0.10\%)$$
 $$\text{Total Round-Trip Friction} \approx 0.32\% - 0.38\% \text{ of trade value}$$
 
 ---

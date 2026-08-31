@@ -27,14 +27,14 @@ def test_indian_cost_model_buy():
     # Brokerage min(20, 100002 * 0.0003) = 20.0
     assert fill.commission == 20.0
     
-    # STT: 100002 * 0.0010 = 100.002
-    assert fill.stt == pytest.approx(100.002)
+    # STT: 100002 * 0.0010 = 100.002 -> rounded to 100.0
+    assert fill.stt == 100.0
     
     # Stamp Duty: 100002 * 0.00015 = 15.0003
     assert fill.stamp_duty == pytest.approx(15.0003)
     
-    # Turnover = 100002 * 0.0000355
-    assert fill.turnover_fee == pytest.approx(100002.0 * 0.0000355)
+    # Turnover = 100002 * 0.0000307 (0.00297% NSE + 0.0001% SEBI)
+    assert fill.turnover_fee == pytest.approx(100002.0 * 0.0000307)
     
     # GST = (20 + Turnover) * 0.18
-    assert fill.gst == pytest.approx((20.0 + (100002.0 * 0.0000355)) * 0.18)
+    assert fill.gst == pytest.approx((20.0 + (100002.0 * 0.0000307)) * 0.18)

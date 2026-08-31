@@ -26,15 +26,18 @@ def deflated_sharpe_ratio(observed_sr: float, returns: pd.Series, N_trials: int)
     sk = skew(returns)
     ku = kurtosis(returns, fisher=False) # standard kurtosis (normal=3)
     
-    # Calculate Variance of Sharpe Ratio
+    # Calculate Variance of Sharpe Ratio in annualized units
     n = len(returns)
-    var_sr = (1 - sk * observed_sr + ((ku - 1) / 4) * (observed_sr ** 2)) / n
+    # Convert annualized Sharpe to daily Sharpe for moment adjustment
+    sr_daily = observed_sr / np.sqrt(252.0)
+    var_sr_daily = (1.0 - sk * sr_daily + ((ku - 1.0) / 4.0) * (sr_daily ** 2)) / n
+    var_sr_annual = var_sr_daily * 252.0
     
-    # Expected Max Sharpe
-    ems = expected_max_sharpe(N_trials, var_sr)
+    # Expected Max Sharpe in annualized units
+    ems_annual = expected_max_sharpe(N_trials, var_sr_annual, benchmark_sr=0.0)
     
     # Calculate DSR Z-score
-    dsr_z = (observed_sr - ems) / np.sqrt(var_sr)
+    dsr_z = (observed_sr - ems_annual) / np.sqrt(var_sr_annual)
     
     # Return p-value
-    return norm.cdf(dsr_z)
+    return float(norm.cdf(dsr_z))

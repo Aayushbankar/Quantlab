@@ -38,14 +38,14 @@ class IndianCostModel:
         # 1. Brokerage: min(20, 0.03% of trade value)
         brokerage = min(20.00, trade_value * 0.0003)
         
-        # 2. STT: 0.1% on both Buy & Sell (Delivery)
-        stt = trade_value * 0.0010
+        # 2. STT: 0.1% on both Buy & Sell (Delivery) - CBDT Rule 5 round to nearest integer
+        stt = float(round(trade_value * 0.0010))
         
         # 3. Stamp Duty: 0.015% (Buy only)
         stamp_duty = (trade_value * 0.00015) if order.side == 'BUY' else 0.0
         
-        # 4. NSE Turnover Fee: 0.00345%
-        nse_turnover = trade_value * 0.0000345
+        # 4. NSE Turnover Fee: 0.00297% (SEBI True-to-Label w.e.f. Oct 2024) + SEBI fee 0.0001%
+        nse_turnover = trade_value * 0.0000297
         sebi_turnover = trade_value * 0.000001
         total_turnover = nse_turnover + sebi_turnover
         

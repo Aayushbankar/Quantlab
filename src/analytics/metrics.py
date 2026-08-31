@@ -57,10 +57,11 @@ class MetricsEngine:
         
     def _sortino_ratio(self, returns: pd.Series) -> float:
         excess_returns = returns - (self.rf / 252.0)
-        downside = excess_returns[excess_returns < 0]
-        std_downside = downside.std()
-        if std_downside == 0 or pd.isna(std_downside): return 0.0
-        return (excess_returns.mean() / std_downside) * np.sqrt(252)
+        # Measure downside semi-deviation across all T trading days per Sortino & Price (1994)
+        downside_deviations = np.minimum(0.0, excess_returns)
+        downside_dev = np.sqrt(np.mean(downside_deviations ** 2))
+        if downside_dev == 0.0 or pd.isna(downside_dev): return 0.0
+        return float((excess_returns.mean() / downside_dev) * np.sqrt(252))
         
     def _calmar_ratio(self) -> float:
         mdd = abs(self._max_drawdown())

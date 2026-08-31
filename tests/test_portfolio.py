@@ -28,4 +28,4 @@ def test_portfolio_cash_flow():
     
     pos = portfolio.positions["TCS.NS"]
     assert pos.quantity == 10
-    assert pos.average_entry_price == 3005.0 # (30000 + 50) / 10
+    assert pos.average_entry_price == 3000.0
