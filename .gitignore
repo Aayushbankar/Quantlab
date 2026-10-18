@@ -18,3 +18,17 @@ frontend/src-tauri/target/
 .env.local
 *.pem
 
+
+# Real engine output — bulk, regenerate via scripts/run_experiments.py
+experiments/equity_curves/
+
+# LaTeX build artifacts (keep the .tex and the .pdf)
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.synctex.gz
+*.fls
+*.fdb_latexmk
