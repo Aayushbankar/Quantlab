@@ -33,7 +33,7 @@ Legend: **PRM-VER** verification · **PRM-EXP** experiment · **PRM-GATE** gate 
 |---|---|---|---|---|---|---|
 | PRM-VER-001 | 2026-10-16 | `src/` is ~1,008 LOC across 18 Python modules | `src/**` | STATIC (source audit) | full source read | **VERIFIED** |
 | PRM-VER-002 | 2026-10-16 | 4-layer decoupled architecture: Dashboard → Analytics → Engine → Data/Strategies | `src/dashboard`, `src/analytics`, `src/engine`, `src/data` | STATIC (source audit) | source read | **VERIFIED** |
-| PRM-VER-003 | 2026-10-16 | pytest suite = **9 tests / 9 passed** at baseline, branch `feat/v2-architecture` | `tests/` (6 files) | STATIC (prior audit, `GTU_MINOR_PROJECT_REVIEW.md:215`) | `GTU_MINOR_PROJECT_REVIEW.md` §9 | **INCONCLUSIVE** — independent re-run pending, scheduled as PRM-EXP-001 |
+| PRM-VER-003 | 2026-10-19 | pytest suite = **9 tests / 9 passed** at baseline; **independently re-run this cycle**, then expanded to 35 | `tests/` | RUNTIME (pytest) | `9 passed in 1.63s` (baseline) · `35 passed in 5.49s` (final) | **VERIFIED** — baseline confirmed by direct re-run |
 | PRM-VER-004 | 2026-10-16 | `scipy` is imported by `deflated_sharpe.py:3` but **absent** from `requirements.txt` → fresh-clone install breaks DSR/CPCV | `src/analytics/deflated_sharpe.py:3` · `requirements.txt:1-7` | STATIC (source audit) | both files read | **VERIFIED** — release blocker, fix = PRM-EXP-002 |
 | PRM-VER-005 | 2026-10-16 | `experiments/` and `data/raw/` are **empty on disk** — no real-data run artifact exists despite being the central result claim | `experiments/`, `data/raw/` | STATIC (filesystem) | directory listing | **VERIFIED (Negative Result)** — fix = PRM-EXP-003 |
 | PRM-VER-006 | 2026-10-16 | Git history = **29 commits, single author** (`aayushbankar`) for a two-person team; `origin/meet` empty/unmerged | git shortlog | STATIC (git audit) | `GTU_MINOR_PROJECT_REVIEW.md:31` | **VERIFIED** — team-evidence risk PR-01 |
@@ -110,3 +110,43 @@ Legend: **PRM-VER** verification · **PRM-EXP** experiment · **PRM-GATE** gate 
 | PRM-VER-003 | pytest 9/9 never independently re-run this branch | PRM-EXP-001 |
 | PRM-VER-032 | no real 2019–2024 dataset or log on disk | PRM-EXP-003 |
 | PRM-VER-038/039 | two documented contradictions in the report | PRM-EXP-002 |
+
+---
+
+## §6 Ralph Cycle — Verification Records (2026-10-19)
+
+| Verification ID | Date & Timestamp (UTC) | Claim / Fact Description | Target | Verification Method | Raw Evidence | Status |
+|---|---|---|---|---|---|---|
+| PRM-VER-060 | 2026-10-19 | `scipy` absent from `requirements.txt` **and** from the venv → `deflated_sharpe.py` unimportable; **no test imported the module**, so the defect was invisible | `src/analytics/deflated_sharpe.py:3`, `requirements.txt` | RUNTIME (import) | `ModuleNotFoundError: No module named 'scipy'` | **VERIFIED** — resolved R02 |
+| PRM-VER-061 | 2026-10-19 | After pinning `scipy==1.17.1` (numpy held at 1.26.4), the DSR import path and its statistics are covered by 7 tests | `tests/test_deflated_sharpe.py` | RUNTIME (pytest) | `35 passed in 5.49s` | **VERIFIED** |
+| PRM-VER-062 | 2026-10-19 | Test suite baseline 9/9 → **35 passed** after adding SMA, RSI, data, DSR and determinism coverage | `tests/` | RUNTIME (pytest) | `35 passed in 5.49s` | **VERIFIED** |
+| PRM-VER-063 | 2026-10-19 | RSI all-gains bug reproduced and fixed: `rs=0` → RSI 0; now saturates at 100; guarded by 5 tests incl. an end-to-end rising-market assertion | `src/strategies/rsi_mean_reversion.py` | RUNTIME (pytest) | `tests/test_rsi.py` 5 passed | **VERIFIED** |
+| PRM-VER-064 | 2026-10-19 | Duplicate-date bug in `clean_data` found by a newly written test, then fixed (dedupe after NaN-drop so complete rows win) | `src/data/clean.py` | RUNTIME (pytest) | `test_clean_rejects_duplicate_dates` fails before fix, passes after | **VERIFIED** |
+| PRM-VER-065 | 2026-10-19 | Determinism holds: two independent runs produce a byte-identical equity curve (SHA-256 of serialised equity equal) | `tests/test_determinism.py` | RUNTIME (pytest) + digest compare | 3 passed | **VERIFIED** — NFR-1 satisfied |
+| PRM-VER-066 | 2026-10-19 | Real-data matrix executed: 10 symbols, 1480 bars each, 2019-01-01…2024-12-30, 30 runs, costs on/off × {full, IS, OOS} | `experiments/experiment_log.csv` | RUNTIME (engine) | 30 rows; log + `oos_decay.csv` + `PROVENANCE.json` + `pbo.json` | **VERIFIED** |
+| PRM-VER-067 | 2026-10-19 | **Buy-and-hold benchmark Sharpe 0.746 (CAGR 19.07%) beat every active strategy**; best active SMA(10,30) at 0.685; 0 of 4 active beat it | `experiments/experiment_log.csv` | RUNTIME (engine) | full-period table | **VERIFIED (Negative Result)** — central finding |
+| PRM-VER-068 | 2026-10-19 | Cost stack removes 48.2% of momentum Sharpe (0.359→0.186) and ₹12,995 of terminal equity on ₹1,00,000 | `experiments/experiment_log.csv` | RUNTIME (engine) | full-period rows | **VERIFIED** — the Profit Mirage |
+| PRM-VER-069 | 2026-10-19 | CPCV PBO = **64.29%** (8 splits, 2 test, 1% embargo, 5 configurations, real returns) | `experiments/pbo.json` | RUNTIME (engine) | pbo.json | **VERIFIED** |
+| PRM-VER-070 | 2026-10-19 | Momentum Sharpe decays 52.0% IS→OOS with costs on | `experiments/oos_decay.csv` | RUNTIME (engine) | decay table | **VERIFIED** |
+| PRM-VER-071 | 2026-10-19 | Fabricated chart pipeline removed: `generate_advanced_charts.py`, `generate_report_charts.py`, `build_report.py` deleted; `np.random` no longer produces any chart data | `scripts/`, `docs/charts/` | STATIC (grep) | `grep -rn "np.random" scripts/` → only prose comments | **VERIFIED** |
+| PRM-VER-072 | 2026-10-19 | All remaining charts derive from `experiments/` only: `equity_curves_real.png` (312 KB), `oos_decay.png`, `profit_mirage.png` from real runs; `market_impact_curve.png` explicitly stamped as an analytic model | `scripts/generate_real_charts.py` | STATIC + RUNTIME (regenerate) | charts present with parameter stamps | **VERIFIED** |
+| PRM-VER-073 | 2026-10-19 | Report compiles with `pdflatex`, 0 errors, 0 undefined references, 40 pages, all department-format front matter and Ch.1–5 present | `docs/Pramaan_Report.pdf` | RUNTIME (build) | `Output written on Pramaan_Report.pdf (40 pages)` · `pdftotext` confirms each required section | **VERIFIED** |
+| PRM-VER-074 | 2026-10-19 | Two per-member PDFs, 40 pages each, body byte-identical from page 2 (50,562 chars), deposit line and roles correct | `docs/Pramaan_Report_{Aayush_Avinash_Bankar,Meet_Jayeshbhai_Patel}.pdf` | RUNTIME (build) + text diff | page counts equal; extracted bodies equal | **VERIFIED** |
+| PRM-VER-075 | 2026-10-19 | PPTX: exactly 10 slides, no empty slides, no placeholder text, zero shapes overflowing the canvas | `Pramaan_Presentation.pptx` | RUNTIME (python-pptx inspection) | enumeration output | **VERIFIED** |
+| PRM-VER-076 | 2026-10-19 | All slide figures are read from the experiment artifacts at generation time — the deck cannot drift from the data | `scripts/build_presentation.py` | STATIC (source audit) | script consumes log + decay CSVs | **VERIFIED** |
+| PRM-VER-077 | 2026-10-19 | NSE turnover reconciled to 0.00297% across code, Thesis.tex, market copy and domain deep-dive — zero un-reconciled `0.00345` remain in deliverable paths | `src/engine/cost_model.py:48`, `docs/`, `scripts/` | STATIC (grep) | `grep -rn "0.00345"` → 0 in deliverable paths | **VERIFIED** — C-01 closed |
+| PRM-VER-078 | 2026-10-19 | `risk_free_rate` default corrected 0.05 → 0.06 to match the mathematical specification | `src/analytics/metrics.py:7` | STATIC + RUNTIME (tests) | 35 passed | **VERIFIED** — C-03 closed |
+
+## Ralph Cycle Retractions
+
+| PRM-VER ID | Date Retracted | Reason |
+|---|---|---|
+| _R-001_ | 2026-10-19 | **Retracted:** "the submitted cost-degradation charts are derived from real backtest runs." Retracted by PRM-VER-030/031 and now fully superseded by PRM-VER-071/072 — the synthetic pipeline is deleted and every surviving chart is generated from `experiments/` with a parameter stamp. |
+
+## Evolution Notes (Ralph cycle)
+
+| EVO ID | Date | Note |
+|---|---|---|
+| EVO-002 | 2026-10-19 | **The most consequential finding of the cycle:** the flagship statistic (DSR) was silently non-functional in the reproduction environment — `scipy` missing from both `requirements.txt` and the venv, and **no test imported it**. A clean-install reviewer would have hit an `ImportError` on the project's headline feature. Lesson recorded: an untested import is a broken import. |
+| EVO-003 | 2026-10-19 | The results are **against the project's own premise** — 0 of 4 strategies beat a passive benchmark. Reported as the central finding rather than reframed, per the steering rule that negative results are logged loudly. |
+| EVO-004 | 2026-10-19 | Requirement pins were drifted from reality (`yfinance==0.2.37` vs 1.7.0 installed). Corrected to the versions actually verified; `python-pptx` added for the presentation build. |
