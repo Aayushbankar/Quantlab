@@ -4,7 +4,7 @@ import numpy as np
 class MetricsEngine:
     """Calculates performance metrics from equity history."""
     
-    def __init__(self, equity_history: pd.DataFrame, risk_free_rate: float = 0.05):
+    def __init__(self, equity_history: pd.DataFrame, risk_free_rate: float = 0.06):
         self.history = equity_history.copy()
         self.rf = risk_free_rate
         

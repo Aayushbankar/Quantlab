@@ -16,12 +16,12 @@ class RSIMeanReversionStrategy(Strategy):
         self.oversold = oversold
         self.overbought = overbought
 
-    def _calculate_rsi(self, closes: np.ndarray) -> float:
+    def _calculate_rsi(self, closes: np.ndarray):
         deltas = np.diff(closes)
         seed = deltas[:self.period]
         up = seed[seed >= 0].sum()/self.period
         down = -seed[seed < 0].sum()/self.period
-        rs = up/down if down != 0 else 0
+        rs = self._relative_strength(up, down)
         rsi = np.zeros_like(closes)
         rsi[:self.period] = 100. - 100./(1. + rs)
 
@@ -36,9 +36,19 @@ class RSIMeanReversionStrategy(Strategy):
 
             up = (up*(self.period - 1) + upval)/self.period
             down = (down*(self.period - 1) + downval)/self.period
-            rs = up/down if down != 0 else 0
+            rs = self._relative_strength(up, down)
             rsi[i] = 100. - 100./(1. + rs)
         return rsi[-1], rsi[-2]
+
+    @staticmethod
+    def _relative_strength(up: float, down: float) -> float:
+        if down > 0:
+            return up / down
+        if up > 0:
+            # All gains: RSI must saturate at 100, not collapse to 0
+            return float('inf')
+        # No price movement: neutral convention
+        return 1.0
 
     def generate_signals(self, current_date: datetime, data: Dict[str, pd.DataFrame], positions: Dict) -> List[SignalEvent]:
         signals = []

@@ -77,7 +77,7 @@ graph TD
 ### 4.1 Killer #1: Transaction Cost Blindness & Market Microstructure Friction
 Most retail tools simulate trading under **zero-friction assumptions**. In reality, Indian equity delivery transactions are subject to:
 1. **Statutory Taxes**: Securities Transaction Tax (STT, 0.10% on buy and sell), Stamp Duty (0.015% on buy), and Goods & Services Tax (GST, 18% on fees) [Ministry of Finance, 2020].
-2. **Exchange & Regulatory Levies**: NSE exchange turnover charges (~0.00297% - 0.00345%), SEBI turnover fees (0.0001%), and broker commissions.
+2. **Exchange & Regulatory Levies**: NSE exchange turnover charges (~0.00297%), SEBI turnover fees (0.0001%), and broker commissions.
 3. **Execution Slippage**: Bid-ask spread crossing and latency delays ($\sim 0.05\% - 0.15\%$) [Kissell & Glantz, 2003].
 
 A high-turnover strategy (e.g., daily momentum) trading 80–100 times a year faces an aggregate friction drag of $100 \times 0.35\% = 35.0\%$ per year, instantly turning an apparent $+25\%$ gain into a $-10\%$ loss.
