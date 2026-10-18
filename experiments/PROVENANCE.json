@@ -1,0 +1,37 @@
+{
+  "generated_utc": "2026-10-18T19:07:50Z",
+  "data_source": "yfinance (Yahoo Finance) alpha-vantage free API",
+  "fetch_window": "2019-01-01..2024-12-31",
+  "universe_size": 10,
+  "universe": [
+    "BHARTIARTL.NS",
+    "HDFCBANK.NS",
+    "HINDUNILVR.NS",
+    "ICICIBANK.NS",
+    "INFY.NS",
+    "ITC.NS",
+    "LT.NS",
+    "RELIANCE.NS",
+    "SBIN.NS",
+    "TCS.NS"
+  ],
+  "bar_interval": "1d",
+  "adjustment": "yfinance auto-adjusted close",
+  "initial_capital": 100000.0,
+  "position_size_fraction": 0.1,
+  "cost_model_version": "1.0-indian-delivery-2024",
+  "gamma": 0.1,
+  "n_runs": 30,
+  "pbo": {
+    "pbo": 0.6428571428571429,
+    "n_strategies": 5,
+    "n_splits": 8,
+    "n_test_splits": 2,
+    "embargo_pct": 0.01,
+    "cost_model_version": "1.0-indian-delivery-2024",
+    "interpretation": "PBO is the probability that the strategy which ranks best in-sample falls to or below the median out-of-sample."
+  },
+  "numpy": "1.26.4",
+  "pandas": "2.2.2",
+  "python": "3.11.16"
+}

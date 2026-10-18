@@ -1,0 +1,9 @@
+{
+  "pbo": 0.6428571428571429,
+  "n_strategies": 5,
+  "n_splits": 8,
+  "n_test_splits": 2,
+  "embargo_pct": 0.01,
+  "cost_model_version": "1.0-indian-delivery-2024",
+  "interpretation": "PBO is the probability that the strategy which ranks best in-sample falls to or below the median out-of-sample."
+}
