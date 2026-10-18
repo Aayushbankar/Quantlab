@@ -556,8 +556,8 @@ headlessly with no streaming or web framework present.
                  text centered, draw=gtured, fill=red!8, font=\small, line width=1.2pt},
     lab/.style={font=\footnotesize\itshape}
 ]
-    \node (ui)   [box, fill=blue!12] {\textbf{Presentation} \quad Next.js web UI $\cdot$ Streamlit fallback $\cdot$ CLI};
-    \node (api)  [box] {\textbf{API} \quad FastAPI REST endpoints $\cdot$ request validation $\cdot$ run persistence};
+    \node (ui)   [box, fill=blue!12] {\textbf{Presentation} \quad Streamlit fallback $\cdot$ CLI \quad (Next.js web UI: planned)};
+    \node (api)  [box] {\textbf{API (planned, FR-15)} \quad FastAPI REST endpoints $\cdot$ request validation $\cdot$ run persistence};
     \node (an)   [box] {\textbf{Analytics} \quad metrics $\cdot$ Deflated Sharpe $\cdot$ CPCV + embargo $\cdot$ grid search};
     \node (eng)  [core] {\textbf{Engine (the contribution)} \quad BacktestEngine $\cdot$ Portfolio $\cdot$ Position $\cdot$ IndianCostModel};
     \node (strat)[box] {\textbf{Strategy} \quad SMA $\cdot$ RSI $\cdot$ Momentum $\cdot$ BuyAndHold};
@@ -804,7 +804,7 @@ one, and it is treated as a first-class requirement:
 \texttt{src/data/clean.py} & Validation, NaN-drop, de-duplication, ordering. \\
 \texttt{src/data/universe.py} & Symbol universe and benchmark. \\
 \texttt{src/strategies/*.py} & SMA, RSI, momentum, buy-and-hold behind one interface. \\
-\texttt{src/api/} & REST surface over the engine. \\
+\texttt{src/dashboard/} & Streamlit demonstration surface (the legacy fallback UI). \\
 \texttt{scripts/run\_experiments.py} & Real-data matrix producing the results artifact. \\
 \texttt{scripts/generate\_real\_charts.py} & Charts rendered from engine output only. \\
 \bottomrule
@@ -1158,8 +1158,13 @@ The engine is delivered as a reproducible artifact set rather than only as a
 demonstration:
 
 \begin{itemize}[leftmargin=1.5cm]
-    \item A REST API exposes the engine, with a documented request contract, so
-    results are reproducible from a single HTTP call.
+    \item The engine runs headlessly with no web framework present; every result
+    is reproducible from the committed artifacts with the two commands in
+    Appendix~\ref{app:repro}. The current demonstration surfaces are the command
+    line and the Streamlit fallback UI. A REST surface over the engine (FR-15),
+    a Next.js web client, and desktop packaging are specified in the plan and
+    deliberately deferred --- they are productisation work, not part of the
+    validated result set presented here.
     \item The results artifact (log, decay table, provenance, PBO record) is
     version-controlled, so a reported figure can be re-derived.
     \item Charts are generated from engine output only, and each carries a
@@ -1278,7 +1283,7 @@ BHARTIARTL.NS & Telecom & \\
 \end{tabular}
 \end{center}
 
-\chapter{Reproducibility Record}
+\chapter{Reproducibility Record}\label{app:repro}
 
 To regenerate every figure and table in this report:
 
@@ -1307,7 +1312,7 @@ than a run artifact, it is stated on the figure.
 \texttt{src/analytics/} & Metrics, DSR, CPCV, parameter search \\
 \texttt{src/strategies/} & Strategy implementations + benchmark \\
 \texttt{src/data/} & Fetch, clean, universe \\
-\texttt{src/api/} & REST interface \\
+\texttt{src/dashboard/} & Streamlit fallback UI \\
 \texttt{tests/} & 35 automated tests \\
 \texttt{experiments/} & Run log, decay table, provenance, PBO \\
 \texttt{docs/charts/} & Charts rendered from real engine output \\

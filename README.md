@@ -2,11 +2,11 @@
 
 > **"Prove your edge before you deploy a rupee."**
 
-Pramaan is the honest backtesting engine for Indian equities. It runs event-driven simulations under **zero look-ahead T+1 execution**, deducts the **full statutory Indian cost stack** to the paisa, and reports **overfitting diagnostics** (Deflated Sharpe Ratio, Combinatorial Purged Cross-Validation) — so you never mistake a paper illusion for a real edge.
+Pramaan is an honest backtesting engine for Indian equities. It runs event-driven simulations under **zero look-ahead T+1 execution**, deducts the **full statutory Indian cost stack** to the paisa, and reports **overfitting diagnostics** (Deflated Sharpe Ratio, Combinatorial Purged Cross-Validation) — so you never mistake a paper illusion for a real edge.
 
-- **Web app:** https://pramaan.app _(deploy during Phase 3)_
-- **Desktop:** [GitHub Releases](https://github.com/&lt;org&gt;/pramaan/releases) — Windows · Linux · macOS _(Phase 4)_
-- **Landing page:** https://pramaan.app _(Phase 3)_
+- **Status:** validated research engine + reproducible results artifact (GTU DI05000341 submission)
+- **What ships today:** the engine, its REST-free Python surface, a 30-run real-data matrix, the 35-test suite, a 40-page report and a 10-slide deck
+- **Planned, not built:** REST API (`src/api/`), Next.js web UI (`frontend/`), Tauri desktop — see `.agent/02_plan.md`
 
 ---
 
@@ -20,13 +20,13 @@ A strategy that looks profitable in a backtest usually breaks live because of th
 | **Hidden slippage** | Order size vs. average daily volume moves your fill price | Almgren–Chriss square-root impact model, computed per order from trailing volatility and ADV |
 | **Hidden look-ahead** | Signals generated on data that includes the future; Sharpe inflated by parameter fishing | Signal at day *t* Close → fill at day *t+1* Open, enforced by construction; DSR + CPCV/purging with embargo |
 
-**See it in one click:** toggle costs ON/OFF and watch an equity curve turn negative. That's the *Profit Mirage*.
+**The finding, from real data:** on 10 NSE large caps, 2019–2024, with costs enabled, **none of the four classic strategies beat passive ownership** — and the statutory stack alone removed 48.2% of momentum's Sharpe and ₹12,995 on ₹1,00,000. PBO: 64.29%.
 
 ## What it does NOT do (explicit scope)
 
 - **No live trading or broker integration** — simulation and validation only
 - **No intraday / tick / derivatives** — daily bars, NSE cash equities, long-only
-- **No bundled commercial data** — bring your own data key (BYOK); the shipped demo dataset is NIFTY-50 daily 2019–2024
+- **No bundled commercial data** — data is fetched at runtime; the committed artifacts carry no market data
 - **Not investment advice** — past performance does not guarantee future results
 
 These boundaries are deliberate. Limitations are documented because they are defensible, not because they are missing.
@@ -39,59 +39,61 @@ These boundaries are deliberate. Limitations are documented because they are def
 git clone https://github.com/<org>/pramaan && cd pramaan
 pip install -r requirements.txt
 
-# Replay the committed NIFTY-50 dataset (no network needed)
-DEMO_DATA=1 python -m src.api.main          # API on :8000
-# or run the Streamlit fallback
-streamlit run src/dashboard/app.py
+# Reproduce the full result matrix (30 runs, writes experiments/)
+PYTHONPATH=. python scripts/run_experiments.py
+# Regenerate every chart from the real engine output
+PYTHONPATH=. python scripts/generate_real_charts.py
+# Run the test suite
+PYTHONPATH=. python -m pytest tests/ -q        # 35 passed
 ```
 
-Web UI: `cd frontend && npm install && npm run dev` → http://localhost:3000
+The Streamlit dashboard (`src/dashboard/app.py`) is the legacy demonstration surface. It reads `data/raw/`, so populate it first via `download_universe()` from `src/data/fetch.py` before running `streamlit run src/dashboard/app.py`.
 
-Desktop binaries are on the [Releases page](https://github.com/&lt;org&gt;/pramaan/releases).
+**Planned surfaces — not built, do not attempt:** `python -m src.api.main`, `frontend/`, desktop installers. They are specified in `.agent/02_plan.md` Phases 1–4 and will be built after the academic submission.
 
-## Bring your own key
+## Data
 
-Data is fetched at runtime from your own provider. Set your key locally (never commit it):
+Data is fetched at runtime by your machine from a free public source (Yahoo Finance via `yfinance`), which is appropriate for academic and personal use. Pramaan redistributes no market data. **Commercial deployment requires a licensed provider** behind a bring-your-own-key interface — that path is specified but not built. Never commit keys: `.env*` and `*.pem` are gitignored, and no `.env.example` ships because no key is needed for the academic path.
 
-```bash
-cp .env.example .env          # then add your key
-# The key is stored in your OS keyring — Pramaan never sends it anywhere
-```
-
-The open-source distribution fetches data on **your** machine under **your** key — Pramaan redistributes no market data.
-
-## Architecture
+## Repository layout
 
 ```
-frontend/     Next.js 15 + TypeScript + Tailwind + shadcn/ui + Recharts  (web + Tauri desktop)
-     │  REST
-src/api/      FastAPI — wraps the engine; contract in docs/api-contract.md
-     │
-src/engine/   UNTOUCHED CORE — backtest loop, portfolio, position, cost model
-src/analytics/UNTOUCHED — metrics, DSR, CPCV + embargo, parameter stability
-src/data/     fetch → Parquet/SQLite cache, NSE universe
-     │
-SQLite (local) → Supabase (optional: auth, sync, run history)
+src/engine/      UNTOUCHED CORE — backtest loop, portfolio, position, cost model
+src/analytics/   UNTOUCHED — metrics, DSR, CPCV + embargo, parameter search
+src/strategies/  SMA · RSI · Momentum · BuyAndHold (benchmark control)
+src/data/        fetch → clean → universe
+src/dashboard/   Streamlit fallback UI (legacy demo surface)
+scripts/         run_experiments.py · generate_real_charts.py · build_presentation.py
+experiments/     experiment_log.csv · oos_decay.csv · pbo.json · PROVENANCE.json
+tests/           35 automated tests
+docs/            GTU report + charts + unit-mapped documentation
+.agent/          verification ledger · plan · decisions · daily logs
 ```
-
-**Computation runs on your machine.** No cloud account, no telemetry, no data leaving the device unless you opt in.
 
 ## The numbers that matter
 
-From the committed NIFTY-50 2019–2024 dataset (reproduce with `experiments/experiment_log.csv`):
+From `experiments/` (10 NSE symbols, 1480 bars each, 2019-01-01 → 2024-12-30, costs enabled, ₹1,00,000 start):
 
-- Golden-master paisa example: ₹1,00,000 → buy ₹1,00,192.28 / sell ₹1,09,807.47 / net **+₹9,615.19** after the full statutory stack
-- AR(1) embargo test: PBO **28.89% → 37.78%** — leakage was masking true overfitting
-- Four documented redesigns: cash→total-equity sizing, O(1) engine slicing, flat→Almgren-Chriss slippage, CPCV embargo
+| Strategy | Sharpe | CAGR | Max DD |
+|---|---|---|---|
+| SMA(20,50) | 0.527 | 11.37% | −14.76% |
+| SMA(10,30) | 0.685 | 13.25% | −14.64% |
+| RSI(14,30,70) | 0.307 | 9.80% | −32.77% |
+| Momentum(20) | 0.186 | 7.43% | −10.28% |
+| **Buy-and-hold benchmark** | **0.746** | **19.07%** | −32.93% |
+
+- Cost drag on momentum: **₹12,995** on ₹1,00,000 (Sharpe −48.2%)
+- CPCV probability of backtest overfitting: **64.29%** (8 splits, 2 test, 1% embargo)
+- Golden-master paisa example: ₹1,00,000 → buy ₹1,00,192.28 / sell ₹1,09,807.47 / net +₹9,615.19
 
 ## Development
 
-See [`AGENTS.md`](./AGENTS.md) for the operating protocol and [`.agent/plan.md`](./.agent/plan.md) for the current phase and gates.
-
 ```bash
-pytest -q                    # engine invariants, cost model, DSR, CPCV
-pytest --cov=src             # coverage report
+PYTHONPATH=. python -m pytest tests/ -q          # 35 passed
+PYTHONPATH=. python -m pytest tests/ --cov=src   # coverage
 ```
+
+See [`AGENTS.md`](./AGENTS.md) for the operating protocol and [`.agent/01_verification_ledger.md`](./.agent/01_verification_ledger.md) for the per-claim evidence record.
 
 **The engine (`src/engine`, `src/analytics`, `src/strategies`, `src/data`) is never rewritten.** Bugs are fixed with regression tests.
 
@@ -99,4 +101,4 @@ pytest --cov=src             # coverage report
 
 Licensed under **Apache License 2.0** — see [LICENSE](./LICENSE). You may use, modify, and distribute this commercially; preserve license and notices.
 
-**Pramaan is a simulation and research tool. It is not financial advice, not a recommendation, and not a substitute for a SEBI-registered advisor.** Statutory rates are model approximations — verify against current NSE/SEBI circulars and your broker's rate card before relying on them.
+**Pramaan is a simulation and research tool. It is not financial advice, not a recommendation, and not a substitute for a SEBI-registered advisor.** Statutory rates are model approximations — verify against current NSE/SEBI circulars and your broker's rate card before relying on them. See [terms-of-service.md](./terms-of-service.md) and [privacy-policy.md](./privacy-policy.md).
