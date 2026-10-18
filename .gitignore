@@ -5,3 +5,16 @@ __pycache__/
 .pytest_cache/
 .ipynb_checkpoints/
 
+# Frontend / desktop (separate release channels)
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/dist/
+frontend/target/
+frontend/src-tauri/target/
+
+# Secrets — never commit keys
+.env
+.env.local
+*.pem
+
