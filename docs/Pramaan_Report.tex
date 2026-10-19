@@ -911,14 +911,15 @@ Data integrity & NaN dropped not forward-filled; duplicates rejected; ordering e
 \begin{resultbox}{Verification record}
 Executed in the project virtual environment:
 \begin{verbatim}
-$ venv/bin/python -m pytest tests/ -q
-...................................                                      [100%]
-35 passed in 5.49s
+$ pytest tests/ -q
+........................................................................ [100%]
+72 passed in 7.22s
 \end{verbatim}
 
 Baseline at the start of the project cycle was 9 tests; the suite now covers
-engine invariants, the full cost stack, all four strategies, data cleaning, the
-DSR algorithm, CPCV, and byte-level determinism. See
+engine invariants, the full cost stack with DP charges, all four strategies plus Bollinger breakout,
+synthetic offline data provider with SHA-256 manifest verification, the corrected cross-trial DSR algorithm,
+CPCV with 95\% bootstrap CI, performance benchmarks, and byte-level determinism. See
 \texttt{.agent/01\_verification\_ledger.md} for the per-claim verification record.
 \end{resultbox}
 
@@ -928,25 +929,30 @@ The full suite, with the specific defect or invariant each module guards:
 
 \begin{table}[h]
 \centering
-\caption{Test inventory (35 tests).}
+\caption{Test inventory (72 automated tests across 16 test modules).}
 \label{tab:tests}
-\begin{tabular}{@{}p{4.3cm}cp{7.2cm}@{}}
+\begin{tabular}{@{}p{4.5cm}cp{7.0cm}@{}}
 \toprule
 \textbf{Module} & \textbf{Tests} & \textbf{Core assertions} \\
 \midrule
-\texttt{test\_rsi.py} & 5 & All-gains $\to$ 100 (was 0, defect D-1); all-losses $\to$ 0; flat $\to$ 50; bounded on random walks; no oversold buy on a rising series. \\
-\texttt{test\_sma.py} & 5 & Golden-cross buy; death-cross sell only with position; insufficient history; inverted-window handling; no look-ahead under a future spike. \\
-\texttt{test\_data.py} & 6 & NaN dropped not forward-filled; no forward-fill leakage; chronological sort; duplicate-date rejection (defect D-2); empty frame; string date column. \\
-\texttt{test\_deflated\_sharpe.py} & 7 & SciPy import path (defect D-3); E[max SR] grows with trials; DSR penalises multiple testing; rejects $<3$ obs and $N=1$. \\
+\texttt{test\_api.py} & 12 & FastAPI endpoints: health, strategies, universe, replay, determinism, ready, trials, sweep, survivorship bias warning, async jobs, HTML report. \\
+\texttt{test\_bollinger.py} & 1 & Bollinger band volatility breakout entry/exit signals. \\
+\texttt{test\_cost\_model.py} & 6 & Golden-master tests: paisa-exact STT, CDSL flat \rupee 13.50 + GST DP charge on sells, Oct 2024 SEBI boundary resolution, slippage floor bps. \\
+\texttt{test\_cpcv.py} & 4 & PBO on random data, genuine signal detection, AR(1) embargo leakage detection, bootstrap 95\% confidence interval. \\
+\texttt{test\_data.py} & 6 & NaN dropped not forward-filled; no forward-fill leakage; chronological sort; duplicate-date rejection; empty frame; date strings. \\
+\texttt{test\_data\_provider.py} & 4 & DataProvider ABC: LocalCSV, Synthetic, SHA-256 manifest integrity, factory resolution. \\
+\texttt{test\_deflated\_sharpe.py} & 10 & True cross-trial variance $V[\{SR_k\}]$, $(T-1)$ degrees of freedom, Bailey \& López de Prado (2014) published worked example. \\
 \texttt{test\_determinism.py} & 3 & Byte-identical equity across runs; stable SHA-256 digest; costs strictly reduce terminal equity. \\
-\texttt{test\_engine.py} & 2 & Fill at next bar's open; sizing uses total equity (defect D-5). \\
-\texttt{test\_cost\_model.py} & 1 & Paisa-exact statutory components. \\
+\texttt{test\_engine.py} & 2 & Fill at next bar's open; sizing uses total equity. \\
+\texttt{test\_honesty.py} & 9 & Honesty defects D1–D11: absence of hardcoded PBO, strict error envelopes, exposure metrics, rejected order logging, env parsing. \\
 \texttt{test\_metrics.py} & 1 & CAGR, Sharpe, zero drawdown on a monotone curve. \\
-\texttt{test\_portfolio.py} & 1 & Cash-flow ledger correctness. \\
-\texttt{test\_cpcv.py} & 3 & PBO on random data; low PBO with genuine signal; embargo raises PBO on AR(1). \\
 \texttt{test\_momentum.py} & 1 & No duplicate buy with an open position. \\
+\texttt{test\_perf.py} & 2 & Performance benchmarking: 6-year $\times$ 10-symbol (14,800 bars) backtest executed in $<3.0$s nominal. \\
+\texttt{test\_portfolio.py} & 1 & Cash-flow ledger correctness and cash $\ge 0$ invariant. \\
+\texttt{test\_rsi.py} & 5 & All-gains $\to$ 100 (was 0, defect D-1); all-losses $\to$ 0; flat $\to$ 50; bounded on random walks; no oversold buy on rising series. \\
+\texttt{test\_sma.py} & 5 & Golden-cross buy; death-cross sell only with position; insufficient history; inverted-window handling; zero look-ahead under future spike. \\
 \midrule
-\textbf{Total} & \textbf{35} & \\
+\textbf{Total} & \textbf{72} & \textbf{100\% offline executable via seeded fixtures} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1330,10 +1336,11 @@ To regenerate every figure and table in this report:
 
 \begin{codebox}{Reproduction sequence}
 \begin{lstlisting}[language=bash]
-pip install -r requirements.txt
-PYTHONPATH=. python scripts/run_experiments.py      # writes experiments/
-PYTHONPATH=. python scripts/generate_real_charts.py # writes docs/charts/
-venv/bin/python -m pytest tests/ -q                  # 35 passed
+pip install -e ".[dev,api]"
+pytest tests/ -q                                       # 72 passed in ~7s
+python scripts/run_experiments.py                      # writes experiments/
+python scripts/run_sweep.py                            # 133 configs, PBO=60.0%
+python scripts/generate_real_charts.py                 # writes docs/charts/
 \end{lstlisting}
 \end{codebox}
 

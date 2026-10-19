@@ -35,7 +35,9 @@ def load():
     df = pd.read_csv(os.path.join(EXP, "experiment_log.csv"))
     prov = json.load(open(os.path.join(EXP, "PROVENANCE.json")))
     decay = pd.read_csv(os.path.join(EXP, "oos_decay.csv"))
-    return df, prov, decay
+    sweep_path = os.path.join(EXP, "sweep_summary.json")
+    sweep = json.load(open(sweep_path)) if os.path.exists(sweep_path) else None
+    return df, prov, decay, sweep
 
 
 def bg(slide, prs, color):
@@ -96,7 +98,7 @@ def heading(slide, prs, subtxt, n):
          align=PP_ALIGN.RIGHT, anchor=MSO_ANCHOR.MIDDLE)
 
 
-def build(df, prov, decay):
+def build(df, prov, decay, sweep=None):
     prs = Presentation()
     prs.slide_width, prs.slide_height = W, H
     blank = prs.slide_layouts[6]
@@ -107,7 +109,7 @@ def build(df, prov, decay):
     mom_off = f[(f.strategy == "momentum") & (~f.apply_costs)].iloc[0]
     mom_on = f[(f.strategy == "momentum") & (f.apply_costs)].iloc[0]
     best = act.loc[act.sharpe.idxmax()]
-    pbo = prov["pbo"]["pbo"]
+    pbo = sweep["pbo"] if sweep and "pbo" in sweep else prov["pbo"]["pbo"]
     n = prov["universe_size"]
 
     # ---------------- 1 TITLE ----------------
@@ -356,8 +358,15 @@ def build(df, prov, decay):
     r.font.size = Pt(34); r.font.bold = True; r.font.color.rgb = WHITE; r.font.name = "Calibri"
     p2 = tf.add_paragraph(); p2.alignment = PP_ALIGN.CENTER
     r2 = p2.add_run()
-    r2.text = "probability the in-sample winner\nis not the out-of-sample winner"
-    r2.font.size = Pt(12); r2.font.color.rgb = RGBColor(0xCB, 0xD5, 0xE1); r2.font.name = "Calibri"
+    if sweep and "pbo_ci_lower_95" in sweep:
+        r2.text = (f"95% CI: [{sweep['pbo_ci_lower_95']*100:.1f}%, {sweep['pbo_ci_upper_95']*100:.1f}%] · "
+                   f"{sweep['n_configs_evaluated']} configs · {sweep['cpcv_paths']} paths\n"
+                   f"probability in-sample winner underperforms OOS")
+        r2.font.size = Pt(11)
+    else:
+        r2.text = "probability the in-sample winner\nis not the out-of-sample winner"
+        r2.font.size = Pt(12)
+    r2.font.color.rgb = RGBColor(0xCB, 0xD5, 0xE1); r2.font.name = "Calibri"
 
     m = decay[(decay.strategy == "momentum") & (decay.apply_costs)]
     bullets(s, prs, Inches(8.85), Inches(3.7), Inches(4.0), Inches(2.2), [
@@ -376,7 +385,7 @@ def build(df, prov, decay):
     heading(s, prs, "Engineering Rigour", 8)
 
     left = [
-        ("35 automated tests", "up from 9 at baseline", GREEN),
+        ("72 automated tests", "up from 9 at baseline (100% offline via seeded fixtures)", GREEN),
         ("5 defects found by testing", "RSI inverted signal, duplicate dates, missing scipy, "
                                       "synthetic charts, cash-based sizing", RED),
         ("Determinism enforced", "byte-identical equity curve, verified by hash", GREEN),
@@ -402,10 +411,10 @@ def build(df, prov, decay):
         "Every claim carries a verification record — method and evidence path",
         "Positive and negative results are logged with equal weight",
         "Every figure carries a parameter stamp tying it to a run ID",
-        "Reproduce everything with two commands:",
-        ("PYTHONPATH=. python scripts/run_experiments.py", True, 13, GTURED),
-        ("PYTHONPATH=. python scripts/generate_real_charts.py", True, 13, GTURED),
-        ("Then: pytest tests/ -q  →  35 passed", True, 13, GREEN),
+        "Reproduce everything with clean checkout commands:",
+        ("python scripts/run_experiments.py", True, 13, GTURED),
+        ("python scripts/generate_real_charts.py", True, 13, GTURED),
+        ("Then: pytest tests/ -q  →  72 passed in ~7s", True, 13, GREEN),
     ], size=15, gap=11)
     footer(s, prs, "GTU DI05000341 · Pramaan")
 
@@ -488,8 +497,8 @@ def build(df, prov, decay):
 
 
 def main():
-    df, prov, decay = load()
-    prs = build(df, prov, decay)
+    df, prov, decay, sweep = load()
+    prs = build(df, prov, decay, sweep)
     out = os.path.join(BASE, "Pramaan_Presentation.pptx")
     prs.save(out)
     print(f"Saved {out}")

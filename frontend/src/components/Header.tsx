@@ -135,6 +135,14 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
 
+          <a
+            href="/landing"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-canvas border border-rule hover:border-turquoise text-mutedText hover:text-inkText transition-all cursor-pointer text-[11px]"
+            title="View Product Landing Page & Interactive Cost Calculator"
+          >
+            <span>🌐 Overview</span>
+          </a>
+
           <button
             type="button"
             onClick={onOpenGuide}
