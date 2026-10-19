@@ -114,3 +114,69 @@ def test_sweep_summary_endpoint():
     assert "pbo" in data
     assert 0.0 <= data["pbo"] <= 1.0
     assert data["pbo_ci_lower_95"] <= data["pbo"] <= data["pbo_ci_upper_95"]
+
+
+def test_universe_survivorship_warning():
+    res = client.get("/universe")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["total_bars"] > 500
+    assert "survivorship_bias_warning" in data
+    assert "SURVIVORSHIP BIAS WARNING" in data["survivorship_bias_warning"]
+
+
+def test_async_jobs_workflow():
+    req = {
+        "strategy": "sma_crossover",
+        "params": {"fast_window": 10, "slow_window": 30},
+        "universe": ["RELIANCE.NS"],
+        "start_date": "2023-01-01",
+        "end_date": "2023-12-31",
+        "initial_capital": 100000.0,
+        "apply_costs": True,
+    }
+    # 1. Submit job
+    res = client.post("/jobs", json=req)
+    assert res.status_code == 200
+    job_id = res.json()["job_id"]
+    assert job_id.startswith("job_")
+
+    # 2. Poll job status
+    import time
+    for _ in range(30):
+        time.sleep(0.2)
+        poll_res = client.get(f"/jobs/{job_id}")
+        assert poll_res.status_code == 200
+        poll_data = poll_res.json()
+        if poll_data["status"] in ("completed", "failed"):
+            break
+
+    assert poll_data["status"] == "completed"
+    assert poll_data["result"] is not None
+    assert "metrics" in poll_data["result"]
+
+
+def test_honesty_report_html_generation():
+    # First ensure a run exists in cache
+    req = {
+        "strategy": "sma_crossover",
+        "params": {"fast_window": 20, "slow_window": 50},
+        "universe": ["RELIANCE.NS"],
+        "start_date": "2023-01-01",
+        "end_date": "2023-12-31",
+        "initial_capital": 100000.0,
+        "apply_costs": True,
+    }
+    run_res = client.post("/run", json=req)
+    assert run_res.status_code == 200
+    run_id = run_res.json()["run_id"]
+
+    # Request HTML honesty report
+    rep_res = client.get(f"/report/{run_id}")
+    assert rep_res.status_code == 200
+    assert "text/html" in rep_res.headers["content-type"]
+    html = rep_res.text
+    assert "Pramaan Honesty Report" in html
+    assert run_id in html
+    assert "Statutory Friction Tollgate Waterfall" in html
+    assert "Academic &amp; Regulatory Disclaimer" in html

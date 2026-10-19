@@ -7,9 +7,9 @@ import pandas as pd
 from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 
-from src.api.adapter import execute_backtest
+from src.api.adapter import RAW_DATA_DIR, execute_backtest
 from src.api.cache import compute_run_id
 from src.api.db import (
     get_cached_run,
@@ -20,7 +20,9 @@ from src.api.db import (
     list_trials,
     save_run,
 )
+from src.api.jobs import job_manager
 from src.api.replay import get_replay_run
+from src.api.report import generate_honesty_report_html
 from src.api.schemas import (
     BacktestRequest,
     BacktestResponse,
@@ -31,6 +33,7 @@ from src.api.schemas import (
     TrialsResponse,
     UniverseResponse,
 )
+from src.data.clean import load_and_clean_all
 from src.data.universe import get_benchmark, get_universe
 
 app = FastAPI(
@@ -156,8 +159,36 @@ def get_strategies():
 def get_universe_info():
     symbols = get_universe()
     benchmark = get_benchmark()
+
+    all_data = load_and_clean_all(RAW_DATA_DIR)
+    if not all_data:
+        fixture_dir = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "tests", "fixtures", "data"
+        )
+        if os.path.exists(fixture_dir):
+            all_data = load_and_clean_all(fixture_dir)
+
+    min_start = "2019-01-01"
+    max_end = "2024-12-30"
+    total_bars = 1480
+    if all_data:
+        first_df = next(iter(all_data.values()))
+        if not first_df.empty and "date" in first_df.columns:
+            min_start = str(first_df["date"].min())[:10]
+            max_end = str(first_df["date"].max())[:10]
+            total_bars = len(first_df)
+
     return UniverseResponse(
-        symbols=symbols, benchmark=benchmark, default_start="2019-01-01", default_end="2024-12-30", total_bars=1480
+        symbols=symbols,
+        benchmark=benchmark,
+        default_start=min_start,
+        default_end=max_end,
+        total_bars=total_bars,
+        survivorship_bias_warning=(
+            "SURVIVORSHIP BIAS WARNING: This universe contains current NIFTY-50 large-cap leaders selected "
+            "as of 2024. Testing over 2019-2024 ignores companies that were delisted, downgraded, or went bankrupt "
+            "during this period (e.g., YES Bank, DHFL). Backtested results may be positively biased."
+        ),
     )
 
 
@@ -205,6 +236,39 @@ def trigger_sweep(max_configs: int = 50):
 
     summary = run_sweep(max_configs=max_configs, record_to_db=True)
     return SweepSummaryResponse(**summary)
+
+
+@app.post("/jobs")
+def create_job(req: BacktestRequest):
+    """Submits a backtest job for background execution (Task B5)."""
+    job_id = job_manager.submit_job(req)
+    return {"job_id": job_id, "status": "queued"}
+
+
+@app.get("/jobs/{job_id}")
+def get_job_status(job_id: str):
+    """Checks the status and retrieves results of a background backtest job."""
+    job = job_manager.get_job(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail=f"Job '{job_id}' not found.")
+    return job
+
+
+@app.get("/report/{run_id}", response_class=HTMLResponse)
+def get_report(run_id: str):
+    """Returns a standalone, printable HTML Honesty Report for a backtest run (Task B6)."""
+    cached = get_cached_run(run_id)
+    if not cached:
+        runs = list_recent_runs(limit=100)
+        found = next((r for r in runs if r.get("run_id") == run_id), None)
+        if not found:
+            raise HTTPException(status_code=404, detail=f"Run '{run_id}' not found in cache or history.")
+        cached = get_cached_run(run_id)
+        if not cached:
+            raise HTTPException(status_code=404, detail=f"Run data for '{run_id}' is unavailable.")
+
+    html = generate_honesty_report_html(cached)
+    return HTMLResponse(content=html)
 
 
 @app.get("/replay/{strategy}", response_model=BacktestResponse)

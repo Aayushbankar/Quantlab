@@ -140,6 +140,7 @@ class UniverseResponse(BaseModel):
     default_start: str
     default_end: str
     total_bars: int
+    survivorship_bias_warning: str | None = None
 
 
 class HealthResponse(BaseModel):
