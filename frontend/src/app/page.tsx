@@ -130,6 +130,10 @@ export default function Home() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const searchParams = new URLSearchParams(window.location.search);
+      const urlTab = searchParams.get("tab") as "mirage" | "costs" | "overfitting" | "ledger" | "unified" | null;
+      if (urlTab && ["mirage", "costs", "overfitting", "ledger", "unified"].includes(urlTab)) {
+        setActiveTab(urlTab);
+      }
       const urlTheme = searchParams.get("theme") as "dark" | "light" | null;
       if (urlTheme === "dark" || urlTheme === "light") {
         setTheme(urlTheme);

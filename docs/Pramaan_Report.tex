@@ -556,8 +556,8 @@ headlessly with no streaming or web framework present.
                  text centered, draw=gtured, fill=red!8, font=\small, line width=1.2pt},
     lab/.style={font=\footnotesize\itshape}
 ]
-    \node (ui)   [box, fill=blue!12] {\textbf{Presentation} \quad Streamlit fallback $\cdot$ CLI \quad (Next.js web UI: planned)};
-    \node (api)  [box] {\textbf{API (planned, FR-15)} \quad FastAPI REST endpoints $\cdot$ request validation $\cdot$ run persistence};
+    \node (ui)   [box, fill=blue!12] {\textbf{Presentation} \quad Next.js 15 Workstation $\cdot$ Streamlit fallback $\cdot$ CLI};
+    \node (api)  [box] {\textbf{API (FR-15)} \quad FastAPI REST service $\cdot$ Pydantic validation $\cdot$ Cache/Replay provenance};
     \node (an)   [box] {\textbf{Analytics} \quad metrics $\cdot$ Deflated Sharpe $\cdot$ CPCV + embargo $\cdot$ grid search};
     \node (eng)  [core] {\textbf{Engine (the contribution)} \quad BacktestEngine $\cdot$ Portfolio $\cdot$ Position $\cdot$ IndianCostModel};
     \node (strat)[box] {\textbf{Strategy} \quad SMA $\cdot$ RSI $\cdot$ Momentum $\cdot$ BuyAndHold};
@@ -927,14 +927,17 @@ CPCV with 95\% bootstrap CI, performance benchmarks, and byte-level determinism.
 
 The full suite, with the specific defect or invariant each module guards:
 
-\begin{table}[h]
-\centering
-\caption{Test inventory (72 automated tests across 16 test modules).}
-\label{tab:tests}
-\begin{tabular}{@{}p{4.5cm}cp{7.0cm}@{}}
+\begin{center}
+\begin{longtable}{@{}p{4.5cm}cp{7.0cm}@{}}
+\caption{Test inventory (72 automated tests across 16 test modules).} \label{tab:tests} \\
 \toprule
 \textbf{Module} & \textbf{Tests} & \textbf{Core assertions} \\
 \midrule
+\endfirsthead
+\toprule
+\textbf{Module} & \textbf{Tests} & \textbf{Core assertions} \\
+\midrule
+\endhead
 \texttt{test\_api.py} & 12 & FastAPI endpoints: health, strategies, universe, replay, determinism, ready, trials, sweep, survivorship bias warning, async jobs, HTML report. \\
 \texttt{test\_bollinger.py} & 1 & Bollinger band volatility breakout entry/exit signals. \\
 \texttt{test\_cost\_model.py} & 6 & Golden-master tests: paisa-exact STT, CDSL flat \rupee 13.50 + GST DP charge on sells, Oct 2024 SEBI boundary resolution, slippage floor bps. \\
@@ -954,8 +957,8 @@ The full suite, with the specific defect or invariant each module guards:
 \midrule
 \textbf{Total} & \textbf{72} & \textbf{100\% offline executable via seeded fixtures} \\
 \bottomrule
-\end{tabular}
-\end{table}
+\end{longtable}
+\end{center}
 
 Note the deliberate asymmetry: five of the eleven modules exist purely to
 establish \emph{bounds} and \emph{failure modes} rather than to demonstrate
@@ -980,6 +983,94 @@ the wall-clock duration. A provenance file additionally records the data source,
 fetch window, bar interval, adjustment policy, library versions, and the Python
 version. The results presented in Chapter~\ref{ch:results} are reproducible from
 that artifact by re-executing the pipeline.
+
+\section{Graphical Workstation and User Interface Architecture}\label{sec:ui_workstation}
+
+To ensure that quantitative findings can be inspected by examiners, auditors, and practitioners without requiring terminal interaction, Pramaan delivers an institutional-grade graphical workstation built with Next.js~15, TypeScript, Tailwind~CSS, and custom high-resolution SVG charting engines. In accordance with the project's non-negotiable principle of computational honesty, the interface serves as a transparent audit vehicle: it never presents an uncomputed metric, always displays dataset and engine provenance, and renders dual-theme surfaces for clear verification.
+
+\subsection{Profit Mirage Dissector}
+
+The primary workstation interface (Figure~\ref{fig:ui_mirage}) exposes the central thesis of this work: the divergence between gross theoretical performance and net realizable wealth under statutory levies.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{charts/screen_profit_mirage.png}
+\caption{The Pramaan Quant Workstation (Profit Mirage Dissector). Note the real-time execution provenance badge (\texttt{SERVED: CACHE}, SHA-256 dataset digest \texttt{1171aeb3}, true-to-label statutory rate card, engine online), strategy KPI cards with market exposure matching, and the visualised crimson friction drag between gross (cyan) and net (turquoise) equity curves.}
+\label{fig:ui_mirage}
+\end{figure}
+
+The workstation displays:
+\begin{itemize}[leftmargin=1.5cm]
+    \item \textbf{Execution Provenance Bar:} A header audit ribbon displaying the run source (\texttt{LIVE}, \texttt{CACHE}, or \texttt{REPLAY}), the SHA-256 fingerprint of the market data partition, the active statutory rate profile (October 2024 SEBI circular calibration), and engine health.
+    \item \textbf{Dual-Curve Mirage Chart:} A dual-curve visualizer plotting the gross equity path (Pacific Cyan) alongside the net equity path (Turquoise), with the intervening area filled with a semi-transparent crimson shading representing cumulative capital eroded by statutory taxes and exchange friction.
+    \item \textbf{Standard and Exposure-Matched Metrics:} Four key performance indicator cards displaying CAGR, Sharpe ratio, maximum drawdown, and portfolio market exposure. Below each metric, the UI explicitly notes the exposure-matched buy-and-hold benchmark differential to eliminate passive holding bias.
+    \item \textbf{Methodological Disclaimers:} Prominent institutional warnings regarding survivorship bias (current 10 NIFTY large-caps) and simulation assumptions.
+\end{itemize}
+
+\subsection{Statutory Friction Tollgate}
+
+To unpack exactly where retail and algorithmic edges are eroded, the workstation provides a dedicated Statutory Tollgate inspector (Figure~\ref{fig:ui_tollgate}).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{charts/screen_statutory_tollgate.png}
+\caption{The Statutory Friction Tollgate view. Every statutory component is decomposed to paisa-level precision: Securities Transaction Tax (44.7\% of total friction), CDSL Depository Participant fees (\rupee 13.50 + 18\% GST on delivery sells), GST, Stamp Duty, and exchange turnover levies.}
+\label{fig:ui_tollgate}
+\end{figure}
+
+Unlike retail charting platforms that apply generic percentage slippages, this view exposes the true composition of Indian market friction:
+\begin{itemize}[leftmargin=1.5cm]
+    \item \textbf{Securities Transaction Tax (STT):} The dominant statutory cost (44.7\% of total friction in active configurations).
+    \item \textbf{Depository Participant (DP) Charges:} A flat levy of \rupee 13.50 plus 18\% GST per delivery sale debit by CDSL/NSDL, which disproportionately penalises small position sizes and active rebalancing.
+    \item \textbf{Exchange and Regulatory Fees:} NSE exchange turnover charges, SEBI regulatory turnover fees, and state stamp duty calculated precisely to statutory specifications.
+\end{itemize}
+
+\subsection{Overfitting Diagnostics and Cross-Validation}
+
+Figure~\ref{fig:ui_overfitting} illustrates the statistical validation suite integrated into the workstation, implementing the diagnostic frameworks of Marcos L{\'o}pez de Prado.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{charts/screen_overfitting_diagnostics.png}
+\caption{Institutional Overfitting Diagnostics interface. (Top) Deflated Sharpe Ratio (DSR) card displaying the Extreme Value Theory (EVT) expected maximum Sharpe hurdle (1.105) alongside the empirical strategy Sharpe (0.506) and selection variance across 133 evaluated models. (Bottom) Combinatorial Purged Cross-Validation (CPCV) matrix across 45 paths showing pathwise Sharpe distributions and empirical PBO.}
+\label{fig:ui_overfitting}
+\end{figure}
+
+The diagnostic dashboard renders:
+\begin{itemize}[leftmargin=1.5cm]
+    \item \textbf{Deflated Sharpe Ratio (DSR):} Evaluates whether an observed Sharpe ratio is statistically significant after accounting for data snooping across multiple trials ($N=133$). The interface displays the EVT expected maximum Sharpe hurdle ($E[\max SR] = 1.105$) that an active strategy must clear before being declared genuine.
+    \item \textbf{Combinatorial Purged Cross-Validation (CPCV) Matrix:} A visual matrix of 45 combinatorial paths ($k=10, g=2$) with a 1\% embargo window to eliminate serial correlation leakage. It reports the Probability of Backtest Overfitting ($\text{PBO} = 60.0\%$) accompanied by a 95\% bootstrap confidence interval $[44.4\%, 73.3\%]$.
+\end{itemize}
+
+\subsection{Execution Ledger and Theme Architecture}
+
+Figure~\ref{fig:ui_ledger} and Figure~\ref{fig:ui_themes} document the transaction audit trail and visual delivery surfaces.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{charts/screen_execution_ledger.png}
+\caption{Zero-Lookahead T+1 Execution Ledger. Every simulated fill records the signal timestamp (Day $t$ Close), the execution timestamp (Day $t+1$ Open), the fill price, applied slippage, and an invariant assertion confirming zero-lookahead compliance.}
+\label{fig:ui_ledger}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{charts/screen_terminal_light.png}
+    \caption{Institutional Light Mode (\emph{Fine Paper \& Teal}).}
+    \label{fig:ui_light}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.48\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{charts/screen_landing_page.png}
+    \caption{Public Product Landing Page.}
+    \label{fig:ui_landing}
+\end{subfigure}
+\caption{Dual-theme styling and public product landing surface. The application supports seamless toggling between Midnight Dark and Fine Paper Light modes, and provides a public educational portal articulating the dual moats of the Pramaan platform.}
+\label{fig:ui_themes}
+\end{figure}
 
 % ================= CHAPTER 4 =================
 \chapter{Modification and Redesign Based on Results}
@@ -1166,11 +1257,11 @@ demonstration:
 \begin{itemize}[leftmargin=1.5cm]
     \item The engine runs headlessly with no web framework present; every result
     is reproducible from the committed artifacts with the two commands in
-    Appendix~\ref{app:repro}. The current demonstration surfaces are the command
-    line and the Streamlit fallback UI. A REST surface over the engine (FR-15),
-    a Next.js web client, and desktop packaging are specified in the plan and
-    deliberately deferred --- they are productisation work, not part of the
-    validated result set presented here.
+    Appendix~\ref{app:repro}. The engine is served through a high-performance
+    FastAPI REST service (FR-15) and exposed via an institutional Next.js~15
+    analytical workstation (\S\ref{sec:ui_workstation}), alongside a legacy
+    Streamlit fallback UI and command-line interface. Desktop packaging via
+    Tauri wraps the web workstation for local offline execution.
     \item The results artifact (log, decay table, provenance, PBO record) is
     version-controlled, so a reported figure can be re-derived.
     \item Charts are generated from engine output only, and each carries a

@@ -35,6 +35,8 @@ experiments/equity_curves/
 
 # Databases
 *.db
+*.db-shm
+*.db-wal
 pramaan_runs.db
 *.synctex.gz
 *.fls
