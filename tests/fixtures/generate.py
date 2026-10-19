@@ -21,9 +21,19 @@ import pandas as pd
 # ---------------------------------------------------------------------------
 SEED = 42
 SYMBOLS = [
-    "TESTCO", "SYNTH", "FIXTR",
-    "RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK",
-    "SBIN", "ITC", "HINDUNILVR", "LT", "BHARTIARTL"
+    "TESTCO",
+    "SYNTH",
+    "FIXTR",
+    "RELIANCE",
+    "TCS",
+    "INFY",
+    "HDFCBANK",
+    "ICICIBANK",
+    "SBIN",
+    "ITC",
+    "HINDUNILVR",
+    "LT",
+    "BHARTIARTL",
 ]
 START_DATE = "2019-01-01"
 END_DATE = "2024-12-31"
@@ -32,8 +42,8 @@ FIXTURE_DATA_DIR = Path(__file__).resolve().parent / "data"
 # Per-symbol parameters (start price, daily drift, daily vol, vol range)
 _SYMBOL_PARAMS: dict[str, dict[str, Any]] = {
     "TESTCO": {"start": 1200.0, "drift": 0.0004, "vol": 0.018, "vol_lo": 200_000, "vol_hi": 3_000_000},
-    "SYNTH":  {"start": 750.0,  "drift": 0.0002, "vol": 0.022, "vol_lo": 150_000, "vol_hi": 2_500_000},
-    "FIXTR":  {"start": 2500.0, "drift": 0.0003, "vol": 0.015, "vol_lo": 100_000, "vol_hi": 5_000_000},
+    "SYNTH": {"start": 750.0, "drift": 0.0002, "vol": 0.022, "vol_lo": 150_000, "vol_hi": 2_500_000},
+    "FIXTR": {"start": 2500.0, "drift": 0.0003, "vol": 0.015, "vol_lo": 100_000, "vol_hi": 5_000_000},
     "RELIANCE": {"start": 1300.0, "drift": 0.0005, "vol": 0.018, "vol_lo": 1_000_000, "vol_hi": 10_000_000},
     "TCS": {"start": 2000.0, "drift": 0.0004, "vol": 0.016, "vol_lo": 500_000, "vol_hi": 4_000_000},
     "INFY": {"start": 700.0, "drift": 0.0005, "vol": 0.020, "vol_lo": 1_000_000, "vol_hi": 8_000_000},
@@ -77,15 +87,17 @@ def _generate_symbol_df(
     raw_vol = rng.lognormal(mean=np.log(1_000_000), sigma=0.6, size=n)
     volume = np.clip(raw_vol, params["vol_lo"], params["vol_hi"]).astype(int)
 
-    df = pd.DataFrame({
-        "date": dates,
-        "open": np.round(open_, 4),
-        "high": np.round(high, 4),
-        "low": np.round(low, 4),
-        "close": np.round(close, 4),
-        "volume": volume,
-        "symbol": f"{symbol}.NS",
-    })
+    df = pd.DataFrame(
+        {
+            "date": dates,
+            "open": np.round(open_, 4),
+            "high": np.round(high, 4),
+            "low": np.round(low, 4),
+            "close": np.round(close, 4),
+            "volume": volume,
+            "symbol": f"{symbol}.NS",
+        }
+    )
     return df
 
 

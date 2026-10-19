@@ -1,4 +1,3 @@
-
 import pandas as pd
 
 from src.engine.portfolio import Position

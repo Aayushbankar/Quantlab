@@ -38,7 +38,10 @@ def get_replay_run(strategy: str, period: str = "full") -> dict[str, Any] | None
     if not os.path.exists(net_curve_path):
         fixture_path = os.path.join(
             os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-            "tests", "fixtures", "data", f"replay_{strategy}.json"
+            "tests",
+            "fixtures",
+            "data",
+            f"replay_{strategy}.json",
         )
         if os.path.exists(fixture_path):
             with open(fixture_path) as f:
@@ -98,5 +101,5 @@ def get_replay_run(strategy: str, period: str = "full") -> dict[str, Any] | None
             "expected_max_sharpe": 0.746,
             "pbo": pbo_val,
             "n_trials": 30,
-        }
+        },
     }

@@ -9,13 +9,7 @@ from src.engine.events import OrderEvent
 def test_indian_cost_model_buy():
     model = IndianCostModel(apply_costs=True, gamma=0.1)
 
-    order = OrderEvent(
-        timestamp=datetime(2023, 1, 1),
-        symbol="RELIANCE.NS",
-        order_type="MKT",
-        side="BUY",
-        quantity=100
-    )
+    order = OrderEvent(timestamp=datetime(2023, 1, 1), symbol="RELIANCE.NS", order_type="MKT", side="BUY", quantity=100)
 
     raw_price = 1000.0
     # Simulate process_order with vol=0.02 and adv=1000000

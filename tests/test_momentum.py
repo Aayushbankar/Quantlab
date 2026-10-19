@@ -9,14 +9,16 @@ def test_momentum_no_duplicate_signals():
 
     dates = pd.date_range(start="2023-01-01", periods=5)
     data = {
-        "AAPL": pd.DataFrame({
-            "date": dates,
-            # Prices: 100, 100, 120 (roc=0.2), 130 (roc=0.3), 140 (roc=0.16)
-            # Day 3: ROC = (120 - 100)/100 = 0.20 > 0.10
-            # Day 4: ROC = (130 - 100)/100 = 0.30 > 0.10
-            # Day 5: ROC = (140 - 120)/120 = 0.166 > 0.10
-            "close": [100.0, 100.0, 120.0, 130.0, 140.0],
-        })
+        "AAPL": pd.DataFrame(
+            {
+                "date": dates,
+                # Prices: 100, 100, 120 (roc=0.2), 130 (roc=0.3), 140 (roc=0.16)
+                # Day 3: ROC = (120 - 100)/100 = 0.20 > 0.10
+                # Day 4: ROC = (130 - 100)/100 = 0.30 > 0.10
+                # Day 5: ROC = (140 - 120)/120 = 0.166 > 0.10
+                "close": [100.0, 100.0, 120.0, 130.0, 140.0],
+            }
+        )
     }
 
     # Empty positions

@@ -12,6 +12,7 @@ class BuyAndHoldStrategy(Strategy):
     that cannot beat this on a risk-adjusted basis has no edge: it is a
     friction tax disguised as alpha.
     """
+
     def __init__(self, skip_first: int = 1):
         self.skip_first = skip_first
 

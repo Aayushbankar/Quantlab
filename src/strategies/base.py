@@ -10,7 +10,9 @@ class Strategy(ABC):
     """Base interface for all trading strategies."""
 
     @abstractmethod
-    def generate_signals(self, current_date: datetime, data: dict[str, pd.DataFrame], positions: dict) -> list[SignalEvent]:
+    def generate_signals(
+        self, current_date: datetime, data: dict[str, pd.DataFrame], positions: dict
+    ) -> list[SignalEvent]:
         """
         Evaluates data up to current_date and returns a list of SignalEvents.
         """

@@ -17,22 +17,23 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     cleaned_df = df.copy()
 
     # Ensure date is datetime
-    cleaned_df['date'] = pd.to_datetime(cleaned_df['date'])
+    cleaned_df["date"] = pd.to_datetime(cleaned_df["date"])
 
     # Drop rows with any NaN in OHLC before de-duplicating so a complete row
     # is never discarded in favour of a NaN duplicate of the same date.
-    cleaned_df = cleaned_df.dropna(subset=['open', 'high', 'low', 'close'])
+    cleaned_df = cleaned_df.dropna(subset=["open", "high", "low", "close"])
 
     # Sort chronologically, then keep the first observation of each date.
-    cleaned_df = cleaned_df.sort_values('date').drop_duplicates(subset='date', keep='first')
+    cleaned_df = cleaned_df.sort_values("date").drop_duplicates(subset="date", keep="first")
 
     # Ensure volume is integer
-    cleaned_df['volume'] = cleaned_df.volume.astype(int, errors='ignore')
+    cleaned_df["volume"] = cleaned_df.volume.astype(int, errors="ignore")
 
     # Reset index
     cleaned_df = cleaned_df.reset_index(drop=True)
 
     return cleaned_df
+
 
 def load_and_clean_all(raw_dir: str = "data/raw") -> dict[str, pd.DataFrame]:
     """

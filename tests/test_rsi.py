@@ -45,14 +45,16 @@ def test_rsi_all_gains_does_not_emit_oversold_buy():
     # Guards the original signal-inversion bug end-to-end through the strategy API.
     strategy = RSIMeanReversionStrategy(period=3, oversold=30, overbought=70)
     dates = pd.date_range("2023-01-01", periods=10)
-    df = pd.DataFrame({
-        "date": dates,
-        "open": np.linspace(100, 130, 10),
-        "high": np.linspace(100, 130, 10),
-        "low": np.linspace(100, 130, 10),
-        "close": np.linspace(100, 130, 10),  # monotonically rising
-        "volume": [1000] * 10,
-    })
+    df = pd.DataFrame(
+        {
+            "date": dates,
+            "open": np.linspace(100, 130, 10),
+            "high": np.linspace(100, 130, 10),
+            "low": np.linspace(100, 130, 10),
+            "close": np.linspace(100, 130, 10),  # monotonically rising
+            "volume": [1000] * 10,
+        }
+    )
 
     signals = [strategy.generate_signals(d, {"RELIANCE.NS": df}, {}) for d in dates]
 

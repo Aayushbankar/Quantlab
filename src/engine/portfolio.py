@@ -1,17 +1,38 @@
+import logging
 
 from src.engine.events import FillEvent
 from src.engine.position import Position
+
+logger = logging.getLogger(__name__)
 
 
 class Portfolio:
     """
     Maintains the state of cash and positions, enforcing invariants.
     """
+
     def __init__(self, initial_cash: float = 100000.0):
         self.initial_cash = initial_cash
         self.cash = initial_cash
         self.positions: dict[str, Position] = {}
         self.equity_history: list[dict] = []
+        self.rejected_trades: list[dict] = []
+
+    def record_rejected(self, timestamp: str, symbol: str, side: str, quantity: int, price: float, reason: str):
+        """Record an order that was rejected (e.g. for insufficient cash)."""
+        self.rejected_trades.append(
+            {
+                "timestamp": str(timestamp)[:10],
+                "symbol": symbol,
+                "side": side,
+                "quantity": int(quantity),
+                "raw_price": round(float(price), 2),
+                "fill_price": round(float(price), 2),
+                "total_cost": 0.0,
+                "status": "REJECTED",
+                "reason": reason,
+            }
+        )
 
     def apply_fill(self, fill: FillEvent):
         """
@@ -25,15 +46,15 @@ class Portfolio:
         position = self.positions[fill.symbol]
 
         # Calculate cash flow
-        if fill.side == 'BUY':
+        if fill.side == "BUY":
             cash_flow = -(fill.quantity * fill.fill_price) - fill.total_cost
-        else: # SELL
+        else:  # SELL
             cash_flow = (fill.quantity * fill.fill_price) - fill.total_cost
 
         self.cash += cash_flow
 
         if self.cash < 0:
-            print(f"WARNING: Cash balance dropped below zero: {self.cash}")
+            logger.warning(f"Cash balance dropped below zero: {self.cash}")
 
         position.update(fill.side, fill.quantity, fill.fill_price, fill.total_cost)
 
@@ -51,8 +72,4 @@ class Portfolio:
                     # Fallback to entry price if no price available (rare)
                     total_equity += position.quantity * position.average_entry_price
 
-        self.equity_history.append({
-            'date': timestamp,
-            'cash': self.cash,
-            'total_equity': total_equity
-        })
+        self.equity_history.append({"date": timestamp, "cash": self.cash, "total_equity": total_equity})

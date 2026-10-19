@@ -1,4 +1,3 @@
-
 import pandas as pd
 
 from src.analytics.metrics import MetricsEngine
@@ -10,11 +9,13 @@ class ValidationEngine:
     Handles 2D Parameter Stability Grid Search and
     In-Sample / Out-of-Sample testing.
     """
+
     def __init__(self, data: dict[str, pd.DataFrame]):
         self.data = data
 
-    def run_grid_search(self, strategy_class, param_grid: dict[str, list],
-                        is_start: str, is_end: str, apply_costs=True) -> pd.DataFrame:
+    def run_grid_search(
+        self, strategy_class, param_grid: dict[str, list], is_start: str, is_end: str, apply_costs=True
+    ) -> pd.DataFrame:
         """
         Runs a grid search over parameters and returns a DataFrame of results.
         param_grid e.g.: {'fast_window': [10,20], 'slow_window': [50,100]}
@@ -25,7 +26,7 @@ class ValidationEngine:
         # Filter data to in-sample period
         is_data = {}
         for symbol, df in self.data.items():
-            mask = (df['date'] >= pd.to_datetime(is_start)) & (df['date'] <= pd.to_datetime(is_end))
+            mask = (df["date"] >= pd.to_datetime(is_start)) & (df["date"] <= pd.to_datetime(is_end))
             is_data[symbol] = df[mask]
 
         param_names = list(param_grid.keys())
@@ -48,8 +49,8 @@ class ValidationEngine:
                 res = {
                     p1_name: p1_val,
                     p2_name: p2_val,
-                    'Sharpe Ratio': metrics.get('Sharpe Ratio', 0),
-                    'CAGR': metrics.get('CAGR', 0)
+                    "Sharpe Ratio": metrics.get("Sharpe Ratio", 0),
+                    "CAGR": metrics.get("CAGR", 0),
                 }
                 results.append(res)
 

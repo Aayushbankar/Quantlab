@@ -11,9 +11,10 @@ def expected_max_sharpe(N_trials: int, variance_sr: float, benchmark_sr: float =
     if N_trials <= 1:
         return benchmark_sr
 
-    emc = 0.5772156649 # Euler-Mascheroni constant
-    Z = (1 - emc) * norm.ppf(1 - 1.0/N_trials) + emc * norm.ppf(1 - 1.0/(N_trials * np.e))
+    emc = 0.5772156649  # Euler-Mascheroni constant
+    Z = (1 - emc) * norm.ppf(1 - 1.0 / N_trials) + emc * norm.ppf(1 - 1.0 / (N_trials * np.e))
     return benchmark_sr + np.sqrt(variance_sr) * Z
+
 
 def deflated_sharpe_ratio(observed_sr: float, returns: pd.Series, N_trials: int) -> float:
     """
@@ -25,13 +26,13 @@ def deflated_sharpe_ratio(observed_sr: float, returns: pd.Series, N_trials: int)
         return np.nan
 
     sk = skew(returns)
-    ku = kurtosis(returns, fisher=False) # standard kurtosis (normal=3)
+    ku = kurtosis(returns, fisher=False)  # standard kurtosis (normal=3)
 
     # Calculate Variance of Sharpe Ratio in annualized units
     n = len(returns)
     # Convert annualized Sharpe to daily Sharpe for moment adjustment
     sr_daily = observed_sr / np.sqrt(252.0)
-    var_sr_daily = (1.0 - sk * sr_daily + ((ku - 1.0) / 4.0) * (sr_daily ** 2)) / n
+    var_sr_daily = (1.0 - sk * sr_daily + ((ku - 1.0) / 4.0) * (sr_daily**2)) / n
     var_sr_annual = var_sr_daily * 252.0
 
     # Expected Max Sharpe in annualized units

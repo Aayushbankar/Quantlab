@@ -12,18 +12,21 @@ class MomentumStrategy(Strategy):
     Buy if ROC over lookback period is positive and above a threshold.
     Sell if ROC turns negative.
     """
+
     def __init__(self, lookback_period=20, threshold_pct=0.05):
         self.lookback_period = lookback_period
         self.threshold_pct = threshold_pct
 
-    def generate_signals(self, current_date: datetime, data: dict[str, pd.DataFrame], positions: dict) -> list[SignalEvent]:
+    def generate_signals(
+        self, current_date: datetime, data: dict[str, pd.DataFrame], positions: dict
+    ) -> list[SignalEvent]:
         signals = []
         for symbol, df in data.items():
-            past_data = df[df['date'] <= current_date]
+            past_data = df[df["date"] <= current_date]
             if len(past_data) < self.lookback_period + 1:
                 continue
 
-            closes = past_data['close'].tail(self.lookback_period + 1).values
+            closes = past_data["close"].tail(self.lookback_period + 1).values
 
             price_today = closes[-1]
             price_n_days_ago = closes[-1 - self.lookback_period]

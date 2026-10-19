@@ -19,7 +19,7 @@ def test_portfolio_cash_flow():
         stamp_duty=0.0,
         gst=0.0,
         turnover_fee=0.0,
-        total_cost=50.0
+        total_cost=50.0,
     )
 
     portfolio.apply_fill(fill)

@@ -13,6 +13,7 @@ class RSIMeanReversionStrategy(Strategy):
     Buy when RSI crosses below oversold (e.g. 30).
     Sell when RSI crosses above overbought (e.g. 70).
     """
+
     def __init__(self, period=14, oversold=30, overbought=70):
         self.period = period
         self.oversold = oversold
@@ -20,26 +21,26 @@ class RSIMeanReversionStrategy(Strategy):
 
     def _calculate_rsi(self, closes: np.ndarray):
         deltas = np.diff(closes)
-        seed = deltas[:self.period]
-        up = seed[seed >= 0].sum()/self.period
-        down = -seed[seed < 0].sum()/self.period
+        seed = deltas[: self.period]
+        up = seed[seed >= 0].sum() / self.period
+        down = -seed[seed < 0].sum() / self.period
         rs = self._relative_strength(up, down)
         rsi = np.zeros_like(closes)
-        rsi[:self.period] = 100. - 100./(1. + rs)
+        rsi[: self.period] = 100.0 - 100.0 / (1.0 + rs)
 
         for i in range(self.period, len(closes)):
             delta = deltas[i - 1]
             if delta > 0:
                 upval = delta
-                downval = 0.
+                downval = 0.0
             else:
-                upval = 0.
+                upval = 0.0
                 downval = -delta
 
-            up = (up*(self.period - 1) + upval)/self.period
-            down = (down*(self.period - 1) + downval)/self.period
+            up = (up * (self.period - 1) + upval) / self.period
+            down = (down * (self.period - 1) + downval) / self.period
             rs = self._relative_strength(up, down)
-            rsi[i] = 100. - 100./(1. + rs)
+            rsi[i] = 100.0 - 100.0 / (1.0 + rs)
         return rsi[-1], rsi[-2]
 
     @staticmethod
@@ -48,19 +49,21 @@ class RSIMeanReversionStrategy(Strategy):
             return up / down
         if up > 0:
             # All gains: RSI must saturate at 100, not collapse to 0
-            return float('inf')
+            return float("inf")
         # No price movement: neutral convention
         return 1.0
 
-    def generate_signals(self, current_date: datetime, data: dict[str, pd.DataFrame], positions: dict) -> list[SignalEvent]:
+    def generate_signals(
+        self, current_date: datetime, data: dict[str, pd.DataFrame], positions: dict
+    ) -> list[SignalEvent]:
         signals = []
         for symbol, df in data.items():
-            past_data = df[df['date'] <= current_date]
+            past_data = df[df["date"] <= current_date]
             if len(past_data) < self.period * 2:
                 continue
 
             # Need a decent buffer to calculate Wilder's smoothing accurately
-            closes = past_data['close'].tail(self.period * 5).values
+            closes = past_data["close"].tail(self.period * 5).values
             rsi_today, rsi_yest = self._calculate_rsi(closes)
 
             # Oversold -> Buy

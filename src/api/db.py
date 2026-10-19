@@ -59,43 +59,49 @@ def save_run(run_id: str, request_data: dict, response_data: dict):
         metrics = response_data.get("metrics", {})
         costs = response_data.get("costs", {})
         diag = response_data.get("diagnostics", {})
-        conn.execute("""
+        conn.execute(
+            """
             INSERT OR REPLACE INTO runs (
                 run_id, strategy, params_json, universe_json, start_date, end_date,
                 initial_capital, apply_costs, total_return, cagr, sharpe, sortino,
                 max_drawdown, calmar, dsr_p_value, pbo, total_friction,
                 execution_time_ms, response_json
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            run_id,
-            request_data.get("strategy"),
-            json.dumps(request_data.get("params", {})),
-            json.dumps(request_data.get("universe", [])),
-            request_data.get("start_date"),
-            request_data.get("end_date"),
-            float(request_data.get("initial_capital", 100000.0)),
-            1 if request_data.get("apply_costs", True) else 0,
-            float(metrics.get("total_return", 0.0)),
-            float(metrics.get("cagr", 0.0)),
-            float(metrics.get("sharpe_ratio", 0.0)),
-            float(metrics.get("sortino_ratio", 0.0)),
-            float(metrics.get("max_drawdown", 0.0)),
-            float(metrics.get("calmar_ratio", 0.0)),
-            diag.get("dsr_p_value"),
-            diag.get("pbo"),
-            float(costs.get("total_friction", 0.0)),
-            float(response_data.get("execution_time_ms", 0.0)),
-            json.dumps(response_data)
-        ))
+        """,
+            (
+                run_id,
+                request_data.get("strategy"),
+                json.dumps(request_data.get("params", {})),
+                json.dumps(request_data.get("universe", [])),
+                request_data.get("start_date"),
+                request_data.get("end_date"),
+                float(request_data.get("initial_capital", 100000.0)),
+                1 if request_data.get("apply_costs", True) else 0,
+                float(metrics.get("total_return", 0.0)),
+                float(metrics.get("cagr", 0.0)),
+                float(metrics.get("sharpe_ratio", 0.0)),
+                float(metrics.get("sortino_ratio", 0.0)),
+                float(metrics.get("max_drawdown", 0.0)),
+                float(metrics.get("calmar_ratio", 0.0)),
+                diag.get("dsr_p_value"),
+                diag.get("pbo"),
+                float(costs.get("total_friction", 0.0)),
+                float(response_data.get("execution_time_ms", 0.0)),
+                json.dumps(response_data),
+            ),
+        )
         conn.commit()
 
 
 def list_recent_runs(limit: int = 20) -> list[dict[str, Any]]:
     init_db()
     with get_db() as conn:
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             SELECT run_id, strategy, start_date, end_date, initial_capital,
                    apply_costs, cagr, sharpe, max_drawdown, total_friction, created_at
             FROM runs ORDER BY created_at DESC LIMIT ?
-        """, (limit,))
+        """,
+            (limit,),
+        )
         return [dict(r) for r in cur.fetchall()]

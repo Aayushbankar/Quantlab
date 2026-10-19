@@ -12,18 +12,21 @@ class DummyStrategy(Strategy):
             return [SignalEvent(timestamp=current_date, symbol="RELIANCE.NS", signal_type=1)]
         return []
 
+
 def test_engine_zero_look_ahead():
     # Setup dummy data
     dates = pd.date_range(start="2023-01-01", periods=3)
     data = {
-        "RELIANCE.NS": pd.DataFrame({
-            "date": dates,
-            "open": [100.0, 105.0, 110.0],
-            "high": [102.0, 107.0, 112.0],
-            "low": [98.0, 103.0, 108.0],
-            "close": [101.0, 106.0, 111.0],
-            "volume": [1000, 1000, 1000]
-        })
+        "RELIANCE.NS": pd.DataFrame(
+            {
+                "date": dates,
+                "open": [100.0, 105.0, 110.0],
+                "high": [102.0, 107.0, 112.0],
+                "low": [98.0, 103.0, 108.0],
+                "close": [101.0, 106.0, 111.0],
+                "volume": [1000, 1000, 1000],
+            }
+        )
     }
 
     engine = BacktestEngine(data, DummyStrategy(), initial_cash=10000.0, apply_costs=False)
@@ -38,6 +41,7 @@ def test_engine_zero_look_ahead():
     pos = engine.portfolio.positions["RELIANCE.NS"]
     assert pos.average_entry_price == 105.0
 
+
 class SizingTestStrategy(Strategy):
     def generate_signals(self, current_date, data, positions):
         if current_date == pd.Timestamp("2023-01-01"):
@@ -46,25 +50,30 @@ class SizingTestStrategy(Strategy):
             return [SignalEvent(timestamp=current_date, symbol="B", signal_type=1)]
         return []
 
+
 def test_engine_position_sizing_uses_total_equity():
     dates = pd.date_range(start="2023-01-01", periods=3)
     data = {
-        "A": pd.DataFrame({
-            "date": dates,
-            "open": [100.0, 100.0, 200.0],
-            "high": [100.0, 200.0, 200.0],
-            "low": [100.0, 100.0, 200.0],
-            "close": [100.0, 200.0, 200.0],
-            "volume": [1000, 1000, 1000]
-        }),
-        "B": pd.DataFrame({
-            "date": dates,
-            "open": [10.0, 10.0, 10.0],
-            "high": [10.0, 10.0, 10.0],
-            "low": [10.0, 10.0, 10.0],
-            "close": [10.0, 10.0, 10.0],
-            "volume": [1000, 1000, 1000]
-        })
+        "A": pd.DataFrame(
+            {
+                "date": dates,
+                "open": [100.0, 100.0, 200.0],
+                "high": [100.0, 200.0, 200.0],
+                "low": [100.0, 100.0, 200.0],
+                "close": [100.0, 200.0, 200.0],
+                "volume": [1000, 1000, 1000],
+            }
+        ),
+        "B": pd.DataFrame(
+            {
+                "date": dates,
+                "open": [10.0, 10.0, 10.0],
+                "high": [10.0, 10.0, 10.0],
+                "low": [10.0, 10.0, 10.0],
+                "close": [10.0, 10.0, 10.0],
+                "volume": [1000, 1000, 1000],
+            }
+        ),
     }
 
     engine = BacktestEngine(data, SizingTestStrategy(), initial_cash=10000.0, apply_costs=False)

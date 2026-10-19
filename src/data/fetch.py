@@ -27,17 +27,18 @@ def fetch_stock_data(symbol: str, start_date: str, end_date: str) -> pd.DataFram
 
         # Reset index to make Date a column and ensure it's timezone naive
         df = df.reset_index()
-        df['Date'] = pd.to_datetime(df['Date']).dt.tz_localize(None)
+        df["Date"] = pd.to_datetime(df["Date"]).dt.tz_localize(None)
 
         # Standardize column names
-        df = df[['Date', 'Open', 'High', 'Low', 'Close', 'Volume']]
-        df.columns = ['date', 'open', 'high', 'low', 'close', 'volume']
-        df['symbol'] = symbol
+        df = df[["Date", "Open", "High", "Low", "Close", "Volume"]]
+        df.columns = ["date", "open", "high", "low", "close", "volume"]
+        df["symbol"] = symbol
 
         return df
     except Exception as e:
         print(f"Error fetching data for {symbol}: {e}")
         return None
+
 
 def download_universe(symbols: list[str], start_date: str, end_date: str, save_dir: str = "data/raw"):
     """
@@ -51,6 +52,7 @@ def download_universe(symbols: list[str], start_date: str, end_date: str, save_d
             file_path = os.path.join(save_dir, f"{symbol.replace('.NS', '')}.csv")
             df.to_csv(file_path, index=False)
             print(f"Saved {symbol} data to {file_path}")
+
 
 if __name__ == "__main__":
     # Test script

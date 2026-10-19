@@ -9,6 +9,7 @@ class CPCV:
     Combinatorial Purged Cross-Validation (CPCV)
     As described by Marcos López de Prado (Advances in Financial Machine Learning, 2018).
     """
+
     def __init__(self, n_splits: int, n_test_splits: int, embargo_pct: float = 0.01):
         self.n_splits = n_splits
         self.n_test_splits = n_test_splits

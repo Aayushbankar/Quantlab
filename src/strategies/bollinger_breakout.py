@@ -14,25 +14,28 @@ class BollingerBreakoutStrategy(Strategy):
     Exits when price falls back below the 20-day middle moving average.
     Avoids duplicate BUY signals while a position is active.
     """
+
     def __init__(self, period: int = 20, num_std: float = 2.0):
         self.period = int(period)
         self.num_std = float(num_std)
 
-    def generate_signals(self, current_date: datetime, data: dict[str, pd.DataFrame], positions: dict) -> list[SignalEvent]:
+    def generate_signals(
+        self, current_date: datetime, data: dict[str, pd.DataFrame], positions: dict
+    ) -> list[SignalEvent]:
         signals = []
         for symbol, df in data.items():
-            past_data = df[df['date'] <= current_date]
+            past_data = df[df["date"] <= current_date]
             if len(past_data) < self.period + 1:
                 continue
 
-            closes = past_data['close'].tail(self.period).values
+            closes = past_data["close"].tail(self.period).values
             mean = np.mean(closes)
             std = np.std(closes)
             if std == 0:
                 continue
 
             upper_band = mean + (self.num_std * std)
-            current_close = past_data['close'].iloc[-1]
+            current_close = past_data["close"].iloc[-1]
 
             # Long Entry: Price closes above Upper Band with no existing position
             if current_close > upper_band:

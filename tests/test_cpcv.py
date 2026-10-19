@@ -17,6 +17,7 @@ def test_calculate_pbo_random_returns():
     # Pure random strategies should yield a PBO around 0.5 (50%)
     assert 0.4 <= pbo <= 0.6, f"Expected PBO ~0.5 for random data, got {pbo}"
 
+
 def test_calculate_pbo_real_signal():
     np.random.seed(42)
     # 1000 days, 50 random strategies
@@ -33,6 +34,7 @@ def test_calculate_pbo_real_signal():
     # Genuine strategy should consistently be chosen IS and perform well OOS, PBO should be very low
     assert pbo < 0.1, f"Expected low PBO for genuine signal, got {pbo}"
 
+
 def test_cpcv_embargo_ar1():
     np.random.seed(42)
     # Generate strongly autocorrelated returns (AR(1) process)
@@ -42,7 +44,7 @@ def test_cpcv_embargo_ar1():
     for i in range(20):
         eps = np.random.normal(0, 1, n)
         for t in range(1, n):
-            returns[t, i] = phi * returns[t-1, i] + eps[t]
+            returns[t, i] = phi * returns[t - 1, i] + eps[t]
 
     df = pd.DataFrame(returns, columns=[f"strat_{i}" for i in range(20)])
 

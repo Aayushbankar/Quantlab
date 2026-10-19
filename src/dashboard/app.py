@@ -1,4 +1,3 @@
-
 import streamlit as st
 
 from src.analytics.metrics import MetricsEngine
@@ -14,10 +13,12 @@ st.set_page_config(page_title="QuantLab Dashboard", layout="wide")
 st.title("QuantLab: Realistic Backtesting Engine")
 st.markdown("GTU DI05000341 Minor Project - Overfitting Diagnostic Platform")
 
+
 @st.cache_data
 def load_data():
     # Assuming data is downloaded in data/raw
     return load_and_clean_all("data/raw")
+
 
 data_dict = load_data()
 

@@ -55,7 +55,7 @@ def test_run_backtest_with_caching():
         "end_date": "2023-12-31",
         "initial_capital": 100000.0,
         "apply_costs": True,
-        "demo_mode": False
+        "demo_mode": False,
     }
     # First call: executes simulation
     res1 = client.post("/run", json=req)
@@ -82,7 +82,7 @@ def test_api_determinism():
         "end_date": "2023-12-31",
         "initial_capital": 100000.0,
         "apply_costs": True,
-        "demo_mode": False
+        "demo_mode": False,
     }
     res1 = client.post("/run", json=req).json()
     res2 = client.post("/run", json=req).json()
