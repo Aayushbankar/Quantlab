@@ -26,8 +26,10 @@ def _run():
 
 
 def test_backtest_is_byte_identical_across_runs():
-    a = _run()[["date", "total_equity"]].round(10)
-    b = _run()[["date", "total_equity"]].round(10)
+    a = _run()[["date", "total_equity"]].copy()
+    a["total_equity"] = a["total_equity"].round(10)
+    b = _run()[["date", "total_equity"]].copy()
+    b["total_equity"] = b["total_equity"].round(10)
 
     pd.testing.assert_frame_equal(a, b, check_exact=True)
 

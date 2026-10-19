@@ -28,6 +28,10 @@ Dated, justified decisions. If a rule is broken, a decision note is written **he
 | DEC-008 | 2026-10-16 | **FastAPI exposes the engine**; frontend consumes only the API contract | One codebase, three surfaces (CLI/GUI/web). The contract is frozen in `docs/api-contract.md` before UI work starts. | Ratified — critical path |
 | DEC-009 | 2026-10-16 | **Web frontend = Next.js + TypeScript + Tailwind + shadcn/ui + Recharts**; desktop via Tauri; PWA for mobile-browser reach | Charts and dashboard quality are the product's face, and TS is the fastest language to build them in. Flutter was rejected for v1 (Dart rewrite, weaker charting, slower ramp) — see `03_dead_ends.md`. | Ratified |
 | DEC-010 | 2026-10-16 | **Streamlit dashboard kept** as the demo fallback until Phase 4 | Zero-cost insurance. If the rebirth fails at the G4 gate the submission still has a working demo. | Active until Oct 22 |
+| DEC-011 | 2026-10-19 | **Dual-Pass Gross Counterfactual Formulation:** Unpenalized independent compounding run for Gross curve rather than shadow sizing | Illustrates the true idealized "Profit Mirage" that traps naive traders, where capital compounds friction-free. Reconciled against Net via statutory tollgate. | Ratified |
+| DEC-012 | 2026-10-19 | **SSE / Live Progress Bar Emission Throttle at 50 bars** | Emitting every single bar saturates client event loops and DOM re-renders. 50 bars provides sub-10ms latency and smooth visual feedback for 1,480-bar runs. | Ratified |
+| DEC-013 | 2026-10-19 | **Tiered Offline Replay Resolution (`DEMO_DATA=1` fail-safe)** | Viva demo must never crash on network failure: Tier 1 SQLite cache -> Tier 2 `experiments/` pre-computed artifacts -> Tier 3 local `data/raw/` offline simulation. | Ratified |
+| DEC-014 | 2026-10-19 | **Attribution & Shared Defense Protocol for GTU DI05000341** | Mitigate 40-1 commit split risk by formalizing per-member subsystem ownership in report Ch.3, adding co-authorship trailers, and adding dedicated student reflection sections. | Ratified |
 
 ## Agents-style working protocol
 

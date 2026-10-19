@@ -458,8 +458,8 @@ def build(df, prov, decay):
     r = p.add_run()
     r.text = ("Under realistic Indian costs over 2019–2024, none of the four classic strategies beat "
               "passive ownership on a risk-adjusted basis.\n\n"
-              "That is not a failure of the project. It is the result the engine was built to find.")
-    r.font.size = Pt(19); r.font.color.rgb = WHITE; r.font.name = "Calibri"
+              "Student Reflections (Syllabus 5.4): Zero-lookahead execution and statutory friction explain why over 90% of retail strategies fail live. An honest tool measures true worth.")
+    r.font.size = Pt(17); r.font.color.rgb = WHITE; r.font.name = "Calibri"
 
     for i, (num, lab) in enumerate([
         (f"{abs(shp):.0f}%", "of Sharpe removed\nby the cost stack"),
@@ -482,7 +482,7 @@ def build(df, prov, decay):
          "An honest backtesting tool does not tell you your idea works.\n"
          "It tells you what your idea is actually worth.",
          size=17, color=GTURED, bold=True, italic=True, align=PP_ALIGN.CENTER)
-    footer(s, prs, "GTU DI05000341 · Pramaan  ·  Apache 2.0  ·  Thank you")
+    footer(s, prs, "GTU DI05000341 · Pramaan · Aayush Bankar & Meet Patel · Apache 2.0")
 
     return prs
 

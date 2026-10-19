@@ -1201,6 +1201,47 @@ is one that tells you, with evidence, what your idea actually is worth.
     \item A licensed data provider behind a bring-your-own-key interface.
 \end{itemize}
 
+\section{Student Reflections and Learning Experience}\label{sec:reflections}
+
+In accordance with GTU DI05000341 syllabus guidelines (Unit 5, sub-point 5.4),
+both team members record their technical and operational reflections from the
+semester's engineering work below.
+
+\subsection{Reflection by Aayush Avinash Bankar (Team Leader, Enrolment: 246230316006)}
+\begin{quote}
+``The most profound technical realization of this project was discovering how easily
+a quantitative model can produce flattering, deceptive results that look perfectly
+valid on the surface. When building an event-driven engine from first principles,
+eliminating look-ahead bias required absolute discipline: forcing bar $t$ signals to
+execute strictly at bar $t+1$ Open initially degraded our paper CAGR, but it revealed
+real market mechanics.
+
+Furthermore, implementing Marcos L\'opez de Prado's Deflated Sharpe Ratio taught me
+that a high Sharpe ratio on historical data is virtually meaningless without
+accounting for trial count, skewness, and kurtosis. Developing the automated test
+suite of 35 regression tests proved essential: it caught subtle bugs like our RSI
+boundary inversion that had survived manual inspection. Building Pramaan has
+permanently altered my understanding of scientific computing and market microstructure.''
+\end{quote}
+
+\subsection{Reflection by Meet Jayeshbhai Patel (Team Member, Enrolment: 246230316133)}
+\begin{quote}
+``Working on the data ingestion pipeline, strategy specifications, and statutory
+Indian cost accounting provided an invaluable bridge between computer engineering and
+financial economics. My primary takeaway was understanding the destructive impact of
+frictions: seeing 48.2\% of Momentum's Sharpe ratio evaporate under SEBI and NSE
+statutory levies was an eye-opening empirical finding that explains why over 90\% of
+active retail traders lose money.
+
+Collaborating on this project taught me the critical difference between building a
+toy prototype and delivering an auditable, reproducible software artifact. Ensuring
+that every chart and table traces back to a version-controlled experiment log
+eliminated subjective bias. Overcoming data synchronization issues and managing
+project deliverables under strict deadlines significantly strengthened my teamwork,
+problem-solving, and technical communication skills.''
+\end{quote}
+
+
 % ================= REFERENCES =================
 \begin{thebibliography}{99}
 

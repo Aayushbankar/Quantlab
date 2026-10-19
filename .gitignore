@@ -29,6 +29,10 @@ experiments/equity_curves/
 *.toc
 *.lof
 *.lot
+
+# Databases
+*.db
+pramaan_runs.db
 *.synctex.gz
 *.fls
 *.fdb_latexmk

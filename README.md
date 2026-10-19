@@ -5,8 +5,8 @@
 Pramaan is an honest backtesting engine for Indian equities. It runs event-driven simulations under **zero look-ahead T+1 execution**, deducts the **full statutory Indian cost stack** to the paisa, and reports **overfitting diagnostics** (Deflated Sharpe Ratio, Combinatorial Purged Cross-Validation) — so you never mistake a paper illusion for a real edge.
 
 - **Status:** validated research engine + reproducible results artifact (GTU DI05000341 submission)
-- **What ships today:** the engine, its REST-free Python surface, a 30-run real-data matrix, the 35-test suite, a 40-page report and a 10-slide deck
-- **Planned, not built:** REST API (`src/api/`), Next.js web UI (`frontend/`), Tauri desktop — see `.agent/02_plan.md`
+- **What ships today:** the engine, the FastAPI REST backend (`src/api/`), the Next.js 15 UI (`frontend/`), a 30-run real-data matrix, the 41-test suite, a 42-page report, and a 10-slide deck
+- **Planned, not built:** Tauri desktop native packaging — see `.agent/02_plan.md`
 
 ---
 
@@ -39,17 +39,17 @@ These boundaries are deliberate. Limitations are documented because they are def
 git clone https://github.com/<org>/pramaan && cd pramaan
 pip install -r requirements.txt
 
-# Reproduce the full result matrix (30 runs, writes experiments/)
-PYTHONPATH=. python scripts/run_experiments.py
-# Regenerate every chart from the real engine output
-PYTHONPATH=. python scripts/generate_real_charts.py
-# Run the test suite
-PYTHONPATH=. python -m pytest tests/ -q        # 35 passed
+# Run the full test suite
+PYTHONPATH=. python -m pytest tests/ -q        # 41 passed
+
+# Launch the FastAPI backend (port 8000)
+uvicorn src.api.main:app --port 8000
+
+# In a separate terminal: Launch the Next.js 15 frontend (port 3000)
+cd frontend && npm run dev
 ```
 
-The Streamlit dashboard (`src/dashboard/app.py`) is the legacy demonstration surface. It reads `data/raw/`, so populate it first via `download_universe()` from `src/data/fetch.py` before running `streamlit run src/dashboard/app.py`.
-
-**Planned surfaces — not built, do not attempt:** `python -m src.api.main`, `frontend/`, desktop installers. They are specified in `.agent/02_plan.md` Phases 1–4 and will be built after the academic submission.
+The Streamlit dashboard (`src/dashboard/app.py`) remains available as a secondary legacy demonstration surface (`streamlit run src/dashboard/app.py`).
 
 ## Data
 
