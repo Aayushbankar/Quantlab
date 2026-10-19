@@ -1,0 +1,21 @@
+{
+  "profile_id": "zerodha_delivery_2024",
+  "name": "Zerodha Equity Delivery (w.e.f. Oct 2024)",
+  "broker": "Zerodha",
+  "exchange": "NSE",
+  "effective_date": "2024-10-01",
+  "unverified": false,
+  "source": "Zerodha Brokerage Calculator & NSE Circular Ref NSE/MEM/59142 (Sept 2024)",
+  "brokerage_percent": 0.0,
+  "brokerage_cap": 0.0,
+  "brokerage_flat": 0.0,
+  "stt_rate": 0.0010,
+  "stamp_duty_rate": 0.00015,
+  "exchange_turnover_rate": 0.0000297,
+  "sebi_turnover_rate": 0.0000010,
+  "ipft_rate": 0.0000010,
+  "dp_charge": 13.50,
+  "gst_rate": 0.18,
+  "slippage_floor_bps": 0.0,
+  "notes": "Verified against Zerodha published charges. 0 brokerage on delivery, DP charge Rs 13.50 per scrip per sell debited from ledger."
+}

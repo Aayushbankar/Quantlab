@@ -1,0 +1,21 @@
+{
+  "profile_id": "traditional_full_service",
+  "name": "Traditional Full Service Broker (Approximate)",
+  "broker": "Traditional Full Service",
+  "exchange": "NSE",
+  "effective_date": "2024-01-01",
+  "unverified": true,
+  "source": "Estimated legacy commission structure; unverified against specific active circular",
+  "brokerage_percent": 0.0050,
+  "brokerage_cap": 0.0,
+  "brokerage_flat": 0.0,
+  "stt_rate": 0.0010,
+  "stamp_duty_rate": 0.00015,
+  "exchange_turnover_rate": 0.0000300,
+  "sebi_turnover_rate": 0.0000010,
+  "ipft_rate": 0.0000010,
+  "dp_charge": 25.00,
+  "gst_rate": 0.18,
+  "slippage_floor_bps": 5.0,
+  "notes": "Unverified legacy rate card with 50 bps brokerage and Rs 25 DP charge."
+}

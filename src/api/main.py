@@ -205,6 +205,7 @@ def run_backtest(req: BacktestRequest):
         universe=req.universe,
         apply_costs=req.apply_costs,
         initial_cash=req.initial_capital,
+        cost_profile=req.cost_profile,
     )
 
     # 1. Tier 1: Check SQLite Cache
@@ -232,6 +233,8 @@ def run_backtest(req: BacktestRequest):
         end_date=req.end_date,
         initial_capital=req.initial_capital,
         apply_costs=req.apply_costs,
+        cost_profile=req.cost_profile,
+        slippage_floor_bps=req.slippage_floor_bps,
     )
 
     response_data = {

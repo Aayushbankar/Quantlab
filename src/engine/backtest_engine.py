@@ -15,11 +15,18 @@ class BacktestEngine:
     Signal on day T Close -> Executed on day T+1 Open.
     """
 
-    def __init__(self, data: dict[str, pd.DataFrame], strategy, initial_cash=100000.0, apply_costs=True):
+    def __init__(
+        self,
+        data: dict[str, pd.DataFrame],
+        strategy,
+        initial_cash=100000.0,
+        apply_costs=True,
+        cost_model: IndianCostModel | None = None,
+    ):
         self.data = data
         self.strategy = strategy
         self.portfolio = Portfolio(initial_cash=initial_cash)
-        self.cost_model = IndianCostModel(apply_costs=apply_costs)
+        self.cost_model = cost_model if cost_model is not None else IndianCostModel(apply_costs=apply_costs)
 
         # Internal state
         self.pending_orders: list[OrderEvent] = []

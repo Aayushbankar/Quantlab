@@ -1,0 +1,21 @@
+{
+  "profile_id": "standard_discount_2024",
+  "name": "Standard Retail Discount Broker (w.e.f. Oct 2024)",
+  "broker": "Standard Discount",
+  "exchange": "NSE",
+  "effective_date": "2024-10-01",
+  "unverified": false,
+  "source": "Standard retail broker rate card: min(Rs 20, 0.03%) brokerage, SEBI True-to-label NSE charges",
+  "brokerage_percent": 0.0003,
+  "brokerage_cap": 20.0,
+  "brokerage_flat": 0.0,
+  "stt_rate": 0.0010,
+  "stamp_duty_rate": 0.00015,
+  "exchange_turnover_rate": 0.0000297,
+  "sebi_turnover_rate": 0.0000010,
+  "ipft_rate": 0.0,
+  "dp_charge": 13.50,
+  "gst_rate": 0.18,
+  "slippage_floor_bps": 0.0,
+  "notes": "Default backtest profile matching original QuantLab baseline brokerage with DP charge on sell."
+}

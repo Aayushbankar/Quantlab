@@ -8,6 +8,7 @@ from src.analytics.deflated_sharpe import deflated_sharpe_ratio, expected_max_sh
 from src.analytics.metrics import MetricsEngine
 from src.data.clean import load_and_clean_all
 from src.engine.backtest_engine import BacktestEngine
+from src.engine.cost_model import IndianCostModel
 from src.engine.events import FillEvent
 from src.strategies.bh_and_hold import BuyAndHoldStrategy
 from src.strategies.bollinger_breakout import BollingerBreakoutStrategy
@@ -59,6 +60,8 @@ def execute_backtest(
     end_date: str,
     initial_capital: float = 100000.0,
     apply_costs: bool = True,
+    cost_profile: str = "standard_discount_2024",
+    slippage_floor_bps: float = 0.0,
 ) -> dict[str, Any]:
     t0 = time.time()
 
@@ -134,8 +137,17 @@ def execute_backtest(
 
     # 1. Primary Run (Net simulation with costs)
     strat_net = make_strategy(strategy_name, params)
+    model_net = IndianCostModel(
+        apply_costs=apply_costs,
+        profile=cost_profile,
+        slippage_floor_bps=slippage_floor_bps,
+    )
     engine_net = BacktestEngine(
-        data=filtered_data, strategy=strat_net, initial_cash=initial_capital, apply_costs=apply_costs
+        data=filtered_data,
+        strategy=strat_net,
+        initial_cash=initial_capital,
+        apply_costs=apply_costs,
+        cost_model=model_net,
     )
 
     captured_trades: list[dict[str, Any]] = []
@@ -145,6 +157,9 @@ def execute_backtest(
         "stamp_duty": 0.0,
         "turnover_fees": 0.0,
         "gst": 0.0,
+        "dp_charges": 0.0,
+        "sebi_fees": 0.0,
+        "ipft": 0.0,
         "market_impact": 0.0,
     }
 
@@ -168,6 +183,9 @@ def execute_backtest(
         total_costs_accum["stamp_duty"] += float(fill.stamp_duty)
         total_costs_accum["turnover_fees"] += float(fill.turnover_fee)
         total_costs_accum["gst"] += float(fill.gst)
+        total_costs_accum["dp_charges"] += float(getattr(fill, "dp_charge", 0.0))
+        total_costs_accum["sebi_fees"] += float(getattr(fill, "sebi_fee", 0.0))
+        total_costs_accum["ipft"] += float(getattr(fill, "ipft", 0.0))
         total_costs_accum["market_impact"] += float(fill.quantity * abs(fill.fill_price - fill.raw_price))
         return orig_apply_fill(fill)
 
@@ -235,6 +253,9 @@ def execute_backtest(
             "stamp_duty": round(total_costs_accum["stamp_duty"], 2),
             "turnover_fees": round(total_costs_accum["turnover_fees"], 2),
             "gst": round(total_costs_accum["gst"], 2),
+            "dp_charges": round(total_costs_accum["dp_charges"], 2),
+            "sebi_fees": round(total_costs_accum["sebi_fees"], 2),
+            "ipft": round(total_costs_accum["ipft"], 2),
             "market_impact": round(total_costs_accum["market_impact"], 2),
             "total_friction": round(cost_drag, 2),
             "friction_drag_pct": round(friction_pct, 2),
@@ -249,6 +270,6 @@ def execute_backtest(
         },
         "data_hash": data_hash,
         "engine_version": "1.0.0",
-        "cost_profile": "1.0-indian-delivery-2024",
+        "cost_profile": model_net.profile.profile_id,
         "execution_time_ms": round((time.time() - t0) * 1000.0, 2),
     }

@@ -59,3 +59,7 @@ class FillEvent(Event):
     gst: float
     turnover_fee: float
     total_cost: float
+    dp_charge: float = 0.0
+    sebi_fee: float = 0.0
+    ipft: float = 0.0
+    slippage: float = 0.0

@@ -39,6 +39,8 @@ class BacktestRequest(BaseModel):
         default=100000.0, ge=10000.0, le=100000000.0, description="Starting cash capital in INR"
     )
     apply_costs: bool = Field(default=True, description="Enable statutory Indian equity delivery cost stack & slippage")
+    cost_profile: str = Field(default="standard_discount_2024", description="Cost profile ID: standard_discount_2024 | zerodha_delivery_2024 | zerodha_delivery_pre_oct2024")
+    slippage_floor_bps: float = Field(default=0.0, ge=0.0, le=100.0, description="Minimum slippage/spread floor in basis points")
     demo_mode: bool = Field(default=False, description="Force offline replay mode from committed experiment artifacts")
 
     @model_validator(mode="after")
@@ -64,6 +66,9 @@ class CostBreakdown(BaseModel):
     stamp_duty: float = 0.0
     turnover_fees: float = 0.0
     gst: float = 0.0
+    dp_charges: float = 0.0
+    sebi_fees: float = 0.0
+    ipft: float = 0.0
     market_impact: float = 0.0
     total_friction: float = 0.0
     friction_drag_pct: float = 0.0
