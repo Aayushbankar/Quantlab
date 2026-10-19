@@ -3,7 +3,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
-\usepackage[margin=2.5cm, left=3cm, right=2.5cm, top=3cm, bottom=3cm]{geometry}
+\usepackage[left=3.0cm, right=2.2cm, top=2.3cm, bottom=2.3cm]{geometry}
 \usepackage{graphicx}
 \usepackage{amsmath, amsfonts, amssymb}
 \usepackage{fancyhdr}
@@ -21,6 +21,16 @@
 \usepackage{enumitem}
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows, positioning, fit, calc, shadows}
+
+% Float & whitespace optimizations to fully utilize A4 format
+\setlength{\headheight}{15pt}
+\setlength{\headsep}{14pt}
+\renewcommand{\topfraction}{0.90}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.10}
+\renewcommand{\floatpagefraction}{0.80}
+\captionsetup{font=small,labelfont={bf,color=gtublue},margin=6pt}
+\captionsetup[sub]{font=footnotesize,labelfont={bf,color=black!85}}
 
 \definecolor{gtublue}{RGB}{0, 51, 102}
 \definecolor{gtured}{RGB}{204, 0, 0}
@@ -70,12 +80,15 @@
 
 \titleformat{\chapter}[display]
   {\normalfont\Huge\bfseries\color{gtublue}}{\chaptertitlename\ \thechapter}{10pt}{\Huge}[\vspace{1ex}\titlerule]
-\titlespacing*{\chapter}{0pt}{-20pt}{30pt}
+\titlespacing*{\chapter}{0pt}{-10pt}{20pt}
 \titleformat{\section}{\normalfont\Large\bfseries\color{black!80}}{\thesection}{1em}{}
+\titlespacing*{\section}{0pt}{12pt plus 3pt minus 2pt}{5pt plus 1pt minus 1pt}
 \titleformat{\subsection}{\normalfont\large\bfseries\color{black!70}}{\thesubsection}{1em}{}
+\titlespacing*{\subsection}{0pt}{10pt plus 2pt minus 1pt}{4pt plus 1pt minus 1pt}
 
-\setstretch{1.25}
-\renewcommand{\arraystretch}{1.25}
+\setstretch{1.18}
+\renewcommand{\arraystretch}{1.20}
+\setlength{\parskip}{3pt plus 1pt minus 1pt}
 
 \newcommand{\rupee}{Rs.\ }
 % Per-member printed copies (identical content; only the deposit line differs)
@@ -455,7 +468,7 @@ models the statutory cost stack and reports selection-bias diagnostics.
 
 \begin{table}[h]
 \centering
-\caption{Comparison of available backtesting approaches against this project's requirements.}
+\caption[Backtesting Approaches Comparison]{Comparison of available backtesting approaches against this project's requirements.}
 \label{tab:competitors}
 \begin{tabular}{@{}p{3.1cm}p{2.1cm}p{2.0cm}p{2.0cm}p{3.2cm}@{}}
 \toprule
@@ -569,7 +582,7 @@ headlessly with no streaming or web framework present.
     \draw [thick,->,>=stealth] (data) -- (eng);
     \node [lab, right=0.25cm of eng, xshift=-6.4cm, yshift=0.55cm] {\textcolor{gtured}{untouched, regression-tested}};
 \end{tikzpicture}
-\caption{Layered architecture. The engine is the academic contribution and is never rewritten.}
+\caption[Layered System Architecture]{Layered architecture. The engine is the academic contribution and is never rewritten.}
 \label{fig:layers}
 \end{figure}
 
@@ -607,7 +620,7 @@ uses an explicit event loop with a one-bar delay between decision and execution.
     \draw [ar] (fill) -- (cost);
     \draw [ar] (cost) -- (ledger);
 \end{tikzpicture}
-\caption{The one-bar execution boundary. A signal generated at bar $t$'s close cannot be filled before bar $t+1$'s open.}
+\caption[One-Bar Zero-Lookahead Execution Boundary]{The one-bar execution boundary. A signal generated at bar $t$'s close cannot be filled before bar $t+1$'s open.}
 \label{fig:timeline}
 \end{figure}
 
@@ -719,7 +732,7 @@ prevent degenerate pricing on thin symbols.
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.85\textwidth]{charts/market_impact_curve.png}
-\caption{Impact as a function of order size at $\gamma=0.1$, $\sigma=0.02$, ADV $=10^6$. \textbf{This figure is the analytic model of Equation~\ref{eq:ac}, not a run artifact} --- it is labelled as such so it is not mistaken for engine output.}
+\caption[Almgren--Chriss Market Impact Model]{Impact as a function of order size at $\gamma=0.1$, $\sigma=0.02$, ADV $=10^6$. \textbf{This figure is the analytic model of Equation~\ref{eq:ac}, not a run artifact} --- it is labelled as such so it is not mistaken for engine output.}
 \label{fig:impact}
 \end{figure}
 
@@ -929,7 +942,7 @@ The full suite, with the specific defect or invariant each module guards:
 
 \begin{center}
 \begin{longtable}{@{}p{4.5cm}cp{7.0cm}@{}}
-\caption{Test inventory (72 automated tests across 16 test modules).} \label{tab:tests} \\
+\caption[Automated Test Inventory]{Test inventory (72 automated tests across 16 test modules).} \label{tab:tests} \\
 \toprule
 \textbf{Module} & \textbf{Tests} & \textbf{Core assertions} \\
 \midrule
@@ -984,93 +997,117 @@ fetch window, bar interval, adjustment policy, library versions, and the Python
 version. The results presented in Chapter~\ref{ch:results} are reproducible from
 that artifact by re-executing the pipeline.
 
-\section{Graphical Workstation and User Interface Architecture}\label{sec:ui_workstation}
+\section{Graphical Workstation and Interactive Audit Terminal}\label{sec:ui_workstation}
 
-To ensure that quantitative findings can be inspected by examiners, auditors, and practitioners without requiring terminal interaction, Pramaan delivers an institutional-grade graphical workstation built with Next.js~15, TypeScript, Tailwind~CSS, and custom high-resolution SVG charting engines. In accordance with the project's non-negotiable principle of computational honesty, the interface serves as a transparent audit vehicle: it never presents an uncomputed metric, always displays dataset and engine provenance, and renders dual-theme surfaces for clear verification.
+To ensure that research findings are inspectable by examiners, auditors, and practitioners without requiring code execution or terminal interaction, Pramaan delivers an institutional-grade graphical workstation built with Next.js~15, TypeScript, Tailwind~CSS, and custom high-resolution SVG charting engines. In accordance with the project's non-negotiable principle of computational honesty, the interface serves as a transparent delivery vehicle: it never presents an uncomputed metric, always displays dataset and engine provenance, and renders dual-theme surfaces for clear verification.
 
-\subsection{Profit Mirage Dissector}
-
-The primary workstation interface (Figure~\ref{fig:ui_mirage}) exposes the central thesis of this work: the divergence between gross theoretical performance and net realizable wealth under statutory levies.
+The graphical interface is completely decoupled from the simulation engine. The core backtester runs headlessly as an in-process Python library; the presentation layer communicates with the engine exclusively through the validated FastAPI REST interface (\S\ref{sec:impl}, FR-15). To maintain complete auditability, the frontend implements deterministic URL query synchronization (\texttt{?tab=mirage|costs|overfitting|ledger|unified\&theme=dark|light}), allowing examiners to deep-link directly into any forensic view.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{charts/screen_profit_mirage.png}
-\caption{The Pramaan Quant Workstation (Profit Mirage Dissector). Note the real-time execution provenance badge (\texttt{SERVED: CACHE}, SHA-256 dataset digest \texttt{1171aeb3}, true-to-label statutory rate card, engine online), strategy KPI cards with market exposure matching, and the visualised crimson friction drag between gross (cyan) and net (turquoise) equity curves.}
+\fboxrule=0.4pt \fboxsep=0pt \fbox{\includegraphics[width=0.96\textwidth]{charts/screen_profit_mirage.png}}
+\caption[Pramaan Quant Workstation (Profit Mirage Dissector)]{The Pramaan Quant Workstation (Profit Mirage Dissector). Note the real-time execution provenance badge (\texttt{SERVED: CACHE}, SHA-256 dataset digest \texttt{1171aeb3}, true-to-label statutory rate card, engine online), strategy KPI cards with market exposure matching, and the visualised crimson friction drag between gross (cyan) and net (turquoise) equity curves.}
 \label{fig:ui_mirage}
 \end{figure}
 
-The workstation displays:
-\begin{itemize}[leftmargin=1.5cm]
-    \item \textbf{Execution Provenance Bar:} A header audit ribbon displaying the run source (\texttt{LIVE}, \texttt{CACHE}, or \texttt{REPLAY}), the SHA-256 fingerprint of the market data partition, the active statutory rate profile (October 2024 SEBI circular calibration), and engine health.
-    \item \textbf{Dual-Curve Mirage Chart:} A dual-curve visualizer plotting the gross equity path (Pacific Cyan) alongside the net equity path (Turquoise), with the intervening area filled with a semi-transparent crimson shading representing cumulative capital eroded by statutory taxes and exchange friction.
-    \item \textbf{Standard and Exposure-Matched Metrics:} Four key performance indicator cards displaying CAGR, Sharpe ratio, maximum drawdown, and portfolio market exposure. Below each metric, the UI explicitly notes the exposure-matched buy-and-hold benchmark differential to eliminate passive holding bias.
-    \item \textbf{Methodological Disclaimers:} Prominent institutional warnings regarding survivorship bias (current 10 NIFTY large-caps) and simulation assumptions.
+The primary workstation interface (Figure~\ref{fig:ui_mirage}) exposes the central thesis of this work: the divergence between gross theoretical performance and net realizable wealth under statutory levies. Rather than displaying an isolated equity line, the workstation computes dual equity paths simultaneously:
+\begin{itemize}[leftmargin=1.2cm]
+    \item \textbf{Gross Equity Curve (Pacific Cyan, \texttt{\#2C8C99}):} Represents the theoretical zero-friction return path typically shown by commercial charting software and retail backtesters.
+    \item \textbf{Net Realizable Equity Curve (Turquoise, \texttt{\#42D9C8}):} Represents true cash-in-hand wealth after deducting exact Indian statutory taxes (STT, stamp duty, exchange turnover, SEBI fees, CDSL DP charges) and Almgren--Chriss market impact.
+    \item \textbf{Statutory Friction Area (Deep Crimson, \texttt{\#931621}):} The filled delta between the curves exposes the cumulative capital evaporated by institutional friction (\rupee 8{,}860 in the baseline SMA run).
 \end{itemize}
 
-\subsection{Statutory Friction Tollgate}
+\begin{table}[htbp]
+\centering
+\small
+\caption[Interactive Workstation Telemetry and Diagnostic Architecture]{Interactive workstation telemetry, provenance ribbons, and diagnostic panels.}
+\label{tab:ui_telemetry}
+\begin{tabular}{@{}p{3.2cm}p{3.8cm}p{6.8cm}@{}}
+\toprule
+\textbf{HUD Component} & \textbf{Telemetry Parameter} & \textbf{Audit \& Forensic Function} \\
+\midrule
+Provenance Ribbon & \texttt{SERVED: CACHE / LIVE} & Distinguishes cached pre-computed artifacts from real-time engine runs; prevents unverified claims. \\
+Data Digest Badge & SHA-256 (\texttt{1171aeb3}) & Cryptographic fingerprint of the 10-symbol NSE equity dataset; guarantees zero silent data mutations. \\
+Rate Profile Pill & \texttt{Oct 2024 True-to-Label} & Identifies active statutory tax schedule (STT 0.1\%, CDSL flat \rupee 13.50 + GST DP charge, SEBI fees). \\
+Mirage Dissector & Gross vs Net Curves & Interactive SVG visualizing equity paths; crimson fill exposes cumulative wealth eroded by taxes. \\
+Exposure KPI Cards & CAGR, Sharpe, MaxDD, Exp & Pairs active strategy return with exposure-matched benchmark to eliminate passive holding bias. \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-To unpack exactly where retail and algorithmic edges are eroded, the workstation provides a dedicated Statutory Tollgate inspector (Figure~\ref{fig:ui_tollgate}).
+\subsection{The Two Institutional Moats: Statutory Friction and Overfitting Diagnostics}
+
+Pramaan's academic and engineering contribution rests upon two diagnostic moats: exact Indian statutory friction modelling and statistical selection-bias measurement. Figure~\ref{fig:ui_moats} demonstrates how both capabilities are exposed interactively.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{charts/screen_statutory_tollgate.png}
-\caption{The Statutory Friction Tollgate view. Every statutory component is decomposed to paisa-level precision: Securities Transaction Tax (44.7\% of total friction), CDSL Depository Participant fees (\rupee 13.50 + 18\% GST on delivery sells), GST, Stamp Duty, and exchange turnover levies.}
-\label{fig:ui_tollgate}
-\end{figure}
-
-Unlike retail charting platforms that apply generic percentage slippages, this view exposes the true composition of Indian market friction:
-\begin{itemize}[leftmargin=1.5cm]
-    \item \textbf{Securities Transaction Tax (STT):} The dominant statutory cost (44.7\% of total friction in active configurations).
-    \item \textbf{Depository Participant (DP) Charges:} A flat levy of \rupee 13.50 plus 18\% GST per delivery sale debit by CDSL/NSDL, which disproportionately penalises small position sizes and active rebalancing.
-    \item \textbf{Exchange and Regulatory Fees:} NSE exchange turnover charges, SEBI regulatory turnover fees, and state stamp duty calculated precisely to statutory specifications.
-\end{itemize}
-
-\subsection{Overfitting Diagnostics and Cross-Validation}
-
-Figure~\ref{fig:ui_overfitting} illustrates the statistical validation suite integrated into the workstation, implementing the diagnostic frameworks of Marcos L{\'o}pez de Prado.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{charts/screen_overfitting_diagnostics.png}
-\caption{Institutional Overfitting Diagnostics interface. (Top) Deflated Sharpe Ratio (DSR) card displaying the Extreme Value Theory (EVT) expected maximum Sharpe hurdle (1.105) alongside the empirical strategy Sharpe (0.506) and selection variance across 133 evaluated models. (Bottom) Combinatorial Purged Cross-Validation (CPCV) matrix across 45 paths showing pathwise Sharpe distributions and empirical PBO.}
-\label{fig:ui_overfitting}
-\end{figure}
-
-The diagnostic dashboard renders:
-\begin{itemize}[leftmargin=1.5cm]
-    \item \textbf{Deflated Sharpe Ratio (DSR):} Evaluates whether an observed Sharpe ratio is statistically significant after accounting for data snooping across multiple trials ($N=133$). The interface displays the EVT expected maximum Sharpe hurdle ($E[\max SR] = 1.105$) that an active strategy must clear before being declared genuine.
-    \item \textbf{Combinatorial Purged Cross-Validation (CPCV) Matrix:} A visual matrix of 45 combinatorial paths ($k=10, g=2$) with a 1\% embargo window to eliminate serial correlation leakage. It reports the Probability of Backtest Overfitting ($\text{PBO} = 60.0\%$) accompanied by a 95\% bootstrap confidence interval $[44.4\%, 73.3\%]$.
-\end{itemize}
-
-\subsection{Execution Ledger and Theme Architecture}
-
-Figure~\ref{fig:ui_ledger} and Figure~\ref{fig:ui_themes} document the transaction audit trail and visual delivery surfaces.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{charts/screen_execution_ledger.png}
-\caption{Zero-Lookahead T+1 Execution Ledger. Every simulated fill records the signal timestamp (Day $t$ Close), the execution timestamp (Day $t+1$ Open), the fill price, applied slippage, and an invariant assertion confirming zero-lookahead compliance.}
-\label{fig:ui_ledger}
-\end{figure}
-
-\begin{figure}[htbp]
-\centering
-\begin{subfigure}[b]{0.48\textwidth}
+\begin{subfigure}[b]{0.485\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{charts/screen_terminal_light.png}
-    \caption{Institutional Light Mode (\emph{Fine Paper \& Teal}).}
-    \label{fig:ui_light}
+    \fboxrule=0.4pt \fboxsep=0pt \fbox{\includegraphics[width=\textwidth]{charts/screen_statutory_tollgate.png}}
+    \caption{Statutory Friction Tollgate (paisa-exact breakdown).}
+    \label{fig:ui_tollgate}
 \end{subfigure}
 \hfill
-\begin{subfigure}[b]{0.48\textwidth}
+\begin{subfigure}[b]{0.485\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{charts/screen_landing_page.png}
-    \caption{Public Product Landing Page.}
-    \label{fig:ui_landing}
+    \fboxrule=0.4pt \fboxsep=0pt \fbox{\includegraphics[width=\textwidth]{charts/screen_overfitting_diagnostics.png}}
+    \caption{Overfitting Diagnostics (DSR \& CPCV 45-path matrix).}
+    \label{fig:ui_overfitting}
 \end{subfigure}
-\caption{Dual-theme styling and public product landing surface. The application supports seamless toggling between Midnight Dark and Fine Paper Light modes, and provides a public educational portal articulating the dual moats of the Pramaan platform.}
-\label{fig:ui_themes}
+\caption[Pramaan Institutional Moats: Cost Tollgate and Overfitting Diagnostics]{The two institutional moats exposed interactively in the workstation: (a) paisa-exact Indian statutory friction breakdown showing STT (44.7\%) and flat CDSL DP charges (21.9\%), and (b) Marcos L{\'o}pez de Prado Deflated Sharpe Ratio with CPCV 45-path combinatorial matrix ($60.0\%$ PBO [44.4\%, 73.3\%]).}
+\label{fig:ui_moats}
 \end{figure}
+
+The \textbf{Statutory Tollgate} (Figure~\ref{fig:ui_tollgate}) decomposes trading friction to the paisa. It reveals that for delivery equities, Securities Transaction Tax (STT) accounts for 44.7\% of total friction, while CDSL Depository Participant (DP) charges (\rupee 13.50 + 18\% GST flat per delivery sell debit) contribute 21.9\%. Because DP charges are fixed per transaction rather than ad valorem, they impose a severe drag on smaller retail capital accounts and active rebalancing strategies.
+
+The \textbf{Overfitting Diagnostics} (Figure~\ref{fig:ui_overfitting}) implements Marcos L{\'o}pez de Prado's Deflated Sharpe Ratio (DSR) and Combinatorial Purged Cross-Validation (CPCV). In a grid of $N=133$ evaluated configurations, Extreme Value Theory dictates an expected maximum Sharpe hurdle $E[\max SR] = 1.105$. The observed active strategy Sharpe of $0.506$ fails to clear this threshold ($p\text{-val} = 0.072$), correctly flagging the result as statistically indistinguishable from luck. The CPCV matrix computes an empirical Probability of Backtest Overfitting $\text{PBO} = 60.0\%$ [44.4\%, 73.3\%] across 45 combinatorial paths ($k=10, g=2$) with a 1\% temporal embargo.
+
+\subsection{Execution Verifiability, Dual-Theme Architecture, and Product Portal}
+
+To verify zero-lookahead compliance and accommodate both digital and printed evaluation, the workstation incorporates transaction-level auditability, adaptive theming, and an educational landing portal (Figure~\ref{fig:ui_audit_themes} and Figure~\ref{fig:ui_landing}).
+
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}[b]{0.485\textwidth}
+    \centering
+    \fboxrule=0.4pt \fboxsep=0pt \fbox{\includegraphics[width=\textwidth]{charts/screen_execution_ledger.png}}
+    \caption{Zero-Lookahead T+1 Execution Ledger.}
+    \label{fig:ui_ledger}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.485\textwidth}
+    \centering
+    \fboxrule=0.4pt \fboxsep=0pt \fbox{\includegraphics[width=\textwidth]{charts/screen_terminal_light.png}}
+    \caption{Dual-Theme Institutional Light Mode.}
+    \label{fig:ui_light}
+\end{subfigure}
+\caption[Execution Ledger Audit and Institutional Light Mode]{Verifiable execution and multi-theme workstation architecture: (a) transaction ledger auditing the $t+1$ Open fill invariant, and (b) Institutional Light mode (\emph{Fine Paper \& Teal}) for formal paper presentation.}
+\label{fig:ui_audit_themes}
+\end{figure}
+
+The \textbf{T+1 Execution Ledger} (Figure~\ref{fig:ui_ledger}) audits every order fill. It displays the signal timestamp (Day $t$ Close), the execution timestamp (Day $t+1$ Open), executed prices, and Almgren--Chriss slippage, accompanied by a verified \texttt{T+1 ZERO-LOOKAHEAD} invariant assertion badge.
+
+The \textbf{Dual-Theme Engine} (Figure~\ref{fig:ui_light}) supports seamless toggling between Obsidian Dark (\texttt{\#0B0F17}) for low-light workstation monitoring and Institutional Light (\emph{Fine Paper \& Maritime Teal}, \texttt{\#F8FAFC}) for daytime viva evaluation and high-contrast physical printing.
+
+\begin{figure}[htbp]
+\centering
+\fboxrule=0.4pt \fboxsep=0pt \fbox{\includegraphics[width=0.75\textwidth]{charts/screen_landing_page.png}}
+\caption[Pramaan Public Product Portal and Interactive Cost Calculator]{Public landing page portal articulating the platform's core thesis and institutional moats, featuring the live interactive statutory cost calculator.}
+\label{fig:ui_landing}
+\end{figure}
+
+The public-facing product landing page (Figure~\ref{fig:ui_landing}) articulates Pramaan's mission (*"Prove your edge before you deploy a rupee"*), providing interactive sliders where retail practitioners can directly simulate how statutory taxes and depository charges erode compounding over multi-year horizons.
+
+\begin{defensebox}{Workstation Implementation \& Forensic Delivery Contract}
+\small
+The graphical delivery vehicle is decoupled from the computational engine through a formal contract:
+\begin{itemize}[leftmargin=1.0cm, topsep=2pt, itemsep=1pt, parsep=0pt]
+    \item \textbf{Decoupled Presentation Layer:} Next.js~15 App Router client communicating over REST endpoints with FastAPI (\texttt{src/api/}), validated via strict Zod schemas with a typed error envelope.
+    \item \textbf{Forensic Deep-Linking:} Deterministic URL synchronization via query parameters (\texttt{?tab=\dots} and \texttt{\&theme=\dots}) enables instant state sharing, bookmarking, and automated headless capture.
+    \item \textbf{Asynchronous Job Execution:} Long-running parameter sweeps and walk-forward evaluations run on background thread pools with non-blocking status polling via \texttt{GET /jobs/\{id\}}.
+    \item \textbf{Desktop Distribution:} Packaged as a native Linux desktop application (\texttt{pramaan-desktop}, 192~MB ELF executable) via Tauri~v2 wrapping WebKit2GTK for offline evaluation.
+\end{itemize}
+\end{defensebox}
 
 % ================= CHAPTER 4 =================
 \chapter{Modification and Redesign Based on Results}
@@ -1121,7 +1158,7 @@ $(SR_{\text{IS}} - SR_{\text{OOS}}) / |SR_{\text{IS}}|$\@.
 \begin{figure}[h]
 \centering
 \includegraphics[width=\textwidth]{charts/oos_decay.png}
-\caption{In-sample versus out-of-sample Sharpe (top) and the decay ratio (bottom), costs enabled, from the real run artifact.}
+\caption[In-Sample vs Out-of-Sample Sharpe Decay]{In-sample versus out-of-sample Sharpe (top) and the decay ratio (bottom), costs enabled, from the real run artifact.}
 \label{fig:decay}
 \end{figure}
 
@@ -1167,7 +1204,7 @@ Runs executed & 30 \\
 \begin{figure}[h]
 \centering
 \includegraphics[width=\textwidth]{charts/profit_mirage.png}
-\caption{Sharpe ratio with costs disabled and enabled (left) and the statutory cost drag on terminal equity (right). The dashed line is the buy-and-hold benchmark. Rendered from \texttt{experiments/experiment\_log.csv}.}
+\caption[The Profit Mirage: Gross vs Net Sharpe and Cost Drag]{Sharpe ratio with costs disabled and enabled (left) and the statutory cost drag on terminal equity (right). The dashed line is the buy-and-hold benchmark. Rendered from \texttt{experiments/experiment\_log.csv}.}
 \label{fig:mirage}
 \end{figure}
 
@@ -1185,7 +1222,7 @@ frequency.
 
 \begin{table}[h]
 \centering
-\caption{Real results, full period, costs enabled. Source: \texttt{experiments/experiment\_log.csv}.}
+\caption[Real Backtest Performance Matrix (Full Period)]{Real results, full period, costs enabled. Source: \texttt{experiments/experiment\_log.csv}.}
 \label{tab:full}
 \begin{tabular}{@{}lccccc@{}}
 \toprule
