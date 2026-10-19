@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import numpy as np
 import pandas as pd
 
 from src.engine.events import SignalEvent
@@ -22,19 +23,23 @@ class SMACrossoverStrategy(Strategy):
     ) -> list[SignalEvent]:
         signals = []
         for symbol, df in data.items():
-            # Get data up to current date
-            past_data = df[df["date"] <= current_date]
+            if df.empty:
+                continue
+            # Use already-sliced frame directly if available (D10); fallback to filter only if needed
+            dates = df["date"].values
+            past_data = df if dates[-1] <= np.datetime64(current_date) else df[df["date"] <= current_date]
             if len(past_data) < self.slow_window + 1:
                 continue  # Not enough data
 
             # Calculate SMAs efficiently using the last few rows
-            closes = past_data["close"].tail(self.slow_window + 1).values
+            closes = past_data["close"].values
+            w = closes[-(self.slow_window + 1) :]
 
-            fast_ma_today = closes[-self.fast_window :].mean()
-            slow_ma_today = closes[-self.slow_window :].mean()
+            fast_ma_today = float(np.sum(w[-self.fast_window :]) / self.fast_window)
+            slow_ma_today = float(np.sum(w[-self.slow_window :]) / self.slow_window)
 
-            fast_ma_yest = closes[-(self.fast_window + 1) : -1].mean()
-            slow_ma_yest = closes[-(self.slow_window + 1) : -1].mean()
+            fast_ma_yest = float(np.sum(w[-(self.fast_window + 1) : -1]) / self.fast_window)
+            slow_ma_yest = float(np.sum(w[-(self.slow_window + 1) : -1]) / self.slow_window)
 
             # Cross above
             if fast_ma_yest <= slow_ma_yest and fast_ma_today > slow_ma_today:

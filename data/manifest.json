@@ -1,0 +1,110 @@
+{
+  "version": "1.0.0",
+  "description": "Committed synthetic fixture and demo dataset with SHA-256 checksums",
+  "files": {
+    "BHARTIARTL.csv": {
+      "symbol": "BHARTIARTL",
+      "sha256": "a574f52a53925590da637cdeb76c097422537df584533112636c34052c694a8d",
+      "size_bytes": 109764,
+      "bars": 1566,
+      "start_date": "2019-01-01",
+      "end_date": "2024-12-31"
+    },
+    "FIXTR.csv": {
+      "symbol": "FIXTR",
+      "sha256": "1c64603661d7b0de93aaa1cd49d28e7a092deeb8e144b26804ec803bf6c5404a",
+      "size_bytes": 101379,
+      "bars": 1566,
+      "start_date": "2019-01-01",
+      "end_date": "2024-12-31"
+    },
+    "HDFCBANK.csv": {
+      "symbol": "HDFCBANK",
+      "sha256": "ca47a614b78de37414c3521f71b8cf347b9a163a96c03450946b7bc8b0afa503",
+      "size_bytes": 109030,
+      "bars": 1566,
+      "start_date": "2019-01-01",
+      "end_date": "2024-12-31"
+    },
+    "HINDUNILVR.csv": {
+      "symbol": "HINDUNILVR",
+      "sha256": "6f608f0b4b1a7b96d4e4af4fed3a66e84ed1be27dc4b90178eaabeb6b3d110b2",
+      "size_bytes": 109171,
+      "bars": 1566,
+      "start_date": "2019-01-01",
+      "end_date": "2024-12-31"
+    },
+    "ICICIBANK.csv": {
+      "symbol": "ICICIBANK",
+      "sha256": "60ebc8ac663c8ed1c3c419dc41635749cd93fe4cd6ade8f3ae289f8bd699b074",
+      "size_bytes": 106323,
+      "bars": 1566,
+      "start_date": "2019-01-01",
+      "end_date": "2024-12-31"
+    },
+    "INFY.csv": {
+      "symbol": "INFY",
+      "sha256": "2b015abb02d12ebc4ed4d8ecc8b89ff45a2aa60974b9953f984fe04c92f3019b",
+      "size_bytes": 99268,
+      "bars": 1566,
+      "start_date": "2019-01-01",
+      "end_date": "2024-12-31"
+    },
+    "ITC.csv": {
+      "symbol": "ITC",
+      "sha256": "a767362a44422bcc13d9b97b88a16a12a1dc6bfa1890810c406d9a0747ccf2d5",
+      "size_bytes": 93530,
+      "bars": 1566,
+      "start_date": "2019-01-01",
+      "end_date": "2024-12-31"
+    },
+    "LT.csv": {
+      "symbol": "LT",
+      "sha256": "dde0d21a3070d30138e7c79cc1eba2b213d74b08a59d729cb410e95249d08f26",
+      "size_bytes": 100137,
+      "bars": 1566,
+      "start_date": "2019-01-01",
+      "end_date": "2024-12-31"
+    },
+    "RELIANCE.csv": {
+      "symbol": "RELIANCE",
+      "sha256": "cb126eca2ba2fd31f52265abbef4e9650226504ba7847a9100b671149215d400",
+      "size_bytes": 107451,
+      "bars": 1566,
+      "start_date": "2019-01-01",
+      "end_date": "2024-12-31"
+    },
+    "SBIN.csv": {
+      "symbol": "SBIN",
+      "sha256": "a9968b5cc25707b7de55c960598dd6935ff3e5aa6185664f39d1ae96aac6a382",
+      "size_bytes": 95931,
+      "bars": 1566,
+      "start_date": "2019-01-01",
+      "end_date": "2024-12-31"
+    },
+    "SYNTH.csv": {
+      "symbol": "SYNTH",
+      "sha256": "0038fd6c897645db680e465d857d86aad02439e14f4ebc3a5b5b4f4bb57e7195",
+      "size_bytes": 103774,
+      "bars": 1566,
+      "start_date": "2019-01-01",
+      "end_date": "2024-12-31"
+    },
+    "TCS.csv": {
+      "symbol": "TCS",
+      "sha256": "f51490efbbeb8b717c6b3363f841da8a44ccf37c0d77ee09028fef3dfe07a363",
+      "size_bytes": 98810,
+      "bars": 1566,
+      "start_date": "2019-01-01",
+      "end_date": "2024-12-31"
+    },
+    "TESTCO.csv": {
+      "symbol": "TESTCO",
+      "sha256": "90020d6d25d31331c86a0fd8399c0eaae64022010b0d00e8e96e37afdecf2b0d",
+      "size_bytes": 105679,
+      "bars": 1566,
+      "start_date": "2019-01-01",
+      "end_date": "2024-12-31"
+    }
+  }
+}

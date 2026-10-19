@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import numpy as np
 import pandas as pd
 
 from src.engine.events import SignalEvent
@@ -22,12 +23,14 @@ class MomentumStrategy(Strategy):
     ) -> list[SignalEvent]:
         signals = []
         for symbol, df in data.items():
-            past_data = df[df["date"] <= current_date]
+            if df.empty:
+                continue
+            dates = df["date"].values
+            past_data = df if dates[-1] <= np.datetime64(current_date) else df[df["date"] <= current_date]
             if len(past_data) < self.lookback_period + 1:
                 continue
 
-            closes = past_data["close"].tail(self.lookback_period + 1).values
-
+            closes = past_data["close"].values
             price_today = closes[-1]
             price_n_days_ago = closes[-1 - self.lookback_period]
 

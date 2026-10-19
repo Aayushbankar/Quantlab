@@ -101,7 +101,7 @@ def _generate_symbol_df(
     return df
 
 
-def generate_fixture_data() -> dict[str, pd.DataFrame]:
+def generate_fixture_data(seed: int = SEED) -> dict[str, pd.DataFrame]:
     """
     Generate deterministic synthetic OHLCV data for all fixture symbols.
 
@@ -111,7 +111,7 @@ def generate_fixture_data() -> dict[str, pd.DataFrame]:
         Mapping of symbol name (without .NS suffix) to a cleaned DataFrame
         ready for the backtest engine.  Columns: date, open, high, low, close, volume.
     """
-    rng = np.random.default_rng(SEED)
+    rng = np.random.default_rng(seed)
     dates = pd.bdate_range(start=START_DATE, end=END_DATE)
 
     data: dict[str, pd.DataFrame] = {}

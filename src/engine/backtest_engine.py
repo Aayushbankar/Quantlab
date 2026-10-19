@@ -1,5 +1,6 @@
 import logging
 
+import numpy as np
 import pandas as pd
 
 from src.engine.cost_model import IndianCostModel
@@ -36,38 +37,57 @@ class BacktestEngine:
         """Creates a sorted master timeline of all dates across the universe."""
         dates = set()
         self.idx_trackers = {}
+        self._date_arrays = {}
+        self._close_arrays = {}
+        self._open_arrays = {}
+        self._high_arrays = {}
+        self._low_arrays = {}
+        self._vol_arrays = {}
+
         for symbol, df in self.data.items():
             dates.update(df["date"].tolist())
             self.idx_trackers[symbol] = 0  # Track row index for O(1) slicing
+            self._date_arrays[symbol] = df["date"].to_numpy()
+            self._close_arrays[symbol] = df["close"].to_numpy()
+            self._open_arrays[symbol] = df["open"].to_numpy()
+            self._high_arrays[symbol] = df["high"].to_numpy()
+            self._low_arrays[symbol] = df["low"].to_numpy()
+            self._vol_arrays[symbol] = df["volume"].to_numpy()
+
         self.timeline = sorted(list(dates))
 
     def run(self):
         """Executes the backtest."""
         logger.info("Starting High-Performance Event Loop...")
+        sliced_data = {s: self.data[s].iloc[:0] for s in self.data}
+        prev_indices = {s: 0 for s in self.data}
 
         for current_date in self.timeline:
-            # 1. T+1 OPEN: Execute pending orders
-            self._execute_pending_orders(current_date)
+            c_date_np = np.datetime64(current_date)
 
-            # Update trackers
-            for symbol, df in self.data.items():
+            # 1. T+1 OPEN: Execute pending orders
+            self._execute_pending_orders(current_date, c_date_np)
+
+            # Update trackers using fast numpy comparison
+            for symbol, arr in self._date_arrays.items():
                 idx = self.idx_trackers[symbol]
-                if idx < len(df) and df["date"].iloc[idx] <= current_date:
-                    self.idx_trackers[symbol] += 1
+                if idx < len(arr) and arr[idx] <= c_date_np:
+                    self.idx_trackers[symbol] = idx + 1
 
             # 2. T CLOSE: MTM and signal generation
             current_prices = {}
-            for symbol, df in self.data.items():
+            for symbol, arr in self._date_arrays.items():
                 idx = self.idx_trackers[symbol] - 1
-                if idx >= 0 and df["date"].iloc[idx] == current_date:
-                    current_prices[symbol] = df["close"].iloc[idx]
+                if idx >= 0 and arr[idx] == c_date_np:
+                    current_prices[symbol] = self._close_arrays[symbol][idx]
 
             self.portfolio.update_timeindex(current_date, current_prices)
 
-            # Fast O(1) Data Slicing (Eliminates O(N^2) memory thrashing)
-            sliced_data = {}
-            for symbol, df in self.data.items():
-                sliced_data[symbol] = df.iloc[: self.idx_trackers[symbol]]
+            # Fast O(1) Data Slicing (only re-slice if index advanced)
+            for symbol, idx in self.idx_trackers.items():
+                if idx != prev_indices[symbol]:
+                    sliced_data[symbol] = self.data[symbol][:idx]
+                    prev_indices[symbol] = idx
 
             signals = self.strategy.generate_signals(current_date, sliced_data, self.portfolio.positions)
             self._process_signals(signals, current_date, sliced_data)
@@ -75,31 +95,45 @@ class BacktestEngine:
         logger.info("Backtest completed.")
         return pd.DataFrame(self.portfolio.equity_history)
 
-    def _execute_pending_orders(self, current_date):
+    def _execute_pending_orders(self, current_date, c_date_np=None):
         """Fills orders with Trade-Through Limit Logic and Market Impact."""
+        if not self.pending_orders:
+            return
+        if c_date_np is None:
+            c_date_np = np.datetime64(current_date)
         executed = []
         for order in self.pending_orders:
-            df = self.data.get(order.symbol)
-            idx = self.idx_trackers[order.symbol]
-            if idx < len(df) and df["date"].iloc[idx] == current_date:
-                row = df.iloc[idx]
+            sym = order.symbol
+            idx = self.idx_trackers[sym]
+            dates = self._date_arrays.get(sym)
+            if dates is not None and idx < len(dates) and dates[idx] == c_date_np:
+                low_val = self._low_arrays[sym][idx]
+                high_val = self._high_arrays[sym][idx]
+                open_val = self._open_arrays[sym][idx]
 
                 # Trade-Through Limit Order Logic
                 if order.order_type == "LMT":
-                    if order.side == "BUY" and row["low"] >= order.limit_price:
+                    if order.side == "BUY" and low_val >= order.limit_price:
                         continue  # Price never reached limit
-                    if order.side == "SELL" and row["high"] <= order.limit_price:
+                    if order.side == "SELL" and high_val <= order.limit_price:
                         continue
                     exec_price = order.limit_price  # Executed exactly at limit
                 else:
-                    exec_price = row["open"]  # MKT executes at Open
+                    exec_price = open_val  # MKT executes at Open
 
-                # Estimate Volatility and ADV for Almgren-Chriss Impact
-                past_data = df.iloc[max(0, idx - 20) : idx]
-                vol = past_data["close"].pct_change().std() if len(past_data) > 2 else 0.02
-                adv = past_data["volume"].mean() if len(past_data) > 2 else 1000000
-                vol = vol if not pd.isna(vol) else 0.02
-                adv = adv if not pd.isna(adv) else 1000000
+                # Estimate Volatility and ADV for Almgren-Chriss Impact via fast numpy
+                start_k = max(0, idx - 20)
+                if idx - start_k > 2:
+                    c_window = self._close_arrays[sym][start_k:idx]
+                    rets = np.diff(c_window) / c_window[:-1]
+                    vol = float(np.std(rets, ddof=1))
+                    adv = float(np.mean(self._vol_arrays[sym][start_k:idx]))
+                else:
+                    vol = 0.02
+                    adv = 1000000.0
+
+                vol = vol if not (np.isnan(vol) or vol == 0) else 0.02
+                adv = adv if not (np.isnan(adv) or adv == 0) else 1000000.0
 
                 fill_event = self.cost_model.process_order(order, exec_price, volatility=vol, adv=adv)
 

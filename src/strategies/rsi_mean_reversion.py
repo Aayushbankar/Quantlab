@@ -22,14 +22,17 @@ class RSIMeanReversionStrategy(Strategy):
     def _calculate_rsi(self, closes: np.ndarray):
         deltas = np.diff(closes)
         seed = deltas[: self.period]
-        up = seed[seed >= 0].sum() / self.period
-        down = -seed[seed < 0].sum() / self.period
+        up = float(seed[seed >= 0].sum() / self.period)
+        down = float(-seed[seed < 0].sum() / self.period)
         rs = self._relative_strength(up, down)
-        rsi = np.zeros_like(closes)
-        rsi[: self.period] = 100.0 - 100.0 / (1.0 + rs)
+        curr_rsi = 100.0 - 100.0 / (1.0 + rs)
+        prev_rsi = curr_rsi
+
+        p_minus_1 = self.period - 1
+        p_float = float(self.period)
 
         for i in range(self.period, len(closes)):
-            delta = deltas[i - 1]
+            delta = float(deltas[i - 1])
             if delta > 0:
                 upval = delta
                 downval = 0.0
@@ -37,11 +40,12 @@ class RSIMeanReversionStrategy(Strategy):
                 upval = 0.0
                 downval = -delta
 
-            up = (up * (self.period - 1) + upval) / self.period
-            down = (down * (self.period - 1) + downval) / self.period
+            up = (up * p_minus_1 + upval) / p_float
+            down = (down * p_minus_1 + downval) / p_float
             rs = self._relative_strength(up, down)
-            rsi[i] = 100.0 - 100.0 / (1.0 + rs)
-        return rsi[-1], rsi[-2]
+            prev_rsi = curr_rsi
+            curr_rsi = 100.0 - 100.0 / (1.0 + rs)
+        return curr_rsi, prev_rsi
 
     @staticmethod
     def _relative_strength(up: float, down: float) -> float:
@@ -58,12 +62,15 @@ class RSIMeanReversionStrategy(Strategy):
     ) -> list[SignalEvent]:
         signals = []
         for symbol, df in data.items():
-            past_data = df[df["date"] <= current_date]
+            if df.empty:
+                continue
+            dates = df["date"].values
+            past_data = df if dates[-1] <= np.datetime64(current_date) else df[df["date"] <= current_date]
             if len(past_data) < self.period * 2:
                 continue
 
             # Need a decent buffer to calculate Wilder's smoothing accurately
-            closes = past_data["close"].tail(self.period * 5).values
+            closes = past_data["close"].values[-(self.period * 5) :]
             rsi_today, rsi_yest = self._calculate_rsi(closes)
 
             # Oversold -> Buy
