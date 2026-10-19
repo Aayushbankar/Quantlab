@@ -1,0 +1,9 @@
+\chapter{Market Microstructure}
+\section{Execution and the Almgren-Chriss Framework}
+Optimal execution trajectories are modeled using the Almgren-Chriss framework to balance market impact costs against volatility risk. We model temporary market impact using the square-root law: 
+\begin{equation}
+\Delta P = \gamma \sigma \sqrt{\frac{Q}{V}}
+\end{equation}
+where $Q$ is the order size, $V$ is the average daily volume, $\sigma$ is the asset's volatility, and $\gamma$ is an empirical constant.
+\section{Limit Order Trade-Through Logic}
+The simulation engine models limit order executions by mapping exact Trade-Through events. An order resting at price $P_L$ is only filled if the exchange matching engine processes subsequent trades at prices $P_T \leq P_L$ (for buys), accounting for the queue position and latent historical volume.

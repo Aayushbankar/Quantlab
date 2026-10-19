@@ -92,7 +92,7 @@
 |-----------|----------|-----------|-------------|------------------------|
 | **Brokerage** | 0.03% (cap ₹20) | 0.03% (cap ₹20) | Broker-specific, discount broker standard | `min(20, value × 0.0003)` |
 | **STT** | 0.10% | 0.10% | Finance Act 2004, Sec 98 | `value × 0.0010` |
-| **NSE Turnover** | 0.00345% | 0.00345% | NSE Circular 2024 | `value × 0.0000345` |
+**NSE Turnover (reconciled C-01):** 0.00297% (SEBI True-to-Label w.e.f. Oct 2024) | 0.00297% | 0.00297% | `value × 0.0000297` |
 | **SEBI Turnover** | ₹10/Crore | ₹10/Crore | SEBI Act | `value × 0.000001` |
 | **GST** | 18% on (Brok+Turnover) | 18% on (Brok+Turnover) | CGST Act 2017 | `(brok+turnover) × 0.18` |
 | **Stamp Duty** | 0.015% | 0% (buy only) | Indian Stamp Act 2019 Rules | `value × 0.00015` (buy) |

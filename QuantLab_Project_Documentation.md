@@ -87,7 +87,7 @@ Diploma-level evaluators (as a demonstrable prototype), and secondarily, any stu
 - No paid APIs or brokers
 - Daily-bar resolution only (no tick-level data)
 - Single asset class: equities
-- Single market: to be fixed by the team (Indian equities recommended)
+- Single market: Indian equities (NSE) with statutory cost modeling
 
 ### 2.4 Assumptions
 
@@ -344,7 +344,6 @@ quantlab/
 **Explicitly out of scope (state this in the report — it strengthens the viva, not weakens it):**
 - No live/paper trading execution — backtesting only
 - No tick-level or intraday data
-- No market-impact modeling (large orders assumed to not move the market)
 - No partial order fills — orders assumed fully filled at (adjusted) price
 - No multi-asset-class support (equities only)
 - Not a production trading recommendation system

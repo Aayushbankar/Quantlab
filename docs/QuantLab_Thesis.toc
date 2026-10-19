@@ -1,0 +1,17 @@
+\contentsline {chapter}{\numberline {1}Seminar 1: Literature Survey \& Problem Identification}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}The Retail Trading Crisis in India}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Literature Review: The "Profit Mirage"}{1}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Project Rationale and Objectives}{2}{section.1.3}%
+\contentsline {chapter}{\numberline {2}Seminar 2: System Architecture \& Methodology}{3}{chapter.2}%
+\contentsline {section}{\numberline {2.1}The Core Architecture (Event-Driven vs Vectorized)}{3}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Architectural Flowchart}{3}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Solving the Python Performance Bottleneck: $\mathcal {O}(1)$ Slicing}{3}{section.2.3}%
+\contentsline {chapter}{\numberline {3}Seminar 3: Testing, Microstructure \& Real Output}{5}{chapter.3}%
+\contentsline {section}{\numberline {3.1}The Indian Cost Model Formulation}{5}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Advanced Microstructure: The Almgren-Chriss Equation}{5}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Limit Order Trade-Through Logic}{6}{section.3.3}%
+\contentsline {chapter}{\numberline {4}Experimental Results \& Case Studies}{7}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Bypassing Data Blocking for Real-World Analysis}{7}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Case Study: Reliance Industries \& TCS (2023-2024)}{7}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Statistical Validation (CPCV)}{8}{section.4.3}%
+\contentsline {chapter}{\numberline {5}Seminar 4: Final Viva Voce Defense Guide}{10}{chapter.5}%

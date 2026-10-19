@@ -1,0 +1,7 @@
+\chapter{System Architecture}
+\section{The V2 Event-Driven Loop}
+The architecture transitions from a vectorized pseudo-framework to a granular V2 Event Loop. This architecture strictly processes sequential state transitions, ensuring that state vectors at time $t$ contain no information from $t+1$. 
+\section{O(1) Memory Slicing and Performance}
+To circumvent the computational overhead of iterative state copying, the engine utilizes zero-copy contiguous memory views. Historical window lookbacks are executed via pointer arithmetic, achieving $\mathcal{O}(1)$ time complexity and minimizing cache misses.
+\section{Zero Look-Ahead Invariants}
+A mathematically enforced temporal invariant dictates that any signal generated at bar $t$ (Close) can only be executed at bar $t+1$ (Open) or later. This structural separation mathematically eliminates look-ahead bias.

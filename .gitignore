@@ -1,0 +1,38 @@
+venv
+data/raw/
+data/processed/
+__pycache__/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Frontend / desktop (separate release channels)
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/dist/
+frontend/target/
+frontend/src-tauri/target/
+
+# Secrets — never commit keys
+.env
+.env.local
+*.pem
+
+
+# Real engine output — bulk, regenerate via scripts/run_experiments.py
+experiments/equity_curves/
+
+# LaTeX build artifacts (keep the .tex and the .pdf)
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+
+# Databases
+*.db
+pramaan_runs.db
+*.synctex.gz
+*.fls
+*.fdb_latexmk

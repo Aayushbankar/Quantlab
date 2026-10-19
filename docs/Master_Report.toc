@@ -1,0 +1,20 @@
+\contentsline {chapter}{List of Figures}{ii}{chapter*.1}%
+\contentsline {chapter}{List of Tables}{iii}{chapter*.2}%
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}The Retail Trading Landscape and SEBI Findings}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Project Rationale}{1}{section.1.2}%
+\contentsline {chapter}{\numberline {2}System Architecture}{2}{chapter.2}%
+\contentsline {section}{\numberline {2.1}The V2 Event-Driven Loop}{2}{section.2.1}%
+\contentsline {section}{\numberline {2.2}O(1) Memory Slicing and Performance}{2}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Zero Look-Ahead Invariants}{2}{section.2.3}%
+\contentsline {chapter}{\numberline {3}Market Microstructure}{3}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Execution and the Almgren-Chriss Framework}{3}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Limit Order Trade-Through Logic}{3}{section.3.2}%
+\contentsline {chapter}{\numberline {4}Statistical Validation}{4}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Combinatorial Purged Cross-Validation (CPCV)}{4}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Deflated Sharpe Ratio (DSR) and Overfitting}{4}{section.4.2}%
+\contentsline {chapter}{\numberline {5}Case Studies and Results}{5}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Regime Analysis: RELIANCE \& TCS}{5}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Experimental Visualizations}{5}{section.5.2}%
+\contentsline {chapter}{\numberline {6}Defense and Viva Voce Framework}{7}{chapter.6}%
+\contentsline {section}{\numberline {6.1}The 6-Level WWWH Interrogation Matrix}{7}{section.6.1}%
