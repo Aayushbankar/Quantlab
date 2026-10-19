@@ -1,23 +1,17 @@
 import os
 import sys
+
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from typing import List
 
-from src.api.schemas import (
-    BacktestRequest,
-    BacktestResponse,
-    HealthResponse,
-    StrategyMetadata,
-    UniverseResponse
-)
-from src.api.cache import compute_run_id
-from src.api.db import get_cached_run, save_run, list_recent_runs
-from src.api.replay import get_replay_run
 from src.api.adapter import execute_backtest
-from src.data.universe import get_universe, get_benchmark
+from src.api.cache import compute_run_id
+from src.api.db import get_cached_run, list_recent_runs, save_run
+from src.api.replay import get_replay_run
+from src.api.schemas import BacktestRequest, BacktestResponse, HealthResponse, StrategyMetadata, UniverseResponse
+from src.data.universe import get_benchmark, get_universe
 
 app = FastAPI(
     title="Pramaan API",
@@ -49,7 +43,7 @@ def health_check():
     )
 
 
-@app.get("/strategies", response_model=List[StrategyMetadata])
+@app.get("/strategies", response_model=list[StrategyMetadata])
 def get_strategies():
     return [
         StrategyMetadata(

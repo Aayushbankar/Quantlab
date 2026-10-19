@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 
+
 class Event:
     """Base class for all events."""
     pass

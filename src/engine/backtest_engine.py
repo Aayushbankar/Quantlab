@@ -1,22 +1,24 @@
+
 import pandas as pd
-from typing import Dict, List
-from src.engine.events import MarketEvent, SignalEvent, OrderEvent
-from src.engine.portfolio import Portfolio
+
 from src.engine.cost_model import IndianCostModel
+from src.engine.events import OrderEvent, SignalEvent
+from src.engine.portfolio import Portfolio
+
 
 class BacktestEngine:
     """
     Event-driven simulation loop enforcing Zero Look-Ahead.
     Signal on day T Close -> Executed on day T+1 Open.
     """
-    def __init__(self, data: Dict[str, pd.DataFrame], strategy, initial_cash=100000.0, apply_costs=True):
+    def __init__(self, data: dict[str, pd.DataFrame], strategy, initial_cash=100000.0, apply_costs=True):
         self.data = data
         self.strategy = strategy
         self.portfolio = Portfolio(initial_cash=initial_cash)
         self.cost_model = IndianCostModel(apply_costs=apply_costs)
-        
+
         # Internal state
-        self.pending_orders: List[OrderEvent] = []
+        self.pending_orders: list[OrderEvent] = []
         self._align_data()
 
     def _align_data(self):
@@ -31,24 +33,24 @@ class BacktestEngine:
     def run(self):
         """Executes the backtest."""
         print("Starting High-Performance Event Loop...")
-        
+
         for current_date in self.timeline:
             # 1. T+1 OPEN: Execute pending orders
             self._execute_pending_orders(current_date)
-            
+
             # Update trackers
             for symbol, df in self.data.items():
                 idx = self.idx_trackers[symbol]
                 if idx < len(df) and df['date'].iloc[idx] <= current_date:
                     self.idx_trackers[symbol] += 1
-            
+
             # 2. T CLOSE: MTM and signal generation
             current_prices = {}
             for symbol, df in self.data.items():
                 idx = self.idx_trackers[symbol] - 1
                 if idx >= 0 and df['date'].iloc[idx] == current_date:
                     current_prices[symbol] = df['close'].iloc[idx]
-                
+
             self.portfolio.update_timeindex(current_date, current_prices)
 
             # Fast O(1) Data Slicing (Eliminates O(N^2) memory thrashing)
@@ -70,7 +72,7 @@ class BacktestEngine:
             idx = self.idx_trackers[order.symbol]
             if idx < len(df) and df['date'].iloc[idx] == current_date:
                 row = df.iloc[idx]
-                
+
                 # Trade-Through Limit Order Logic
                 if order.order_type == 'LMT':
                     if order.side == 'BUY' and row['low'] >= order.limit_price:
@@ -80,7 +82,7 @@ class BacktestEngine:
                     exec_price = order.limit_price # Executed exactly at limit
                 else:
                     exec_price = row['open'] # MKT executes at Open
-                
+
                 # Estimate Volatility and ADV for Almgren-Chriss Impact
                 past_data = df.iloc[max(0, idx-20):idx]
                 vol = past_data['close'].pct_change().std() if len(past_data) > 2 else 0.02
@@ -89,7 +91,7 @@ class BacktestEngine:
                 adv = adv if not pd.isna(adv) else 1000000
 
                 fill_event = self.cost_model.process_order(order, exec_price, volatility=vol, adv=adv)
-                
+
                 if order.side == 'BUY':
                     estimated_cost = (fill_event.quantity * fill_event.fill_price) + fill_event.total_cost
                     if estimated_cost > self.portfolio.cash:
@@ -99,32 +101,34 @@ class BacktestEngine:
                 fill_event.timestamp = current_date
                 self.portfolio.apply_fill(fill_event)
                 executed.append(order)
-                
+
         self.pending_orders = [o for o in self.pending_orders if o not in executed]
 
-    def _process_signals(self, signals: List[SignalEvent], current_date, sliced_data):
+    def _process_signals(self, signals: list[SignalEvent], current_date, sliced_data):
         for signal in signals:
             side = 'BUY' if signal.signal_type == 1 else 'SELL'
-            
+
             if side == 'BUY':
                 # FIX: Original code sized based on raw cash (self.portfolio.cash).
                 # This causes position sizing to artificially shrink as more capital is deployed.
                 # Correct sizing is 10% of total portfolio equity (cash + open positions MTM).
                 current_equity = self.portfolio.equity_history[-1]['total_equity'] if self.portfolio.equity_history else self.portfolio.cash
                 target_value = current_equity * 0.10
-                
+
                 df = sliced_data[signal.symbol]
                 est_price = df['close'].iloc[-1]
-                
-                if est_price <= 0: continue
+
+                if est_price <= 0:
+                    continue
                 qty = int(target_value / est_price)
-                if qty <= 0: continue
+                if qty <= 0:
+                    continue
             else:
                 pos = self.portfolio.positions.get(signal.symbol)
                 if not pos or pos.quantity <= 0:
                     continue
                 qty = pos.quantity
-                
+
             order = OrderEvent(
                 timestamp=current_date,
                 symbol=signal.symbol,

@@ -1,11 +1,12 @@
+from typing import Any
+
 from pydantic import BaseModel, Field
-from typing import Dict, Any, List, Optional
 
 
 class BacktestRequest(BaseModel):
     strategy: str = Field(default="sma_crossover", description="Strategy identifier: sma_crossover | sma_crossover_10_30 | rsi_mean_reversion | momentum | bh_and_hold")
-    params: Dict[str, Any] = Field(default_factory=dict, description="Strategy hyperparameters")
-    universe: List[str] = Field(default=["RELIANCE.NS"], description="List of stock tickers from NIFTY-10 universe")
+    params: dict[str, Any] = Field(default_factory=dict, description="Strategy hyperparameters")
+    universe: list[str] = Field(default=["RELIANCE.NS"], description="List of stock tickers from NIFTY-10 universe")
     start_date: str = Field(default="2019-01-01", description="Backtest start date (YYYY-MM-DD)")
     end_date: str = Field(default="2024-12-31", description="Backtest end date (YYYY-MM-DD)")
     initial_capital: float = Field(default=100000.0, ge=10000.0, description="Starting cash capital in INR")
@@ -45,9 +46,9 @@ class PerformanceMetrics(BaseModel):
 
 
 class OverfittingDiagnostics(BaseModel):
-    dsr_p_value: Optional[float] = None
-    expected_max_sharpe: Optional[float] = None
-    pbo: Optional[float] = None
+    dsr_p_value: float | None = None
+    expected_max_sharpe: float | None = None
+    pbo: float | None = None
     n_trials: int = 30
 
 
@@ -56,12 +57,12 @@ class BacktestResponse(BaseModel):
     strategy: str
     is_cached: bool = False
     execution_time_ms: float
-    dates: List[str]
-    gross_equity: List[float]
-    net_equity: List[float]
+    dates: list[str]
+    gross_equity: list[float]
+    net_equity: list[float]
     metrics: PerformanceMetrics
     costs: CostBreakdown
-    trades: List[TradeRecord]
+    trades: list[TradeRecord]
     diagnostics: OverfittingDiagnostics
 
 
@@ -69,12 +70,12 @@ class StrategyMetadata(BaseModel):
     id: str
     name: str
     description: str
-    default_params: Dict[str, Any]
-    param_ranges: Dict[str, Any]
+    default_params: dict[str, Any]
+    param_ranges: dict[str, Any]
 
 
 class UniverseResponse(BaseModel):
-    symbols: List[str]
+    symbols: list[str]
     benchmark: str
     default_start: str
     default_end: str

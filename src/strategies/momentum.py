@@ -1,8 +1,10 @@
-from src.strategies.base import Strategy
-from src.engine.events import SignalEvent
-from typing import Dict, List
-import pandas as pd
 from datetime import datetime
+
+import pandas as pd
+
+from src.engine.events import SignalEvent
+from src.strategies.base import Strategy
+
 
 class MomentumStrategy(Strategy):
     """
@@ -14,20 +16,20 @@ class MomentumStrategy(Strategy):
         self.lookback_period = lookback_period
         self.threshold_pct = threshold_pct
 
-    def generate_signals(self, current_date: datetime, data: Dict[str, pd.DataFrame], positions: Dict) -> List[SignalEvent]:
+    def generate_signals(self, current_date: datetime, data: dict[str, pd.DataFrame], positions: dict) -> list[SignalEvent]:
         signals = []
         for symbol, df in data.items():
             past_data = df[df['date'] <= current_date]
             if len(past_data) < self.lookback_period + 1:
                 continue
-                
+
             closes = past_data['close'].tail(self.lookback_period + 1).values
-            
+
             price_today = closes[-1]
             price_n_days_ago = closes[-1 - self.lookback_period]
-            
+
             roc = (price_today - price_n_days_ago) / price_n_days_ago
-            
+
             if roc > self.threshold_pct:
                 # FIX: Previous code emitted a BUY signal every day ROC stayed above threshold.
                 # Added guard to only buy if there is no existing open position for this symbol.
@@ -36,5 +38,5 @@ class MomentumStrategy(Strategy):
             elif roc < 0:
                 if symbol in positions and positions[symbol].quantity > 0:
                     signals.append(SignalEvent(timestamp=current_date, symbol=symbol, signal_type=-1))
-                    
+
         return signals

@@ -1,7 +1,7 @@
+import json
 import os
 import sqlite3
-import json
-from typing import Optional, Dict, Any, List
+from typing import Any
 
 DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "pramaan_runs.db")
 
@@ -41,7 +41,7 @@ def init_db():
         conn.commit()
 
 
-def get_cached_run(run_id: str) -> Optional[Dict[str, Any]]:
+def get_cached_run(run_id: str) -> dict[str, Any] | None:
     init_db()
     with get_db() as conn:
         cur = conn.execute("SELECT response_json FROM runs WHERE run_id = ?", (run_id,))
@@ -90,7 +90,7 @@ def save_run(run_id: str, request_data: dict, response_data: dict):
         conn.commit()
 
 
-def list_recent_runs(limit: int = 20) -> List[Dict[str, Any]]:
+def list_recent_runs(limit: int = 20) -> list[dict[str, Any]]:
     init_db()
     with get_db() as conn:
         cur = conn.execute("""

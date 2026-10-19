@@ -1,9 +1,8 @@
-import pytest
+
 import pandas as pd
-import numpy as np
-from datetime import datetime
-from src.strategies.sma_crossover import SMACrossoverStrategy
+
 from src.engine.position import Position
+from src.strategies.sma_crossover import SMACrossoverStrategy
 
 
 def _frame(closes):

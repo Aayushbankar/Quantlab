@@ -3,6 +3,9 @@ data/raw/
 data/processed/
 __pycache__/
 .pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
 .ipynb_checkpoints/
 
 # Frontend / desktop (separate release channels)

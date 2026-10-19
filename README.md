@@ -1,11 +1,13 @@
 # Pramaan (प्रमाण)
 
+[![CI](https://github.com/Aayushbankar/Quantlab/actions/workflows/ci.yml/badge.svg)](https://github.com/Aayushbankar/Quantlab/actions/workflows/ci.yml)
+
 > **"Prove your edge before you deploy a rupee."**
 
 Pramaan is an honest backtesting engine for Indian equities. It runs event-driven simulations under **zero look-ahead T+1 execution**, deducts the **full statutory Indian cost stack** to the paisa, and reports **overfitting diagnostics** (Deflated Sharpe Ratio, Combinatorial Purged Cross-Validation) — so you never mistake a paper illusion for a real edge.
 
 - **Status:** validated research engine + reproducible results artifact (GTU DI05000341 submission)
-- **What ships today:** the engine, the FastAPI REST backend (`src/api/`), the Next.js 15 UI (`frontend/`), a 30-run real-data matrix, the 41-test suite, a 42-page report, and a 10-slide deck
+- **What ships today:** the engine, the FastAPI REST backend (`src/api/`), the Next.js 15 UI (`frontend/`), a 30-run real-data matrix, the 42-test suite, a 42-page report, and a 10-slide deck
 - **Planned, not built:** Tauri desktop native packaging — see `.agent/02_plan.md`
 
 ---
@@ -36,11 +38,11 @@ These boundaries are deliberate. Limitations are documented because they are def
 ## Quickstart
 
 ```bash
-git clone https://github.com/<org>/pramaan && cd pramaan
+git clone https://github.com/Aayushbankar/Quantlab.git && cd Quantlab
 pip install -r requirements.txt
 
-# Run the full test suite
-PYTHONPATH=. python -m pytest tests/ -q        # 41 passed
+# Run the full test suite (offline-capable, no PYTHONPATH required)
+pytest -q        # 42 passed
 
 # Launch the FastAPI backend (port 8000)
 uvicorn src.api.main:app --port 8000
@@ -53,19 +55,19 @@ The Streamlit dashboard (`src/dashboard/app.py`) remains available as a secondar
 
 ## Data
 
-Data is fetched at runtime by your machine from a free public source (Yahoo Finance via `yfinance`), which is appropriate for academic and personal use. Pramaan redistributes no market data. **Commercial deployment requires a licensed provider** behind a bring-your-own-key interface — that path is specified but not built. Never commit keys: `.env*` and `*.pem` are gitignored, and no `.env.example` ships because no key is needed for the academic path.
+Data is fetched at runtime by your machine from a free public source (Yahoo Finance via `yfinance`), which is appropriate for academic and personal use. Pramaan redistributes no market data. A committed synthetic fixture dataset (`tests/fixtures/`) guarantees clean-clone offline testing. **Commercial deployment requires a licensed provider** behind a bring-your-own-key interface — that path is specified but not built. Never commit keys: `.env*` and `*.pem` are gitignored, and no `.env.example` ships because no key is needed for the academic path.
 
 ## Repository layout
 
 ```
 src/engine/      UNTOUCHED CORE — backtest loop, portfolio, position, cost model
 src/analytics/   UNTOUCHED — metrics, DSR, CPCV + embargo, parameter search
-src/strategies/  SMA · RSI · Momentum · BuyAndHold (benchmark control)
+src/strategies/  SMA · RSI · Momentum · Bollinger Breakout · BuyAndHold (benchmark)
 src/data/        fetch → clean → universe
 src/dashboard/   Streamlit fallback UI (legacy demo surface)
 scripts/         run_experiments.py · generate_real_charts.py · build_presentation.py
 experiments/     experiment_log.csv · oos_decay.csv · pbo.json · PROVENANCE.json
-tests/           35 automated tests
+tests/           42 automated tests (offline-capable seeded fixtures)
 docs/            GTU report + charts + unit-mapped documentation
 .agent/          verification ledger · plan · decisions · daily logs
 ```
@@ -89,8 +91,10 @@ From `experiments/` (10 NSE symbols, 1480 bars each, 2019-01-01 → 2024-12-30, 
 ## Development
 
 ```bash
-PYTHONPATH=. python -m pytest tests/ -q          # 35 passed
-PYTHONPATH=. python -m pytest tests/ --cov=src   # coverage
+pytest -q                         # 42 passed
+pytest --cov=src                  # test coverage
+ruff check src/ tests/            # lint check
+cd frontend && npm run build      # Next.js production build
 ```
 
 See [`AGENTS.md`](./AGENTS.md) for the operating protocol and [`.agent/01_verification_ledger.md`](./.agent/01_verification_ledger.md) for the per-claim evidence record.

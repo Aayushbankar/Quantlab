@@ -1,18 +1,19 @@
-import time
 import os
-import pandas as pd
-from typing import Dict, Any, List
+import time
+from typing import Any
 
+import pandas as pd
+
+from src.analytics.deflated_sharpe import deflated_sharpe_ratio, expected_max_sharpe
+from src.analytics.metrics import MetricsEngine
 from src.data.clean import load_and_clean_all
 from src.engine.backtest_engine import BacktestEngine
-from src.engine.events import FillEvent, OrderEvent
-from src.analytics.metrics import MetricsEngine
-from src.analytics.deflated_sharpe import deflated_sharpe_ratio, expected_max_sharpe
-from src.strategies.sma_crossover import SMACrossoverStrategy
-from src.strategies.rsi_mean_reversion import RSIMeanReversionStrategy
-from src.strategies.momentum import MomentumStrategy
+from src.engine.events import FillEvent
 from src.strategies.bh_and_hold import BuyAndHoldStrategy
 from src.strategies.bollinger_breakout import BollingerBreakoutStrategy
+from src.strategies.momentum import MomentumStrategy
+from src.strategies.rsi_mean_reversion import RSIMeanReversionStrategy
+from src.strategies.sma_crossover import SMACrossoverStrategy
 
 RAW_DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "data", "raw")
 
@@ -54,12 +55,12 @@ def make_strategy(name: str, params: dict):
 def execute_backtest(
     strategy_name: str,
     params: dict,
-    universe_symbols: List[str],
+    universe_symbols: list[str],
     start_date: str,
     end_date: str,
     initial_capital: float = 100000.0,
     apply_costs: bool = True
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     t0 = time.time()
 
     # Attempt on-demand fetching for any new tickers not currently in data/raw
@@ -77,7 +78,14 @@ def execute_backtest(
                 pass
 
     all_data = load_and_clean_all(RAW_DATA_DIR)
-    
+    if not all_data:
+        fixture_dir = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+            "tests", "fixtures", "data"
+        )
+        if os.path.exists(fixture_dir):
+            all_data = load_and_clean_all(fixture_dir)
+
     # Filter universe
     filtered_data = {}
     clean_symbols = [s.replace(".NS", "") for s in universe_symbols]
@@ -101,7 +109,7 @@ def execute_backtest(
         apply_costs=apply_costs
     )
 
-    captured_trades: List[Dict[str, Any]] = []
+    captured_trades: list[dict[str, Any]] = []
     total_costs_accum = {
         "brokerage": 0.0,
         "stt": 0.0,

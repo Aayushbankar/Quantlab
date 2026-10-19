@@ -1,6 +1,6 @@
-import pytest
-import pandas as pd
 import numpy as np
+import pandas as pd
+
 from src.engine.backtest_engine import BacktestEngine
 from src.strategies.sma_crossover import SMACrossoverStrategy
 

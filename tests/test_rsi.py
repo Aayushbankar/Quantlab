@@ -1,8 +1,8 @@
-import pytest
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pytest
+
 from src.strategies.rsi_mean_reversion import RSIMeanReversionStrategy
-from src.engine.position import Position
 
 
 def _strategy():

@@ -1,9 +1,11 @@
-from src.strategies.base import Strategy
-from src.engine.events import SignalEvent
-from typing import Dict, List
-import pandas as pd
-import numpy as np
 from datetime import datetime
+
+import numpy as np
+import pandas as pd
+
+from src.engine.events import SignalEvent
+from src.strategies.base import Strategy
+
 
 class RSIMeanReversionStrategy(Strategy):
     """
@@ -50,24 +52,24 @@ class RSIMeanReversionStrategy(Strategy):
         # No price movement: neutral convention
         return 1.0
 
-    def generate_signals(self, current_date: datetime, data: Dict[str, pd.DataFrame], positions: Dict) -> List[SignalEvent]:
+    def generate_signals(self, current_date: datetime, data: dict[str, pd.DataFrame], positions: dict) -> list[SignalEvent]:
         signals = []
         for symbol, df in data.items():
             past_data = df[df['date'] <= current_date]
             if len(past_data) < self.period * 2:
                 continue
-                
+
             # Need a decent buffer to calculate Wilder's smoothing accurately
             closes = past_data['close'].tail(self.period * 5).values
             rsi_today, rsi_yest = self._calculate_rsi(closes)
-            
+
             # Oversold -> Buy
             if rsi_yest >= self.oversold and rsi_today < self.oversold:
                 signals.append(SignalEvent(timestamp=current_date, symbol=symbol, signal_type=1))
-                
+
             # Overbought -> Sell
             elif rsi_yest <= self.overbought and rsi_today > self.overbought:
                 if symbol in positions and positions[symbol].quantity > 0:
                     signals.append(SignalEvent(timestamp=current_date, symbol=symbol, signal_type=-1))
-                    
+
         return signals

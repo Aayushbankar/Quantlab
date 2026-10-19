@@ -1,7 +1,7 @@
-from src.strategies.base import Strategy
-from src.engine.events import SignalEvent
-from typing import Dict, List
 from datetime import datetime
+
+from src.engine.events import SignalEvent
+from src.strategies.base import Strategy
 
 
 class BuyAndHoldStrategy(Strategy):
@@ -15,14 +15,14 @@ class BuyAndHoldStrategy(Strategy):
     def __init__(self, skip_first: int = 1):
         self.skip_first = skip_first
 
-    def generate_signals(self, current_date: datetime, data: Dict, positions: Dict) -> List[SignalEvent]:
+    def generate_signals(self, current_date: datetime, data: dict, positions: dict) -> list[SignalEvent]:
         if self.skip_first > 0:
             self.skip_first -= 1
         else:
             return []
 
         signals = []
-        for symbol in data.keys():
+        for symbol in data:
             if symbol not in positions or positions[symbol].quantity == 0:
                 signals.append(SignalEvent(timestamp=current_date, symbol=symbol, signal_type=1))
         return signals

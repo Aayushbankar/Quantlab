@@ -1,9 +1,10 @@
-import pandas as pd
-import numpy as np
 from datetime import datetime
-from typing import Dict, List
-from src.strategies.base import Strategy
+
+import numpy as np
+import pandas as pd
+
 from src.engine.events import SignalEvent
+from src.strategies.base import Strategy
 
 
 class BollingerBreakoutStrategy(Strategy):
@@ -17,7 +18,7 @@ class BollingerBreakoutStrategy(Strategy):
         self.period = int(period)
         self.num_std = float(num_std)
 
-    def generate_signals(self, current_date: datetime, data: Dict[str, pd.DataFrame], positions: Dict) -> List[SignalEvent]:
+    def generate_signals(self, current_date: datetime, data: dict[str, pd.DataFrame], positions: dict) -> list[SignalEvent]:
         signals = []
         for symbol, df in data.items():
             past_data = df[df['date'] <= current_date]
