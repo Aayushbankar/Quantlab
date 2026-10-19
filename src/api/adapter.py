@@ -2,10 +2,12 @@ import os
 import time
 from typing import Any
 
+import numpy as np
 import pandas as pd
 
 from src.analytics.deflated_sharpe import deflated_sharpe_ratio, expected_max_sharpe
 from src.analytics.metrics import MetricsEngine
+from src.api.db import get_trial_sharpes, record_trial
 from src.data.clean import load_and_clean_all
 from src.engine.backtest_engine import BacktestEngine
 from src.engine.cost_model import IndianCostModel
@@ -216,15 +218,51 @@ def execute_backtest(
     metrics_dict = metrics_calc.compute_all()
 
     # DSR calculation
+    # DSR calculation using trial ledger (D1 & D6)
     daily_returns = net_equity_df["total_equity"].pct_change().dropna().values
     dsr_p_val = None
     expected_max_sr = None
+    n_trials = 1
     if len(daily_returns) > 30:
         try:
             obs_sr = float(metrics_dict.get("Sharpe Ratio", 0.0))
             returns_series = pd.Series(daily_returns)
-            dsr_p_val = float(deflated_sharpe_ratio(observed_sr=obs_sr, returns=returns_series, N_trials=30))
-            expected_max_sr = float(expected_max_sharpe(N_trials=30, variance_sr=0.01, benchmark_sr=0.0))
+
+            # Record trial in persistent ledger
+            record_trial(
+                strategy=strategy_name,
+                params=params,
+                universe=list(filtered_data.keys()),
+                start_date=str(dates[0])[:10],
+                end_date=str(dates[-1])[:10],
+                sharpe=obs_sr,
+                total_return=float(metrics_dict.get("Total Return", 0.0)),
+                max_drawdown=float(metrics_dict.get("Max Drawdown", 0.0)),
+            )
+
+            # Retrieve all historical trial Sharpes to compute cross-trial variance
+            historical_sharpes = get_trial_sharpes()
+            n_trials = len(historical_sharpes)
+            if n_trials > 1:
+                cross_trial_var = float(np.var(historical_sharpes, ddof=1))
+                dsr_p_val = float(
+                    deflated_sharpe_ratio(
+                        observed_sr=obs_sr,
+                        returns=returns_series,
+                        N_trials=n_trials,
+                        variance_sr=cross_trial_var,
+                    )
+                )
+                expected_max_sr = float(
+                    expected_max_sharpe(
+                        N_trials=n_trials,
+                        variance_sr=cross_trial_var,
+                        benchmark_sr=0.0,
+                    )
+                )
+            else:
+                expected_max_sr = 0.0
+                dsr_p_val = 1.0 if obs_sr > 0 else 0.0
         except Exception:
             pass
 
@@ -266,7 +304,7 @@ def execute_backtest(
             "expected_max_sharpe": round(expected_max_sr, 4) if expected_max_sr is not None else None,
             "pbo": None,
             "pbo_reason": "PBO requires a combinatorial parameter sweep; run /sweep to compute empirical PBO",
-            "n_trials": 1,
+            "n_trials": n_trials,
         },
         "data_hash": data_hash,
         "engine_version": "1.0.0",

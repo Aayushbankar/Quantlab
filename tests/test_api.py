@@ -88,3 +88,29 @@ def test_api_determinism():
     res2 = client.post("/run", json=req).json()
     assert res1["run_id"] == res2["run_id"]
     assert res1["metrics"] == res2["metrics"]
+
+
+def test_ready_endpoint():
+    res = client.get("/ready")
+    assert res.status_code == 200
+    assert res.json()["status"] == "ready"
+
+
+def test_trials_endpoint():
+    res = client.get("/trials")
+    assert res.status_code == 200
+    data = res.json()
+    assert "total_trials" in data
+    assert "trials" in data
+    assert "cross_trial_variance" in data
+    assert data["total_trials"] >= 1
+
+
+def test_sweep_summary_endpoint():
+    res = client.get("/sweep")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["n_configs_evaluated"] >= 100
+    assert "pbo" in data
+    assert 0.0 <= data["pbo"] <= 1.0
+    assert data["pbo_ci_lower_95"] <= data["pbo"] <= data["pbo_ci_upper_95"]

@@ -1,16 +1,25 @@
+import json
 import os
 import sys
 
 import numpy as np
 import pandas as pd
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from src.api.adapter import execute_backtest
 from src.api.cache import compute_run_id
-from src.api.db import get_cached_run, list_recent_runs, save_run
+from src.api.db import (
+    get_cached_run,
+    get_trial_sharpes,
+    get_trials_count,
+    init_db,
+    list_recent_runs,
+    list_trials,
+    save_run,
+)
 from src.api.replay import get_replay_run
 from src.api.schemas import (
     BacktestRequest,
@@ -18,6 +27,8 @@ from src.api.schemas import (
     ErrorResponse,
     HealthResponse,
     StrategyMetadata,
+    SweepSummaryResponse,
+    TrialsResponse,
     UniverseResponse,
 )
 from src.data.universe import get_benchmark, get_universe
@@ -29,12 +40,18 @@ app = FastAPI(
     responses={422: {"model": ErrorResponse}},
 )
 
-# CORS configuration for Next.js frontend, LAN, remote forwards, and Tauri desktop shell
+# CORS configuration (D12: env-configurable origins, no wildcard credentials)
+allowed_origins_env = os.environ.get(
+    "PRAMAAN_ALLOWED_ORIGINS",
+    "http://localhost:3000,http://127.0.0.1:3000,http://localhost:8000,http://127.0.0.1:8000",
+)
+allowed_origins = [orig.strip() for orig in allowed_origins_env.split(",") if orig.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"^https?://.*",
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_origins=allowed_origins,
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -147,6 +164,47 @@ def get_universe_info():
 @app.get("/history")
 def get_history(limit: int = 20):
     return list_recent_runs(limit=limit)
+
+
+@app.get("/ready")
+def get_readiness():
+    init_db()
+    return {"status": "ready", "engine": "Pramaan", "version": "1.0.0"}
+
+
+@app.get("/trials", response_model=TrialsResponse)
+def get_trials(strategy: str | None = None, limit: int = 50, offset: int = 0):
+    count = get_trials_count(strategy=strategy)
+    items = list_trials(strategy=strategy, limit=limit, offset=offset)
+    sharpes = get_trial_sharpes(strategy=strategy)
+    var = float(np.var(sharpes, ddof=1)) if len(sharpes) > 1 else 0.0
+    return TrialsResponse(
+        total_trials=count,
+        trials=items,
+        cross_trial_variance=round(var, 6),
+    )
+
+
+@app.get("/sweep", response_model=SweepSummaryResponse)
+def get_sweep_summary():
+    summary_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+        "experiments",
+        "sweep_summary.json",
+    )
+    if os.path.exists(summary_path):
+        with open(summary_path, encoding="utf-8") as f:
+            data = json.load(f)
+        return SweepSummaryResponse(**data)
+    raise HTTPException(status_code=404, detail="No sweep summary found. Run scripts/run_sweep.py first.")
+
+
+@app.post("/sweep", response_model=SweepSummaryResponse)
+def trigger_sweep(max_configs: int = 50):
+    from scripts.run_sweep import run_sweep
+
+    summary = run_sweep(max_configs=max_configs, record_to_db=True)
+    return SweepSummaryResponse(**summary)
 
 
 @app.get("/replay/{strategy}", response_model=BacktestResponse)

@@ -94,3 +94,68 @@ class CPCV:
             return np.nan
 
         return overfit_count / valid_paths
+
+    def calculate_pbo_with_ci(
+        self,
+        strategies_returns: pd.DataFrame,
+        n_bootstraps: int = 500,
+        ci_level: float = 0.95,
+        random_state: int = 42,
+    ) -> dict[str, float]:
+        """
+        Calculates Probability of Backtest Overfitting (PBO) along with
+        non-parametric bootstrap confidence intervals across CPCV paths.
+        """
+        paths = self.generate_paths(len(strategies_returns))
+        if not paths:
+            return {"pbo": float(np.nan), "ci_lower": float(np.nan), "ci_upper": float(np.nan), "n_paths": 0}
+
+        path_indicators: list[int] = []
+
+        for train_idx, test_idx in paths:
+            train_returns = strategies_returns.iloc[train_idx]
+            test_returns = strategies_returns.iloc[test_idx]
+
+            train_std = train_returns.std().replace(0, 1e-8)
+            sharpe_is = train_returns.mean() / train_std
+
+            test_std = test_returns.std().replace(0, 1e-8)
+            sharpe_oos = test_returns.mean() / test_std
+
+            if sharpe_is.isna().all() or sharpe_oos.isna().all():
+                continue
+
+            best_strat = sharpe_is.idxmax()
+            oos_perf_of_best_is = sharpe_oos[best_strat]
+            median_oos_perf = sharpe_oos.median()
+
+            if pd.isna(oos_perf_of_best_is) or pd.isna(median_oos_perf):
+                continue
+
+            path_indicators.append(1 if oos_perf_of_best_is < median_oos_perf else 0)
+
+        n_paths = len(path_indicators)
+        if n_paths == 0:
+            return {"pbo": float(np.nan), "ci_lower": float(np.nan), "ci_upper": float(np.nan), "n_paths": 0}
+
+        pbo = float(np.mean(path_indicators))
+
+        # Bootstrap confidence intervals
+        rng = np.random.default_rng(random_state)
+        arr = np.array(path_indicators)
+        bootstrap_pbos = np.empty(n_bootstraps)
+        for b in range(n_bootstraps):
+            resample = rng.choice(arr, size=n_paths, replace=True)
+            bootstrap_pbos[b] = np.mean(resample)
+
+        alpha = (1.0 - ci_level) / 2.0
+        ci_lower = float(np.percentile(bootstrap_pbos, alpha * 100))
+        ci_upper = float(np.percentile(bootstrap_pbos, (1.0 - alpha) * 100))
+
+        return {
+            "pbo": round(pbo, 4),
+            "ci_lower": round(ci_lower, 4),
+            "ci_upper": round(ci_upper, 4),
+            "n_paths": n_paths,
+            "overfit_paths": sum(path_indicators),
+        }

@@ -60,3 +60,18 @@ def test_cpcv_embargo_ar1():
     # to be artificially predictable from adjacent IS performance, lowering PBO artificially.
     # Proper embargo breaks this leakage, so PBO should be higher with embargo.
     assert pbo_embargo > pbo_no_embargo, f"Embargo did not increase PBO: {pbo_no_embargo} vs {pbo_embargo}"
+
+
+def test_cpcv_bootstrap_ci():
+    np.random.seed(42)
+    returns_data = {f"strat_{i}": np.random.normal(0, 1, 1000) for i in range(30)}
+    df = pd.DataFrame(returns_data)
+
+    cpcv = CPCV(n_splits=8, n_test_splits=2)
+    res = cpcv.calculate_pbo_with_ci(df, n_bootstraps=200, ci_level=0.95)
+
+    assert "pbo" in res
+    assert "ci_lower" in res
+    assert "ci_upper" in res
+    assert 0.0 <= res["ci_lower"] <= res["pbo"] <= res["ci_upper"] <= 1.0
+    assert res["n_paths"] == 28  # comb(8, 2)

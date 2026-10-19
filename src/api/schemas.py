@@ -151,3 +151,39 @@ class HealthResponse(BaseModel):
     numpy_version: str
     pandas_version: str
     demo_mode: bool
+
+
+class TrialRecord(BaseModel):
+    trial_id: int
+    strategy: str
+    params: dict[str, Any]
+    universe: list[str]
+    start_date: str
+    end_date: str
+    sharpe: float
+    total_return: float
+    max_drawdown: float
+    run_id: str | None = None
+    created_at: str
+
+
+class TrialsResponse(BaseModel):
+    total_trials: int
+    trials: list[TrialRecord]
+    cross_trial_variance: float
+
+
+class SweepSummaryResponse(BaseModel):
+    n_configs_evaluated: int
+    universe_symbols: list[str]
+    cross_trial_variance: float
+    mean_sharpe: float
+    std_sharpe: float
+    max_sharpe: float
+    min_sharpe: float
+    pbo: float | None = None
+    pbo_ci_lower_95: float | None = None
+    pbo_ci_upper_95: float | None = None
+    cpcv_paths: int = 0
+    cpcv_overfit_paths: int = 0
+    best_config: dict[str, Any] | None = None
