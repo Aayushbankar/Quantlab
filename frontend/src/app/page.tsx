@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Header } from "../components/Header";
 import { RunConfigurator } from "../components/RunConfigurator";
 import { ProfitMirageDissector } from "../components/ProfitMirageDissector";
@@ -10,11 +10,29 @@ import { CpcvEmbargoMatrix } from "../components/CpcvEmbargoMatrix";
 import { ExecutionLedger } from "../components/ExecutionLedger";
 import { MethodologyGuideModal } from "../components/MethodologyGuideModal";
 import { InteractiveTourHUD } from "../components/InteractiveTourHUD";
+import { RunHistoryDrawer } from "../components/RunHistoryDrawer";
+import {
+  runBacktest,
+  checkHealth,
+  fetchUniverse,
+  fetchSweepSummary,
+  getReportUrl,
+  API_BASE_URL,
+  StrategyType,
+  BacktestResponse,
+  SweepSummaryResponse,
+} from "../lib/api";
 
-// Verified baseline fallback for instant rendering without waiting for backend
-const DEFAULT_FALLBACK_DATA = {
+// Honest baseline fallback when API is offline
+const DEFAULT_FALLBACK_DATA: BacktestResponse = {
   run_id: "bf3f93a2fb4a",
   strategy: "sma_crossover",
+  is_cached: true,
+  served_from: "cache",
+  replay_reason: "Offline demonstration fallback",
+  engine_version: "1.0.0",
+  data_hash: "a574f52a53925590",
+  cost_profile: "zerodha_delivery_2024",
   execution_time_ms: 18.5,
   dates: [
     "2019-01-01", "2019-06-01", "2020-01-01", "2020-06-01",
@@ -34,16 +52,23 @@ const DEFAULT_FALLBACK_DATA = {
     sortino_ratio: 0.7609,
     max_drawdown: -0.1476,
     calmar_ratio: 0.7704,
+    average_exposure: 0.618,
+    alpha: 0.042,
+    beta: 0.784,
+    exposure_matched_return: 0.712,
   },
   costs: {
-    brokerage: 1440.0,
+    brokerage: 0.0,
     stt: 2680.0,
     stamp_duty: 201.0,
     turnover_fees: 82.28,
     gst: 274.01,
+    dp_charges: 180.0,
+    sebi_fees: 1.20,
+    ipft: 1.20,
     market_impact: 1644.84,
-    total_friction: 6322.13,
-    friction_drag_pct: 6.32,
+    total_friction: 5064.53,
+    friction_drag_pct: 5.06,
   },
   trades: [
     { timestamp: "2019-01-22", symbol: "RELIANCE", side: "BUY", quantity: 45, raw_price: 2210.0, fill_price: 2212.4, total_cost: 122.5, status: "FILLED" },
@@ -57,81 +82,37 @@ const DEFAULT_FALLBACK_DATA = {
   diagnostics: {
     dsr_p_value: 0.524,
     expected_max_sharpe: 0.746,
-    pbo: 0.6429,
-    n_trials: 30,
-  }
+    pbo: 0.6000,
+    pbo_reason: "Empirical CPCV PBO computed across 133 configs in parameter sweep",
+    n_trials: 133,
+  },
 };
 
-interface BacktestData {
-  run_id: string;
-  strategy: string;
-  execution_time_ms: number;
-  dates: string[];
-  gross_equity: number[];
-  net_equity: number[];
-  metrics: {
-    total_return: number;
-    cagr: number;
-    sharpe_ratio: number;
-    sortino_ratio: number;
-    max_drawdown: number;
-    calmar_ratio: number;
-  };
-  costs: {
-    brokerage: number;
-    stt: number;
-    stamp_duty: number;
-    turnover_fees: number;
-    gst: number;
-    market_impact: number;
-    total_friction: number;
-    friction_drag_pct: number;
-  };
-  trades: Array<{
-    timestamp: string;
-    symbol: string;
-    side: string;
-    quantity: number;
-    raw_price: number;
-    fill_price: number;
-    total_cost: number;
-    status: string;
-  }>;
-  diagnostics: {
-    dsr_p_value?: number | null;
-    expected_max_sharpe?: number | null;
-    pbo?: number | null;
-    n_trials: number;
-  };
-}
-
 export default function Home() {
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
-  const [activeTab, setActiveTab] = useState<"mirage" | "costs" | "overfitting" | "ledger" | "unified">("mirage");
+  const [data, setData] = useState<BacktestResponse>(DEFAULT_FALLBACK_DATA);
   const [strategy, setStrategy] = useState<string>("sma_crossover");
-  const [params, setParams] = useState<Record<string, number>>({ fast_window: 20, slow_window: 50 });
-  const [initialCapital, setInitialCapital] = useState<number>(100000);
-  const [universe, setUniverse] = useState<string[]>([
-    "RELIANCE.NS",
-    "TCS.NS",
-    "INFY.NS",
-    "HDFCBANK.NS",
-    "ICICIBANK.NS",
-    "SBIN.NS",
-    "ITC.NS",
-    "HINDUNILVR.NS",
-    "LT.NS",
-    "BHARTIARTL.NS",
-  ]);
   const [period, setPeriod] = useState<string>("full");
   const [applyCosts, setApplyCosts] = useState<boolean>(true);
-  const [demoMode, setDemoMode] = useState<boolean>(true);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [costProfile, setCostProfile] = useState<string>("zerodha_delivery_2024");
+  const [slippageFloorBps, setSlippageFloorBps] = useState<number>(0);
+  const [demoMode, setDemoMode] = useState<boolean>(false);
+  const [initialCapital, setInitialCapital] = useState<number>(100000);
+  const [params, setParams] = useState<Record<string, number>>({ fast_window: 20, slow_window: 50 });
+  const [universe, setUniverse] = useState<string[]>([
+    "RELIANCE.NS", "TCS.NS", "INFY.NS", "HDFCBANK.NS", "ICICIBANK.NS",
+    "SBIN.NS", "ITC.NS", "HINDUNILVR.NS", "LT.NS", "BHARTIARTL.NS",
+  ]);
+  const [survivorshipWarning, setSurvivorshipWarning] = useState<string | null>(null);
+
+  const [activeTab, setActiveTab] = useState<"mirage" | "costs" | "overfitting" | "ledger" | "unified">("mirage");
   const [engineOnline, setEngineOnline] = useState<boolean>(false);
-  const [data, setData] = useState<BacktestData>(DEFAULT_FALLBACK_DATA);
+  const [loading, setLoading] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<{ text: string; type: "success" | "error" | "info" } | null>(null);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [isGuideOpen, setIsGuideOpen] = useState<boolean>(false);
-  const [isResultsFresh, setIsResultsFresh] = useState<boolean>(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState<boolean>(false);
+  const [sweepSummary, setSweepSummary] = useState<SweepSummaryResponse | null>(null);
+
   const [lastRunStats, setLastRunStats] = useState<{
     strategyName: string;
     period: string;
@@ -144,6 +125,7 @@ export default function Home() {
     executionTimeMs: number;
     timestamp: string;
   } | null>(null);
+  const [isResultsFresh, setIsResultsFresh] = useState<boolean>(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -173,103 +155,79 @@ export default function Home() {
     }
   };
 
-  const getApiUrl = (path: string) => {
-    return `/api/engine${path}`;
-  };
-
-  const loadBacktest = React.useCallback(async () => {
+  const loadBacktest = useCallback(async () => {
     setLoading(true);
     setToastMessage({ text: "Simulating portfolio across Indian equity market bars...", type: "info" });
-    try {
-      if (demoMode) {
-        const res = await fetch(getApiUrl(`/replay/${strategy}?period=${period}`));
-        if (res.ok) {
-          const json = await res.json();
-          setData(json);
-          setIsResultsFresh(true);
-          setTimeout(() => setIsResultsFresh(false), 2500);
-          setLastRunStats({
-            strategyName: strategy,
-            period,
-            initialCapital,
-            terminalNet: json.net_equity ? json.net_equity[json.net_equity.length - 1] : initialCapital,
-            terminalGross: json.gross_equity ? json.gross_equity[json.gross_equity.length - 1] : initialCapital,
-            totalReturn: json.metrics?.total_return ?? 0,
-            totalFriction: json.costs?.total_friction ?? 0,
-            tradesCount: json.trades?.length ?? 0,
-            executionTimeMs: json.execution_time_ms ?? 18,
-            timestamp: new Date().toLocaleTimeString(),
-          });
-          setLoading(false);
-          setToastMessage({
-            text: `Simulation complete: Results updated for ${strategy.replace(/_/g, " ").toUpperCase()} (${period.toUpperCase()}).`,
-            type: "success"
-          });
-          return;
-        }
-      }
 
-      // Live simulation POST request with all interactive parameters
-      const res = await fetch(getApiUrl("/run"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          strategy,
-          params,
-          universe,
-          start_date: period === "IS" ? "2019-01-01" : period === "OOS" ? "2023-01-01" : "2019-01-01",
-          end_date: period === "IS" ? "2022-12-31" : "2024-12-30",
-          initial_capital: initialCapital,
-          apply_costs: applyCosts,
-          demo_mode: false,
-        }),
+    const startDate = period === "IS" ? "2019-01-01" : period === "OOS" ? "2023-01-01" : "2019-01-01";
+    const endDate = period === "IS" ? "2022-12-31" : "2024-12-30";
+
+    try {
+      const resp = await runBacktest({
+        strategy: strategy as StrategyType,
+        params,
+        universe,
+        start_date: startDate,
+        end_date: endDate,
+        initial_capital: initialCapital,
+        apply_costs: applyCosts,
+        cost_profile: costProfile,
+        slippage_floor_bps: slippageFloorBps,
+        demo_mode: demoMode,
       });
-      if (res.ok) {
-        const json = await res.json();
-        setData(json);
-        setIsResultsFresh(true);
-        setTimeout(() => setIsResultsFresh(false), 2500);
-        setLastRunStats({
-          strategyName: strategy,
-          period,
-          initialCapital,
-          terminalNet: json.net_equity ? json.net_equity[json.net_equity.length - 1] : initialCapital,
-          terminalGross: json.gross_equity ? json.gross_equity[json.gross_equity.length - 1] : initialCapital,
-          totalReturn: json.metrics?.total_return ?? 0,
-          totalFriction: json.costs?.total_friction ?? 0,
-          tradesCount: json.trades?.length ?? 0,
-          executionTimeMs: json.execution_time_ms ?? 20,
-          timestamp: new Date().toLocaleTimeString(),
-        });
-        setLoading(false);
-        setToastMessage({
-          text: `Backtest complete: Evaluated across ${universe.length} stocks in ${Number(json.execution_time_ms).toFixed(0)} ms.`,
-          type: "success"
-        });
-        return;
-      }
-    } catch {
+
+      setData(resp);
+      setIsResultsFresh(true);
+      setTimeout(() => setIsResultsFresh(false), 2500);
+
+      const netEq = resp.net_equity[resp.net_equity.length - 1] ?? initialCapital;
+      const grossEq = resp.gross_equity[resp.gross_equity.length - 1] ?? initialCapital;
+
+      setLastRunStats({
+        strategyName: strategy,
+        period,
+        initialCapital,
+        terminalNet: netEq,
+        terminalGross: grossEq,
+        totalReturn: resp.metrics.total_return,
+        totalFriction: resp.costs.total_friction,
+        tradesCount: resp.trades.length,
+        executionTimeMs: resp.execution_time_ms,
+        timestamp: new Date().toLocaleTimeString(),
+      });
+
+      setLoading(false);
       setToastMessage({
-        text: "Simulation loaded from verified local cache.",
-        type: "info"
+        text: `Backtest complete: Evaluated ${universe.length} stocks (${resp.served_from.toUpperCase()}) in ${resp.execution_time_ms.toFixed(0)} ms.`,
+        type: "success",
+      });
+    } catch (err: unknown) {
+      setLoading(false);
+      const msg = err instanceof Error ? err.message : "Failed to execute backtest";
+      setToastMessage({
+        text: `Simulation error: ${msg}. Showing cached baseline.`,
+        type: "error",
       });
     }
-    setLoading(false);
-  }, [strategy, period, applyCosts, demoMode, params, universe, initialCapital]);
+  }, [strategy, period, applyCosts, costProfile, slippageFloorBps, demoMode, params, universe, initialCapital]);
 
+  // Initial data loading: Health check, Universe metadata, Sweep summary
   useEffect(() => {
-    fetch(getApiUrl("/health"))
-      .then((res) => {
-        if (res.ok) return res.json();
-        throw new Error("Proxy error");
-      })
+    checkHealth()
       .then(() => setEngineOnline(true))
-      .catch(() => {
-        fetch("http://127.0.0.1:8000/health")
-          .then((res) => res.json())
-          .then(() => setEngineOnline(true))
-          .catch(() => setEngineOnline(false));
-      });
+      .catch(() => setEngineOnline(false));
+
+    fetchUniverse()
+      .then((u) => {
+        if (u.survivorship_bias_warning) {
+          setSurvivorshipWarning(u.survivorship_bias_warning);
+        }
+      })
+      .catch(() => {});
+
+    fetchSweepSummary()
+      .then((summary) => setSweepSummary(summary))
+      .catch(() => {});
 
     loadBacktest();
   }, [loadBacktest]);
@@ -280,18 +238,44 @@ export default function Home() {
 
   return (
     <div className="h-screen w-screen overflow-hidden flex flex-col bg-canvas text-inkText font-sans select-none">
-      {/* Header (56px) */}
+      {/* Header with Served_From Provenance Pill & Honesty Report Export */}
       <Header
         demoMode={demoMode}
         engineOnline={engineOnline}
         theme={theme}
+        servedFrom={data.served_from}
+        replayReason={data.replay_reason}
+        dataHash={data.data_hash}
+        costProfile={data.cost_profile}
+        runId={data.run_id}
         onToggleTheme={toggleTheme}
         onOpenGuide={() => setIsGuideOpen(true)}
+        onOpenHistory={() => setIsHistoryOpen(true)}
+        onDownloadReport={() => {
+          if (data?.run_id) {
+            window.open(getReportUrl(data.run_id), "_blank");
+          }
+        }}
       />
 
       <MethodologyGuideModal
         isOpen={isGuideOpen}
         onClose={() => setIsGuideOpen(false)}
+      />
+
+      <RunHistoryDrawer
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        onSelectTrial={(trial) => {
+          setStrategy(trial.strategy);
+          setParams(trial.params as Record<string, number>);
+          if (trial.universe?.length) setUniverse(trial.universe);
+          setIsHistoryOpen(false);
+          setToastMessage({
+            text: `Loaded parameters from trial #${trial.trial_id}`,
+            type: "info",
+          });
+        }}
       />
 
       {/* Main Viewport Shell: 100vw x 100vh Fill */}
@@ -305,6 +289,10 @@ export default function Home() {
             setPeriod={setPeriod}
             applyCosts={applyCosts}
             setApplyCosts={setApplyCosts}
+            costProfile={costProfile}
+            setCostProfile={setCostProfile}
+            slippageFloorBps={slippageFloorBps}
+            setSlippageFloorBps={setSlippageFloorBps}
             demoMode={demoMode}
             setDemoMode={setDemoMode}
             initialCapital={initialCapital}
@@ -313,6 +301,7 @@ export default function Home() {
             setParams={setParams}
             universe={universe}
             setUniverse={setUniverse}
+            survivorshipWarning={survivorshipWarning}
             onRun={loadBacktest}
             loading={loading}
             lastExecutionMs={data?.execution_time_ms}
@@ -322,12 +311,45 @@ export default function Home() {
         {/* Right Main Stage (Expansive Full Canvas) */}
         <main className="flex-1 min-w-0 h-full overflow-y-auto p-4 lg:p-5 flex flex-col justify-between space-y-3.5">
           <div className="space-y-3.5 flex-1 flex flex-col">
+            {/* Offline Replay Banner (Never fails silently) */}
+            {!engineOnline && (
+              <div
+                role="alert"
+                aria-live="polite"
+                className="px-4 py-2.5 rounded border border-amber-500/40 bg-amber-500/10 text-amber-200 text-xs font-mono flex items-center justify-between shrink-0"
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/25 border border-amber-500/50 text-amber-300">
+                    REPLAY (offline demo)
+                  </span>
+                  <span>
+                    Backend API unreachable at <code className="bg-canvas/50 px-1 py-0.5 rounded text-amber-100">{API_BASE_URL}</code>. Displaying committed baseline replay artifact.
+                  </span>
+                </div>
+                <button
+                  onClick={() => {
+                    checkHealth()
+                      .then(() => {
+                        setEngineOnline(true);
+                        loadBacktest();
+                      })
+                      .catch(() => {
+                        setToastMessage({ text: "API still unreachable. Ensure `python -m src.api.main` is running.", type: "error" });
+                      });
+                  }}
+                  className="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-100 border border-amber-500/30 text-[11px] font-medium transition-colors"
+                >
+                  Retry Connection
+                </button>
+              </div>
+            )}
+
             {/* Toast Alert */}
             {toastMessage && (
-              <div 
+              <div
                 className={`px-4 py-2 rounded border text-xs font-mono flex items-center justify-between transition-all shrink-0 ${
-                  toastMessage.type === "success" 
-                    ? "bg-turquoise/15 border-turquoise/40 text-turquoise" 
+                  toastMessage.type === "success"
+                    ? "bg-turquoise/15 border-turquoise/40 text-turquoise"
                     : toastMessage.type === "error"
                     ? "bg-crimson/15 border-crimson/40 text-crimson"
                     : "bg-pacificCyan/15 border-pacificCyan/40 text-pacificCyan"
@@ -337,7 +359,7 @@ export default function Home() {
                   <span className="font-bold">{toastMessage.type === "success" ? "✓" : "ℹ"}</span>
                   <span>{toastMessage.text}</span>
                 </div>
-                <button 
+                <button
                   onClick={() => setToastMessage(null)}
                   className="text-mutedText hover:text-inkText ml-4 font-bold"
                 >
@@ -348,9 +370,9 @@ export default function Home() {
 
             {/* Run Completion & Delta Feedback Banner */}
             {lastRunStats && (
-              <div 
+              <div
                 className={`p-3 rounded-md border flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs shrink-0 transition-all duration-300 ${
-                  isResultsFresh 
+                  isResultsFresh
                     ? "bg-turquoise/15 border-turquoise shadow-md shadow-turquoise/15 ring-1 ring-turquoise/40"
                     : "bg-panel border-rule"
                 }`}
@@ -359,7 +381,7 @@ export default function Home() {
                   <span className={`w-2.5 h-2.5 rounded-full bg-turquoise shrink-0 ${isResultsFresh ? "animate-ping" : "animate-pulse"}`} />
                   <div>
                     <div className="font-bold text-inkText flex items-center gap-2">
-                      <span>✓ Backtest Results Updated</span>
+                      <span>✓ Backtest Results Updated ({data.served_from.toUpperCase()})</span>
                       <span className="text-[10px] text-mutedText font-normal">at {lastRunStats.timestamp}</span>
                     </div>
                     <div className="text-mutedText text-[11px] mt-0.5">
@@ -381,8 +403,13 @@ export default function Home() {
                   </div>
 
                   <div className="bg-canvas px-2.5 py-1 rounded border border-rule">
+                    <span className="text-mutedText">Exposure: </span>
+                    <span className="text-pacificCyan font-bold">{((metrics.average_exposure ?? 0.6) * 100).toFixed(0)}%</span>
+                  </div>
+
+                  <div className="bg-canvas px-2.5 py-1 rounded border border-rule">
                     <span className="text-mutedText">Trades: </span>
-                    <span className="text-inkText font-bold">{lastRunStats.tradesCount} filled</span>
+                    <span className="text-inkText font-bold">{lastRunStats.tradesCount} fills</span>
                   </div>
                 </div>
               </div>
@@ -392,9 +419,9 @@ export default function Home() {
             <div className={`grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3 font-tabular shrink-0 transition-all duration-500 rounded-md p-0.5 ${
               isResultsFresh ? "ring-1 ring-turquoise/60 shadow-lg shadow-turquoise/15 bg-turquoise/5" : ""
             }`}>
-              <div 
+              <div
                 className="bg-panel border border-rule border-t-2 border-t-turquoise p-3.5 rounded-md hover:border-turquoise transition-all cursor-help shadow-xs"
-                title="Compound Annual Growth Rate: Annualized geometric return. Nifty 10 Buy & Hold achieved 19.07% over 2019–2024."
+                title="Compound Annual Growth Rate: Annualized geometric return. Passive Buy & Hold achieved 19.07% over 2019–2024."
               >
                 <div className="flex items-center justify-between">
                   <div className="text-mutedText text-[11px] font-mono uppercase tracking-wider">CAGR (Annualized)</div>
@@ -403,10 +430,12 @@ export default function Home() {
                 <div className="text-2xl font-bold font-mono text-turquoise mt-1">
                   {(metrics.cagr * 100).toFixed(2)}%
                 </div>
-                <div className="text-[11px] text-mutedText font-mono mt-0.5">vs 19.07% Nifty-10 B&H</div>
+                <div className="text-[11px] text-mutedText font-mono mt-0.5">
+                  Exp-Matched: {((metrics.exposure_matched_return ?? 0.15) * 100).toFixed(1)}%
+                </div>
               </div>
 
-              <div 
+              <div
                 className="bg-panel border border-rule border-t-2 border-t-pacificCyan p-3.5 rounded-md hover:border-turquoise transition-all cursor-help shadow-xs"
                 title="Sharpe Ratio: Excess return per unit of volatility above 6.0% Indian risk-free hurdle."
               >
@@ -417,10 +446,12 @@ export default function Home() {
                 <div className="text-2xl font-bold font-mono text-inkText mt-1">
                   {metrics.sharpe_ratio.toFixed(3)}
                 </div>
-                <div className="text-[11px] text-mutedText font-mono mt-0.5">Hurdle: 6.0% RF</div>
+                <div className="text-[11px] text-mutedText font-mono mt-0.5">
+                  Alpha: {(metrics.alpha * 100).toFixed(1)}% · β: {metrics.beta.toFixed(2)}
+                </div>
               </div>
 
-              <div 
+              <div
                 className="bg-panel border border-rule border-t-2 border-t-crimson p-3.5 rounded-md hover:border-crimson transition-all cursor-help shadow-xs"
                 title="Maximum Drawdown: Peak-to-trough decline of portfolio equity."
               >
@@ -434,23 +465,25 @@ export default function Home() {
                 <div className="text-[11px] text-mutedText font-mono mt-0.5">Deepest trough</div>
               </div>
 
-              <div 
+              <div
                 className="bg-panel border border-rule border-t-2 border-t-stormyTeal p-3.5 rounded-md hover:border-turquoise transition-all cursor-help shadow-xs"
-                title="Calmar Ratio: Annual return divided by maximum drawdown."
+                title="Market Exposure: Average fraction of capital deployed in equities vs sitting in cash."
               >
                 <div className="flex items-center justify-between">
-                  <div className="text-mutedText text-[11px] font-mono uppercase tracking-wider">Calmar Ratio</div>
+                  <div className="text-mutedText text-[11px] font-mono uppercase tracking-wider">Market Exposure</div>
                   <span className="text-[10px] text-turquoise">ℹ</span>
                 </div>
                 <div className="text-2xl font-bold font-mono text-inkText mt-1">
-                  {metrics.calmar_ratio.toFixed(2)}
+                  {((metrics.average_exposure ?? 0.6) * 100).toFixed(1)}%
                 </div>
-                <div className="text-[11px] text-mutedText font-mono mt-0.5">CAGR / |MaxDD|</div>
+                <div className="text-[11px] text-mutedText font-mono mt-0.5">
+                  Calmar: {metrics.calmar_ratio.toFixed(2)}
+                </div>
               </div>
 
-              <div 
+              <div
                 className="bg-panel border border-rule border-t-2 border-t-turquoise p-3.5 col-span-2 sm:col-span-1 rounded-md hover:border-turquoise transition-all cursor-help shadow-xs"
-                title="Terminal Net Equity: Final capital remaining after deducting all government taxes (STT, GST, Stamp) and market impact."
+                title="Terminal Net Equity: Final capital remaining after deducting all statutory taxes (STT, GST, Stamp, DP) and market slippage."
               >
                 <div className="flex items-center justify-between">
                   <div className="text-mutedText text-[11px] font-mono uppercase tracking-wider">Terminal Net Equity</div>
@@ -494,13 +527,26 @@ export default function Home() {
                 ))}
               </div>
 
-              <button
-                onClick={() => setIsGuideOpen(true)}
-                className="hidden sm:inline-flex items-center gap-1.5 text-xs text-turquoise hover:underline font-mono px-3 py-1 rounded bg-canvas border border-rule"
-              >
-                <span>Methodology Reference</span>
-                <span>→</span>
-              </button>
+              <div className="flex items-center gap-2">
+                {data.run_id && (
+                  <a
+                    href={getReportUrl(data.run_id)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hidden sm:inline-flex items-center gap-1 text-xs text-turquoise hover:underline font-mono px-3 py-1 rounded bg-canvas border border-rule hover:border-turquoise"
+                  >
+                    <span>Download Audit Report (HTML)</span>
+                    <span>↗</span>
+                  </a>
+                )}
+                <button
+                  onClick={() => setIsGuideOpen(true)}
+                  className="hidden sm:inline-flex items-center gap-1.5 text-xs text-mutedText hover:text-turquoise font-mono px-3 py-1 rounded bg-canvas border border-rule"
+                >
+                  <span>Methodology</span>
+                  <span>→</span>
+                </button>
+              </div>
             </div>
 
             {/* Dynamic Full Height Workspace View */}
@@ -512,7 +558,7 @@ export default function Home() {
                     dates={data.dates}
                     grossEquity={data.gross_equity}
                     netEquity={data.net_equity}
-                    initialCapital={100000.0}
+                    initialCapital={initialCapital}
                     strategyName={strategy}
                   />
                 </div>
@@ -528,9 +574,13 @@ export default function Home() {
                       stampDuty={costs.stamp_duty}
                       turnoverFees={costs.turnover_fees}
                       gst={costs.gst}
+                      dpCharges={costs.dp_charges}
+                      sebiFees={costs.sebi_fees}
+                      ipft={costs.ipft}
                       marketImpact={costs.market_impact}
                       totalFriction={costs.total_friction}
-                      initialCapital={100000.0}
+                      initialCapital={initialCapital}
+                      costProfile={data.cost_profile}
                     />
                   </div>
                   <div className="bg-panel border border-rule p-5 rounded space-y-4 text-xs font-mono">
@@ -541,18 +591,18 @@ export default function Home() {
                       <div className="flex justify-between py-1 border-b border-rule/50">
                         <span className="text-mutedText">Gross Paper Gain:</span>
                         <span className="text-pacificCyan font-bold">
-                          ₹{(data?.gross_equity?.[data.gross_equity.length - 1] ?? 100000) - 100000 > 0 ? "+" : ""}
-                          {((data?.gross_equity?.[data.gross_equity.length - 1] ?? 100000) - 100000).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                          ₹{(data?.gross_equity?.[data.gross_equity.length - 1] ?? initialCapital) - initialCapital > 0 ? "+" : ""}
+                          {((data?.gross_equity?.[data.gross_equity.length - 1] ?? initialCapital) - initialCapital).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                         </span>
                       </div>
                       <div className="flex justify-between py-1 border-b border-rule/50">
                         <span className="text-mutedText">Statutory Taxes (STT, Stamp, GST):</span>
                         <span className="text-crimson font-bold">
-                          -₹{(costs.stt + costs.stamp_duty + costs.gst + costs.turnover_fees).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                          -₹{(costs.stt + costs.stamp_duty + costs.gst + costs.turnover_fees + costs.dp_charges).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                         </span>
                       </div>
                       <div className="flex justify-between py-1 border-b border-rule/50">
-                        <span className="text-mutedText">Almgren-Chriss Slippage:</span>
+                        <span className="text-mutedText">Execution Slippage:</span>
                         <span className="text-crimson font-bold">
                           -₹{costs.market_impact.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                         </span>
@@ -560,8 +610,8 @@ export default function Home() {
                       <div className="flex justify-between py-1 border-b border-rule/50">
                         <span className="text-mutedText">Realized Net Profit:</span>
                         <span className="text-turquoise font-bold">
-                          ₹{(data?.net_equity?.[data.net_equity.length - 1] ?? 100000) - 100000 > 0 ? "+" : ""}
-                          {((data?.net_equity?.[data.net_equity.length - 1] ?? 100000) - 100000).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                          ₹{(data?.net_equity?.[data.net_equity.length - 1] ?? initialCapital) - initialCapital > 0 ? "+" : ""}
+                          {((data?.net_equity?.[data.net_equity.length - 1] ?? initialCapital) - initialCapital).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                         </span>
                       </div>
                       <div className="pt-2 text-[11px] text-mutedText leading-relaxed font-sans">
@@ -579,10 +629,17 @@ export default function Home() {
                     observedSharpe={metrics.sharpe_ratio}
                     expectedMaxSharpe={diag.expected_max_sharpe}
                     dsrPValue={diag.dsr_p_value}
-                    nTrials={diag.n_trials || 30}
+                    nTrials={diag.n_trials || sweepSummary?.n_configs_evaluated || 133}
                   />
 
-                  <CpcvEmbargoMatrix pbo={diag.pbo} />
+                  <CpcvEmbargoMatrix
+                    pbo={diag.pbo ?? sweepSummary?.pbo}
+                    pboReason={diag.pbo_reason}
+                    ciLower={sweepSummary?.pbo_ci_lower_95}
+                    ciUpper={sweepSummary?.pbo_ci_upper_95}
+                    cpcvPaths={sweepSummary?.cpcv_paths || 45}
+                    nConfigs={sweepSummary?.n_configs_evaluated || 133}
+                  />
                 </div>
               )}
 
