@@ -1,9 +1,10 @@
-import pandas as pd
-import numpy as np
 from datetime import datetime
-from typing import Dict, List
-from src.strategies.base import Strategy
+
+import numpy as np
+import pandas as pd
+
 from src.engine.events import SignalEvent
+from src.strategies.base import Strategy
 
 
 class BollingerBreakoutStrategy(Strategy):
@@ -13,25 +14,34 @@ class BollingerBreakoutStrategy(Strategy):
     Exits when price falls back below the 20-day middle moving average.
     Avoids duplicate BUY signals while a position is active.
     """
+
     def __init__(self, period: int = 20, num_std: float = 2.0):
         self.period = int(period)
         self.num_std = float(num_std)
 
-    def generate_signals(self, current_date: datetime, data: Dict[str, pd.DataFrame], positions: Dict) -> List[SignalEvent]:
+    def generate_signals(
+        self, current_date: datetime, data: dict[str, pd.DataFrame], positions: dict
+    ) -> list[SignalEvent]:
         signals = []
         for symbol, df in data.items():
-            past_data = df[df['date'] <= current_date]
+            if df.empty:
+                continue
+            dates = df["date"].values
+            past_data = df if dates[-1] <= np.datetime64(current_date) else df[df["date"] <= current_date]
             if len(past_data) < self.period + 1:
                 continue
 
-            closes = past_data['close'].tail(self.period).values
-            mean = np.mean(closes)
-            std = np.std(closes)
-            if std == 0:
+            closes = past_data["close"].values
+            window_closes = closes[-self.period :]
+            mean = float(np.sum(window_closes) / self.period)
+            diff = window_closes - mean
+            variance = float(np.sum(diff * diff) / self.period)
+            if variance <= 0:
                 continue
+            std = float(np.sqrt(variance))
 
             upper_band = mean + (self.num_std * std)
-            current_close = past_data['close'].iloc[-1]
+            current_close = closes[-1]
 
             # Long Entry: Price closes above Upper Band with no existing position
             if current_close > upper_band:

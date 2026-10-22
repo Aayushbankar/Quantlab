@@ -13,6 +13,10 @@ export interface ConfiguratorProps {
   setPeriod: (p: string) => void;
   applyCosts: boolean;
   setApplyCosts: (c: boolean) => void;
+  costProfile: string;
+  setCostProfile: (cp: string) => void;
+  slippageFloorBps: number;
+  setSlippageFloorBps: (bps: number) => void;
   demoMode: boolean;
   setDemoMode: (d: boolean) => void;
   initialCapital: number;
@@ -21,6 +25,7 @@ export interface ConfiguratorProps {
   setParams: React.Dispatch<React.SetStateAction<Record<string, StrategyParamValue>>>;
   universe: string[];
   setUniverse: React.Dispatch<React.SetStateAction<string[]>>;
+  survivorshipWarning?: string | null;
   onRun: () => void;
   loading: boolean;
   lastExecutionMs?: number;
@@ -101,6 +106,10 @@ export const RunConfigurator: React.FC<ConfiguratorProps> = ({
   setPeriod,
   applyCosts,
   setApplyCosts,
+  costProfile,
+  setCostProfile,
+  slippageFloorBps,
+  setSlippageFloorBps,
   demoMode,
   setDemoMode,
   initialCapital,
@@ -109,6 +118,7 @@ export const RunConfigurator: React.FC<ConfiguratorProps> = ({
   setParams,
   universe,
   setUniverse,
+  survivorshipWarning,
   onRun,
   loading,
   lastExecutionMs,
@@ -531,7 +541,13 @@ export const RunConfigurator: React.FC<ConfiguratorProps> = ({
           </div>
 
           {/* Stock Universe Summary & Manager */}
-          <div className="pt-1 border-t border-rule/50">
+          <div className="pt-1 border-t border-rule/50 space-y-2">
+            {survivorshipWarning && (
+              <div className="p-2 bg-amber-500/10 border border-amber-500/30 rounded text-[10px] text-amber-300 leading-snug">
+                ⚠️ <span className="font-semibold">Survivorship Bias Warning:</span> {survivorshipWarning}
+              </div>
+            )}
+
             <div className="flex items-center justify-between">
               <span className="text-[10px] text-mutedText">
                 Active Stocks: <strong className="text-inkText">{universe.length} NSE Equities</strong>
@@ -661,7 +677,7 @@ export const RunConfigurator: React.FC<ConfiguratorProps> = ({
             ))}
           </div>
 
-          <div className="space-y-1.5 pt-1 border-t border-rule/50">
+          <div className="space-y-2 pt-1 border-t border-rule/50">
             <label className="flex items-center justify-between cursor-pointer py-1 bg-panel px-2 rounded border border-rule/50 hover:border-rule">
               <div>
                 <div className="text-inkText font-medium text-[10px]">Deduct Statutory Indian Taxes</div>
@@ -674,6 +690,57 @@ export const RunConfigurator: React.FC<ConfiguratorProps> = ({
                 className="accent-turquoise w-3.5 h-3.5 cursor-pointer"
               />
             </label>
+
+            {applyCosts && (
+              <div className="p-2 bg-canvas/80 border border-rule rounded space-y-2">
+                <div>
+                  <div className="flex justify-between text-[10px] mb-1">
+                    <span className="text-mutedText">Broker Rate Card:</span>
+                    <span className="text-turquoise font-medium font-mono text-[9px]">
+                      {costProfile.replace(/_/g, " ")}
+                    </span>
+                  </div>
+                  <select
+                    value={costProfile}
+                    onChange={(e) => setCostProfile(e.target.value)}
+                    className="w-full px-2 py-1 bg-panel border border-rule rounded text-[10px] text-inkText outline-none focus:border-turquoise font-sans"
+                  >
+                    <option value="zerodha_delivery_2024">
+                      Zerodha Delivery (Oct 2024 True-to-Label, ₹0 brokerage)
+                    </option>
+                    <option value="standard_discount_2024">
+                      Standard Discount Broker (₹20/order, SEBI 2024)
+                    </option>
+                    <option value="zerodha_delivery_pre_oct2024">
+                      Zerodha Delivery (Pre-Oct 2024 Rates)
+                    </option>
+                    <option value="traditional_full_service">
+                      Full-Service Traditional (0.25% Brokerage)
+                    </option>
+                  </select>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-[10px] mb-1">
+                    <span className="text-mutedText">Spread / Slippage Floor:</span>
+                    <span className="text-turquoise font-bold font-mono">{slippageFloorBps} bps</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="20"
+                    step="1"
+                    value={slippageFloorBps}
+                    onChange={(e) => setSlippageFloorBps(parseInt(e.target.value))}
+                    className="w-full accent-turquoise h-1 bg-darkSlate rounded cursor-pointer"
+                  />
+                  <div className="flex justify-between text-[8px] text-mutedText font-mono mt-0.5">
+                    <span>0 bps (Pure Almgren-Chriss)</span>
+                    <span>20 bps (Liquid Smallcap)</span>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <label className="flex items-center justify-between cursor-pointer py-1 bg-panel px-2 rounded border border-rule/50 hover:border-rule">
               <div>

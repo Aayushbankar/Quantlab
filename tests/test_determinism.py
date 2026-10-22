@@ -1,6 +1,6 @@
-import pytest
-import pandas as pd
 import numpy as np
+import pandas as pd
+
 from src.engine.backtest_engine import BacktestEngine
 from src.strategies.sma_crossover import SMACrossoverStrategy
 
@@ -9,14 +9,16 @@ def _data():
     rng = np.random.default_rng(5)
     dates = pd.date_range("2019-01-01", periods=300, freq="B")
     closes = 100 * np.cumprod(1 + rng.normal(0.0005, 0.015, 300))
-    df = pd.DataFrame({
-        "date": dates,
-        "open": closes,
-        "high": closes * 1.005,
-        "low": closes * 0.995,
-        "close": closes,
-        "volume": [500_000] * 300,
-    })
+    df = pd.DataFrame(
+        {
+            "date": dates,
+            "open": closes,
+            "high": closes * 1.005,
+            "low": closes * 0.995,
+            "close": closes,
+            "volume": [500_000] * 300,
+        }
+    )
     return {"RELIANCE.NS": df}
 
 

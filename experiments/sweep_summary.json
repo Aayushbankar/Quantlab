@@ -1,0 +1,33 @@
+{
+  "n_configs_evaluated": 133,
+  "universe_symbols": [
+    "BHARTIARTL",
+    "HDFCBANK",
+    "HINDUNILVR",
+    "ICICIBANK",
+    "INFY",
+    "ITC",
+    "LT",
+    "RELIANCE",
+    "SBIN",
+    "TCS"
+  ],
+  "cross_trial_variance": 0.085991,
+  "mean_sharpe": 0.8116,
+  "std_sharpe": 0.2932,
+  "max_sharpe": 1.2697,
+  "min_sharpe": -0.1091,
+  "pbo": 0.6,
+  "pbo_ci_lower_95": 0.4444,
+  "pbo_ci_upper_95": 0.7333,
+  "cpcv_paths": 45,
+  "cpcv_overfit_paths": 27,
+  "best_config": {
+    "config_id": "sma_5_45",
+    "strategy": "sma_crossover",
+    "params": "{\"fast_window\": 5, \"slow_window\": 45}",
+    "total_return": 1.0067,
+    "sharpe": 1.2697,
+    "max_drawdown": -0.1408
+  }
+}

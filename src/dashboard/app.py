@@ -1,23 +1,24 @@
 import streamlit as st
-import pandas as pd
-import os
+
+from src.analytics.metrics import MetricsEngine
+from src.dashboard.components import plot_drawdown_underwater, plot_equity_curve
 from src.data.clean import load_and_clean_all
 from src.engine.backtest_engine import BacktestEngine
-from src.strategies.sma_crossover import SMACrossoverStrategy
-from src.strategies.rsi_mean_reversion import RSIMeanReversionStrategy
 from src.strategies.momentum import MomentumStrategy
-from src.analytics.metrics import MetricsEngine
-from src.dashboard.components import plot_equity_curve, plot_drawdown_underwater
+from src.strategies.rsi_mean_reversion import RSIMeanReversionStrategy
+from src.strategies.sma_crossover import SMACrossoverStrategy
 
 st.set_page_config(page_title="QuantLab Dashboard", layout="wide")
 
 st.title("QuantLab: Realistic Backtesting Engine")
 st.markdown("GTU DI05000341 Minor Project - Overfitting Diagnostic Platform")
 
+
 @st.cache_data
 def load_data():
     # Assuming data is downloaded in data/raw
     return load_and_clean_all("data/raw")
+
 
 data_dict = load_data()
 
@@ -47,10 +48,10 @@ if st.sidebar.button("Run Backtest"):
     with st.spinner("Running event-driven simulation..."):
         engine = BacktestEngine(data_dict, strategy, apply_costs=apply_costs)
         equity_history = engine.run()
-        
+
         metrics_engine = MetricsEngine(equity_history)
         metrics = metrics_engine.compute_all()
-        
+
         # Display Metrics
         st.subheader("Performance Metrics")
         col1, col2, col3, col4 = st.columns(4)
@@ -58,7 +59,7 @@ if st.sidebar.button("Run Backtest"):
         col2.metric("Sharpe Ratio", f"{metrics.get('Sharpe Ratio', 0):.2f}")
         col3.metric("Max Drawdown", f"{metrics.get('Max Drawdown', 0):.2%}")
         col4.metric("Calmar Ratio", f"{metrics.get('Calmar Ratio', 0):.2f}")
-        
+
         # Display Charts
         st.plotly_chart(plot_equity_curve(equity_history), use_container_width=True)
         st.plotly_chart(plot_drawdown_underwater(equity_history), use_container_width=True)

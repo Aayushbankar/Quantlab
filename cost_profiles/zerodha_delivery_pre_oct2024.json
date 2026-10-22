@@ -1,0 +1,21 @@
+{
+  "profile_id": "zerodha_delivery_pre_oct2024",
+  "name": "Zerodha Equity Delivery (July 2020 - Sept 2024)",
+  "broker": "Zerodha",
+  "exchange": "NSE",
+  "effective_date": "2020-07-01",
+  "unverified": false,
+  "source": "NSE Cash Market Transaction Charges pre-Oct 2024 True-to-Label revision",
+  "brokerage_percent": 0.0,
+  "brokerage_cap": 0.0,
+  "brokerage_flat": 0.0,
+  "stt_rate": 0.0010,
+  "stamp_duty_rate": 0.00015,
+  "exchange_turnover_rate": 0.0000345,
+  "sebi_turnover_rate": 0.0000010,
+  "ipft_rate": 0.0000010,
+  "dp_charge": 13.50,
+  "gst_rate": 0.18,
+  "slippage_floor_bps": 0.0,
+  "notes": "Pre-October 2024 rate with standard NSE cash transaction charge slab 0.00345%."
+}

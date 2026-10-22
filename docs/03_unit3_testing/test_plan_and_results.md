@@ -51,42 +51,24 @@ To satisfy Unit 3 paisa-level precision, a ₹1,00,000 round-trip transaction is
 ============================= test session starts ==============================
 platform linux -- Python 3.11.16, pytest-8.3.4
 rootdir: /mnt/work/projects/Quantlab
-collected 35 items
+collected 72 items
 
-tests/test_cost_model.py::test_indian_cost_model_buy PASSED              [  2%]
-tests/test_cpcv.py::test_calculate_pbo_random_returns PASSED             [  5%]
-tests/test_cpcv.py::test_calculate_pbo_real_signal PASSED                [  8%]
-tests/test_cpcv.py::test_cpcv_embargo_ar1 PASSED                         [ 11%]
-tests/test_data.py::test_clean_drops_missing_ohlc_rows_not_forward_filled PASSED [ 14%]
-tests/test_data.py::test_clean_does_not_forward_fill PASSED              [ 17%]
-tests/test_data.py::test_clean_sorts_chronologically PASSED              [ 20%]
-tests/test_data.py::test_clean_rejects_duplicate_dates PASSED            [ 22%]
-tests/test_data.py::test_clean_accepts_empty_frame_without_crashing PASSED [ 25%]
-tests/test_data.py::test_clean_handles_datetime_string_column PASSED     [ 28%]
-tests/test_deflated_sharpe.py::test_expected_max_sharpe_increases_with_trials PASSED [ 31%]
-tests/test_deflated_sharpe.py::test_expected_max_sharpe_single_trial_returns_benchmark PASSED [ 34%]
-tests/test_deflated_sharpe.py::test_dsr_returns_valid_pvalue_for_noise PASSED [ 37%]
-tests/test_deflated_sharpe.py::test_dsr_punishes_single_trial_less_than_many PASSED [ 40%]
-tests/test_deflated_sharpe.py::test_dsr_rejects_insufficient_data PASSED [ 42%]
-tests/test_deflated_sharpe.py::test_dsr_rejects_single_trial PASSED      [ 45%]
-tests/test_deflated_sharpe.py::test_dsr_high_true_sharpe_is_credible PASSED [ 48%]
-tests/test_determinism.py::test_backtest_is_byte_identical_across_runs PASSED [ 51%]
-tests/test_determinism.py::test_backtest_equity_hash_stable PASSED       [ 54%]
-tests/test_determinism.py::test_costs_change_the_outcome PASSED          [ 57%]
-tests/test_engine.py::test_engine_zero_look_ahead PASSED                 [ 60%]
-tests/test_engine.py::test_engine_position_sizing_uses_total_equity PASSED [ 62%]
-tests/test_metrics.py::test_metrics_engine PASSED                        [ 65%]
-tests/test_momentum.py::test_momentum_no_duplicate_signals PASSED        [ 68%]
-tests/test_portfolio.py::test_portfolio_cash_flow PASSED                 [ 71%]
-tests/test_rsi.py::test_rsi_100_when_all_gains PASSED                    [ 74%]
-tests/test_rsi.py::test_rsi_0_when_all_losses PASSED                     [ 77%]
-tests/test_rsi.py::test_rsi_neutral_on_flat_series PASSED                [ 80%]
-tests/test_rsi.py::test_rsi_bounded_zero_to_hundred_on_random_walk PASSED [ 82%]
-tests/test_rsi.py::test_rsi_all_gains_does_not_emit_oversold_buy PASSED  [ 85%]
-tests/test_sma.py::test_sma_golden_cross_emits_buy PASSED                [ 88%]
-tests/test_sma.py::test_sma_death_cross_emits_sell_only_with_position PASSED [ 91%]
-tests/test_sma.py::test_sma_insufficient_history_produces_no_signal PASSED [ 94%]
-tests/test_sma.py::test_sma_respects_fast_must_be_less_than_slow PASSED  [ 97%]
-tests/test_sma.py::test_sma_no_lookahead_uses_only_past_bars PASSED      [100%]
-============================== 35 passed in 2.91s ===============================
+tests/test_api.py (12 passed)
+tests/test_bollinger.py (1 passed)
+tests/test_cost_model.py (6 passed)
+tests/test_cpcv.py (4 passed)
+tests/test_data.py (6 passed)
+tests/test_data_provider.py (4 passed)
+tests/test_deflated_sharpe.py (10 passed)
+tests/test_determinism.py (3 passed)
+tests/test_engine.py (2 passed)
+tests/test_honesty.py (9 passed)
+tests/test_metrics.py (1 passed)
+tests/test_momentum.py (1 passed)
+tests/test_perf.py (2 passed)
+tests/test_portfolio.py (1 passed)
+tests/test_rsi.py (5 passed)
+tests/test_sma.py (5 passed)
+
+============================== 72 passed in 7.22s ===============================
 ```

@@ -1,5 +1,6 @@
 class Position:
     """Represents a trading position in a specific symbol."""
+
     def __init__(self, symbol: str):
         self.symbol = symbol
         self.quantity = 0
@@ -8,15 +9,15 @@ class Position:
 
     def update(self, side: str, quantity: int, fill_price: float, total_cost: float):
         """Updates the position based on a filled order."""
-        if side == 'BUY':
+        if side == "BUY":
             if self.quantity >= 0:
                 # Adding to long position (clean execution cost basis)
                 total_cost_basis = (self.quantity * self.average_entry_price) + (quantity * fill_price)
                 self.quantity += quantity
                 self.average_entry_price = total_cost_basis / self.quantity
             else:
-                pass # Long-only engine
-        elif side == 'SELL':
+                pass  # Long-only engine
+        elif side == "SELL":
             if self.quantity > 0:
                 # Closing long position
                 close_qty = min(self.quantity, quantity)
