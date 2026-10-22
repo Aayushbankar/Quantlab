@@ -22,6 +22,7 @@ import {
   BacktestResponse,
   SweepSummaryResponse,
 } from "../lib/api";
+import { applyTheme, applyThemeFromString, loadTheme, nextTheme, type ThemeName } from "../lib/theme";
 
 // Honest baseline fallback when API is offline
 const DEFAULT_FALLBACK_DATA: BacktestResponse = {
@@ -108,7 +109,7 @@ export default function Home() {
   const [engineOnline, setEngineOnline] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<{ text: string; type: "success" | "error" | "info" } | null>(null);
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [theme, setTheme] = useState<ThemeName>("abyss");
   const [isGuideOpen, setIsGuideOpen] = useState<boolean>(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState<boolean>(false);
   const [sweepSummary, setSweepSummary] = useState<SweepSummaryResponse | null>(null);
@@ -134,29 +135,22 @@ export default function Home() {
       if (urlTab && ["mirage", "costs", "overfitting", "ledger", "unified"].includes(urlTab)) {
         setActiveTab(urlTab);
       }
-      const urlTheme = searchParams.get("theme") as "dark" | "light" | null;
-      if (urlTheme === "dark" || urlTheme === "light") {
-        setTheme(urlTheme);
-        document.documentElement.setAttribute("data-theme", urlTheme);
+      const urlTheme = searchParams.get("theme") as ThemeName | "dark" | "light" | null;
+      if (urlTheme) {
+        const resolved = applyThemeFromString(urlTheme);
+        setTheme(resolved);
         return;
       }
-      const saved = localStorage.getItem("pramaan_theme") as "dark" | "light" | null;
-      if (saved) {
-        setTheme(saved);
-        document.documentElement.setAttribute("data-theme", saved);
-      } else {
-        document.documentElement.setAttribute("data-theme", "dark");
-      }
+      const saved = loadTheme();
+      setTheme(saved);
+      applyTheme(saved);
     }
   }, []);
 
   const toggleTheme = () => {
-    const next = theme === "dark" ? "light" : "dark";
+    const next = nextTheme(theme);
     setTheme(next);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("pramaan_theme", next);
-      document.documentElement.setAttribute("data-theme", next);
-    }
+    applyTheme(next);
   };
 
   const loadBacktest = useCallback(async () => {
@@ -285,7 +279,7 @@ export default function Home() {
       {/* Main Viewport Shell: 100vw x 100vh Fill */}
       <div className="flex-1 w-full min-h-0 flex overflow-hidden">
         {/* Left Sidebar Control Dock (320px) */}
-        <aside className="w-[320px] 2xl:w-[350px] shrink-0 h-full overflow-y-auto border-r border-rule bg-panel p-4 flex flex-col justify-between">
+        <aside className="w-[320px] 2xl:w-[350px] shrink-0 h-full overflow-y-auto border-r border-rule bg-panel/70 px-4 py-4 flex flex-col justify-between">
           <RunConfigurator
             strategy={strategy}
             setStrategy={setStrategy}
@@ -313,21 +307,21 @@ export default function Home() {
         </aside>
 
         {/* Right Main Stage (Expansive Full Canvas) */}
-        <main className="flex-1 min-w-0 h-full overflow-y-auto p-4 lg:p-5 flex flex-col justify-between space-y-3.5">
+        <main className="flex-1 min-w-0 h-full overflow-y-auto p-4 lg:p-6 flex flex-col justify-between gap-3.5">
           <div className="space-y-3.5 flex-1 flex flex-col">
             {/* Offline Replay Banner (Never fails silently) */}
             {!engineOnline && (
               <div
                 role="alert"
                 aria-live="polite"
-                className="px-4 py-2.5 rounded border border-amber-500/40 bg-amber-500/10 text-amber-200 text-xs font-mono flex items-center justify-between shrink-0"
+                className="px-4 py-2.5 rounded-lg border border-amber-500/35 bg-amber-500/[0.07] text-amber-200 text-xs font-mono flex items-center justify-between shrink-0"
               >
                 <div className="flex items-center gap-2.5">
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/25 border border-amber-500/50 text-amber-300">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 border border-amber-500/45 text-amber-300">
                     REPLAY (offline demo)
                   </span>
                   <span>
-                    Backend API unreachable at <code className="bg-canvas/50 px-1 py-0.5 rounded text-amber-100">{API_BASE_URL}</code>. Displaying committed baseline replay artifact.
+                    Backend API unreachable at <code className="bg-canvas/60 px-1 py-0.5 rounded text-amber-100">{API_BASE_URL}</code>. Displaying committed baseline replay artifact.
                   </span>
                 </div>
                 <button
@@ -341,7 +335,7 @@ export default function Home() {
                         setToastMessage({ text: "API still unreachable. Ensure `python -m src.api.main` is running.", type: "error" });
                       });
                   }}
-                  className="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-100 border border-amber-500/30 text-[11px] font-medium transition-colors"
+                  className="px-2.5 py-1 rounded-md bg-amber-500/15 hover:bg-amber-500/25 text-amber-100 border border-amber-500/30 text-[11px] font-medium transition-colors duration-micro cursor-pointer"
                 >
                   Retry Connection
                 </button>
@@ -351,21 +345,22 @@ export default function Home() {
             {/* Toast Alert */}
             {toastMessage && (
               <div
-                className={`px-4 py-2 rounded border text-xs font-mono flex items-center justify-between transition-all shrink-0 ${
+                className={`px-4 py-2.5 rounded-lg border text-xs font-mono flex items-center justify-between transition-all shrink-0 ${
                   toastMessage.type === "success"
-                    ? "bg-turquoise/15 border-turquoise/40 text-turquoise"
+                    ? "bg-turquoise/10 border-turquoise/35 text-turquoise"
                     : toastMessage.type === "error"
-                    ? "bg-crimson/15 border-crimson/40 text-crimson"
-                    : "bg-pacificCyan/15 border-pacificCyan/40 text-pacificCyan"
+                    ? "bg-crimson/10 border-crimson/40 text-crimson"
+                    : "bg-pacificCyan/10 border-pacificCyan/40 text-pacificCyan"
                 }`}
               >
-                <div className="flex items-center gap-2">
-                  <span className="font-bold">{toastMessage.type === "success" ? "✓" : "ℹ"}</span>
+                <div className="flex items-center gap-2.5">
+                  <span className="font-bold">{toastMessage.type === "success" ? "✓" : toastMessage.type === "error" ? "✕" : "ℹ"}</span>
                   <span>{toastMessage.text}</span>
                 </div>
                 <button
                   onClick={() => setToastMessage(null)}
-                  className="text-mutedText hover:text-inkText ml-4 font-bold"
+                  className="text-mutedText hover:text-inkText ml-4 font-bold cursor-pointer"
+                  aria-label="Dismiss notification"
                 >
                   ✕
                 </button>
@@ -375,18 +370,18 @@ export default function Home() {
             {/* Run Completion & Delta Feedback Banner */}
             {lastRunStats && (
               <div
-                className={`p-3 rounded-md border flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs shrink-0 transition-all duration-300 ${
+                className={`px-4 py-3 rounded-lg border flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs shrink-0 transition-all duration-medium ease-out ${
                   isResultsFresh
-                    ? "bg-turquoise/15 border-turquoise shadow-md shadow-turquoise/15 ring-1 ring-turquoise/40"
+                    ? "bg-card border-turquoise/50 shadow-glow"
                     : "bg-panel border-rule"
                 }`}
               >
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-3">
                   <span className={`w-2.5 h-2.5 rounded-full bg-turquoise shrink-0 ${isResultsFresh ? "animate-ping" : "animate-pulse"}`} />
                   <div>
-                    <div className="font-bold text-inkText flex items-center gap-2">
-                      <span>✓ Backtest Results Updated ({data.served_from.toUpperCase()})</span>
-                      <span className="text-[10px] text-mutedText font-normal">at {lastRunStats.timestamp}</span>
+                    <div className="font-semibold text-inkText flex items-center gap-2">
+                      <span>Backtest results updated · {data.served_from.toUpperCase()}</span>
+                      <span className="text-[10px] text-tertiaryText font-normal font-mono">{lastRunStats.timestamp}</span>
                     </div>
                     <div className="text-mutedText text-[11px] mt-0.5">
                       Tested <strong className="text-turquoise">{lastRunStats.strategyName.replace(/_/g, " ").toUpperCase()}</strong> with starting capital of <strong className="text-inkText">₹{lastRunStats.initialCapital.toLocaleString("en-IN")}</strong>.
@@ -395,109 +390,100 @@ export default function Home() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 font-mono text-[11px]">
-                  <div className="bg-canvas px-2.5 py-1 rounded border border-rule">
-                    <span className="text-mutedText">Net Wealth: </span>
+                  <div className="bg-canvas px-2.5 py-1 rounded-md border border-rule">
+                    <span className="text-tertiaryText">Net Wealth </span>
                     <span className="text-turquoise font-bold">₹{lastRunStats.terminalNet.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</span>
                     <span className="text-turquoise text-[10px] ml-1 font-bold">({(lastRunStats.totalReturn * 100).toFixed(1)}%)</span>
                   </div>
 
-                  <div className="bg-canvas px-2.5 py-1 rounded border border-rule">
-                    <span className="text-mutedText">Tax Drag: </span>
+                  <div className="bg-canvas px-2.5 py-1 rounded-md border border-rule">
+                    <span className="text-tertiaryText">Tax Drag </span>
                     <span className="text-crimson font-bold">-₹{lastRunStats.totalFriction.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</span>
                   </div>
 
-                  <div className="bg-canvas px-2.5 py-1 rounded border border-rule">
-                    <span className="text-mutedText">Exposure: </span>
+                  <div className="bg-canvas px-2.5 py-1 rounded-md border border-rule">
+                    <span className="text-tertiaryText">Exposure </span>
                     <span className="text-pacificCyan font-bold">{((metrics.average_exposure ?? 0.6) * 100).toFixed(0)}%</span>
                   </div>
 
-                  <div className="bg-canvas px-2.5 py-1 rounded border border-rule">
-                    <span className="text-mutedText">Trades: </span>
+                  <div className="bg-canvas px-2.5 py-1 rounded-md border border-rule">
+                    <span className="text-tertiaryText">Trades </span>
                     <span className="text-inkText font-bold">{lastRunStats.tradesCount} fills</span>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Top KPI Ribbon (5 Spacious Institutional Cards) */}
-            <div className={`grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3 font-tabular shrink-0 transition-all duration-500 rounded-md p-0.5 ${
-              isResultsFresh ? "ring-1 ring-turquoise/60 shadow-lg shadow-turquoise/15 bg-turquoise/5" : ""
-            }`}>
+            {/* Top KPI Ribbon — hairline bento grid with staggered entrance */}
+            <div
+              key={lastRunStats?.timestamp ?? "initial-kpis"}
+              className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-px font-tabular shrink-0 bg-rule/60 border border-rule rounded-xl overflow-hidden"
+            >
               <div
-                className="bg-panel border border-rule border-t-2 border-t-turquoise p-3.5 rounded-md hover:border-turquoise transition-all cursor-help shadow-xs"
+                className="enter bg-panel hover:bg-cardHover transition-colors duration-small p-4 cursor-help"
+                style={{ "--enter-delay": "0ms" } as React.CSSProperties}
                 title="Compound Annual Growth Rate: Annualized geometric return. Passive Buy & Hold achieved 19.07% over 2019–2024."
               >
-                <div className="flex items-center justify-between">
-                  <div className="text-mutedText text-[11px] font-mono uppercase tracking-wider">CAGR (Annualized)</div>
-                  <span className="text-[10px] text-turquoise">ℹ</span>
-                </div>
-                <div className="text-2xl font-bold font-mono text-turquoise mt-1">
+                <div className="eyebrow">CAGR (Annualized)</div>
+                <div className="num text-[1.7rem] leading-none font-semibold text-turquoise mt-2.5">
                   {(metrics.cagr * 100).toFixed(2)}%
                 </div>
-                <div className="text-[11px] text-mutedText font-mono mt-0.5">
-                  Exp-Matched: {((metrics.exposure_matched_return ?? 0.15) * 100).toFixed(1)}%
+                <div className="num text-[11px] text-tertiaryText mt-2">
+                  Exp-Matched {((metrics.exposure_matched_return ?? 0.15) * 100).toFixed(1)}%
                 </div>
               </div>
 
               <div
-                className="bg-panel border border-rule border-t-2 border-t-pacificCyan p-3.5 rounded-md hover:border-turquoise transition-all cursor-help shadow-xs"
+                className="enter bg-panel hover:bg-cardHover transition-colors duration-small p-4 cursor-help"
+                style={{ "--enter-delay": "70ms" } as React.CSSProperties}
                 title="Sharpe Ratio: Excess return per unit of volatility above 6.0% Indian risk-free hurdle."
               >
-                <div className="flex items-center justify-between">
-                  <div className="text-mutedText text-[11px] font-mono uppercase tracking-wider">Sharpe Ratio</div>
-                  <span className="text-[10px] text-turquoise">ℹ</span>
-                </div>
-                <div className="text-2xl font-bold font-mono text-inkText mt-1">
+                <div className="eyebrow">Sharpe Ratio</div>
+                <div className="num text-[1.7rem] leading-none font-semibold text-inkText mt-2.5">
                   {metrics.sharpe_ratio.toFixed(3)}
                 </div>
-                <div className="text-[11px] text-mutedText font-mono mt-0.5">
-                  Alpha: {(metrics.alpha * 100).toFixed(1)}% · β: {metrics.beta.toFixed(2)}
+                <div className="num text-[11px] text-tertiaryText mt-2">
+                  Alpha {(metrics.alpha * 100).toFixed(1)}% · β {metrics.beta.toFixed(2)}
                 </div>
               </div>
 
               <div
-                className="bg-panel border border-rule border-t-2 border-t-crimson p-3.5 rounded-md hover:border-crimson transition-all cursor-help shadow-xs"
+                className="enter bg-panel hover:bg-cardHover transition-colors duration-small p-4 cursor-help"
+                style={{ "--enter-delay": "140ms" } as React.CSSProperties}
                 title="Maximum Drawdown: Peak-to-trough decline of portfolio equity."
               >
-                <div className="flex items-center justify-between">
-                  <div className="text-mutedText text-[11px] font-mono uppercase tracking-wider">Max Drawdown</div>
-                  <span className="text-[10px] text-crimson">ℹ</span>
-                </div>
-                <div className="text-2xl font-bold font-mono text-crimson mt-1">
+                <div className="eyebrow">Max Drawdown</div>
+                <div className="num text-[1.7rem] leading-none font-semibold text-crimson mt-2.5">
                   {(metrics.max_drawdown * 100).toFixed(2)}%
                 </div>
-                <div className="text-[11px] text-mutedText font-mono mt-0.5">Deepest trough</div>
+                <div className="num text-[11px] text-tertiaryText mt-2">Deepest trough</div>
               </div>
 
               <div
-                className="bg-panel border border-rule border-t-2 border-t-stormyTeal p-3.5 rounded-md hover:border-turquoise transition-all cursor-help shadow-xs"
+                className="enter bg-panel hover:bg-cardHover transition-colors duration-small p-4 cursor-help"
+                style={{ "--enter-delay": "210ms" } as React.CSSProperties}
                 title="Market Exposure: Average fraction of capital deployed in equities vs sitting in cash."
               >
-                <div className="flex items-center justify-between">
-                  <div className="text-mutedText text-[11px] font-mono uppercase tracking-wider">Market Exposure</div>
-                  <span className="text-[10px] text-turquoise">ℹ</span>
-                </div>
-                <div className="text-2xl font-bold font-mono text-inkText mt-1">
+                <div className="eyebrow">Market Exposure</div>
+                <div className="num text-[1.7rem] leading-none font-semibold text-inkText mt-2.5">
                   {((metrics.average_exposure ?? 0.6) * 100).toFixed(1)}%
                 </div>
-                <div className="text-[11px] text-mutedText font-mono mt-0.5">
-                  Calmar: {metrics.calmar_ratio.toFixed(2)}
+                <div className="num text-[11px] text-tertiaryText mt-2">
+                  Calmar {metrics.calmar_ratio.toFixed(2)}
                 </div>
               </div>
 
               <div
-                className="bg-panel border border-rule border-t-2 border-t-turquoise p-3.5 col-span-2 sm:col-span-1 rounded-md hover:border-turquoise transition-all cursor-help shadow-xs"
+                className="enter bg-panel hover:bg-cardHover transition-colors duration-small p-4 col-span-2 sm:col-span-1 cursor-help"
+                style={{ "--enter-delay": "280ms" } as React.CSSProperties}
                 title="Terminal Net Equity: Final capital remaining after deducting all statutory taxes (STT, GST, Stamp, DP) and market slippage."
               >
-                <div className="flex items-center justify-between">
-                  <div className="text-mutedText text-[11px] font-mono uppercase tracking-wider">Terminal Net Equity</div>
-                  <span className="text-[10px] text-turquoise">ℹ</span>
-                </div>
-                <div className="text-2xl font-bold font-mono text-turquoise mt-1">
+                <div className="eyebrow">Terminal Net Equity</div>
+                <div className="num text-[1.7rem] leading-none font-semibold text-turquoise mt-2.5">
                   ₹{(data?.net_equity?.[data.net_equity.length - 1] ?? 100000).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                 </div>
-                <div className="text-[11px] text-crimson font-mono mt-0.5">
-                  -₹{costs.total_friction.toLocaleString("en-IN", { maximumFractionDigits: 0 })} lost to friction
+                <div className="num text-[11px] text-crimson mt-2">
+                  -₹{costs.total_friction.toLocaleString("en-IN", { maximumFractionDigits: 0 })} friction
                 </div>
               </div>
             </div>
@@ -508,22 +494,22 @@ export default function Home() {
             </div>
 
             {/* Institutional Workspace Tab Bar */}
-            <div className="border-b border-rule flex items-center justify-between gap-4 shrink-0 pb-px">
-              <div className="flex items-center gap-1 font-mono text-xs">
+            <div className="border-b border-rule flex items-center justify-between gap-4 shrink-0">
+              <div className="flex items-center gap-1 overflow-x-auto -mb-px">
                 {[
-                  { id: "mirage", label: "📈 The Profit Mirage" },
-                  { id: "costs", label: "🏛️ Statutory Tollgate" },
-                  { id: "overfitting", label: "🛡️ Overfitting Diagnostics" },
-                  { id: "ledger", label: "📋 T+1 Execution Ledger" },
-                  { id: "unified", label: "🔲 Unified Master View" },
+                  { id: "mirage", label: "Profit Mirage" },
+                  { id: "costs", label: "Statutory Tollgate" },
+                  { id: "overfitting", label: "Overfitting Diagnostics" },
+                  { id: "ledger", label: "T+1 Execution Ledger" },
+                  { id: "unified", label: "Unified View" },
                 ].map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                    className={`px-4 py-2 font-medium border-b-2 whitespace-nowrap transition-all ${
+                    className={`label-caps px-3.5 py-2.5 border-b-2 whitespace-nowrap transition-all duration-micro cursor-pointer ${
                       activeTab === tab.id
-                        ? "border-turquoise text-turquoise bg-panel font-bold shadow-sm"
-                        : "border-transparent text-mutedText hover:text-inkText hover:bg-panel/50"
+                        ? "border-turquoise text-turquoise"
+                        : "border-transparent text-tertiaryText hover:text-inkText"
                     }`}
                   >
                     {tab.label}
@@ -531,21 +517,21 @@ export default function Home() {
                 ))}
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="hidden sm:flex items-center gap-2 shrink-0">
                 {data.run_id && (
                   <a
                     href={getReportUrl(data.run_id)}
                     target="_blank"
                     rel="noreferrer"
-                    className="hidden sm:inline-flex items-center gap-1 text-xs text-turquoise hover:underline font-mono px-3 py-1 rounded bg-canvas border border-rule hover:border-turquoise"
+                    className="inline-flex items-center gap-1.5 text-[11px] font-medium text-turquoise hover:text-inkText font-mono px-3 py-1.5 rounded-md bg-card border border-rule hover:border-turquoise/60 transition-all duration-micro"
                   >
-                    <span>Download Audit Report (HTML)</span>
+                    <span>Audit Report</span>
                     <span>↗</span>
                   </a>
                 )}
                 <button
                   onClick={() => setIsGuideOpen(true)}
-                  className="hidden sm:inline-flex items-center gap-1.5 text-xs text-mutedText hover:text-turquoise font-mono px-3 py-1 rounded bg-canvas border border-rule"
+                  className="inline-flex items-center gap-1.5 text-[11px] font-medium text-mutedText hover:text-inkText font-mono px-3 py-1.5 rounded-md bg-card border border-rule hover:border-turquoise/60 transition-all duration-micro cursor-pointer"
                 >
                   <span>Methodology</span>
                   <span>→</span>
@@ -657,8 +643,11 @@ export default function Home() {
           </div>
 
           {/* Minimal Persistent Status Footer */}
-          <footer className="pt-2 border-t border-rule text-center text-[11px] text-mutedText font-mono shrink-0">
-            Pramaan (प्रमाण) · GTU DI05000341 Sem-5 Minor Project · Aayush Avinash Bankar & Meet Jayeshbhai Patel · Apache 2.0
+          <footer className="pt-3 border-t border-rule flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center text-[10px] text-tertiaryText font-mono shrink-0">
+            <span className="label-caps !text-[9px] text-mutedText">Pramaan प्रमाण</span>
+            <span>· GTU DI05000341 Sem-5 Minor Project</span>
+            <span>· Aayush Avinash Bankar &amp; Meet Jayeshbhai Patel</span>
+            <span>· Apache 2.0</span>
           </footer>
         </main>
       </div>

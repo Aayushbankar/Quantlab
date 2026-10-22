@@ -999,9 +999,9 @@ that artifact by re-executing the pipeline.
 
 \section{Graphical Workstation and Interactive Audit Terminal}\label{sec:ui_workstation}
 
-To ensure that research findings are inspectable by examiners, auditors, and practitioners without requiring code execution or terminal interaction, Pramaan delivers an institutional-grade graphical workstation built with Next.js~15, TypeScript, Tailwind~CSS, and custom high-resolution SVG charting engines. In accordance with the project's non-negotiable principle of computational honesty, the interface serves as a transparent delivery vehicle: it never presents an uncomputed metric, always displays dataset and engine provenance, and renders dual-theme surfaces for clear verification.
+To ensure that research findings are inspectable by examiners, auditors, and practitioners without requiring code execution or terminal interaction, Pramaan delivers an institutional-grade graphical workstation built with Next.js~15, TypeScript, Tailwind~CSS, and custom high-resolution SVG charting engines. In accordance with the project's non-negotiable principle of computational honesty, the interface serves as a transparent delivery vehicle: it never presents an uncomputed metric, always displays dataset and engine provenance, and renders three switchable surfaces (Abyss, Vellum, Graphite) for clear verification under any lighting or printing condition.
 
-The graphical interface is completely decoupled from the simulation engine. The core backtester runs headlessly as an in-process Python library; the presentation layer communicates with the engine exclusively through the validated FastAPI REST interface (\S\ref{sec:impl}, FR-15). To maintain complete auditability, the frontend implements deterministic URL query synchronization (\texttt{?tab=mirage|costs|overfitting|ledger|unified\&theme=dark|light}), allowing examiners to deep-link directly into any forensic view.
+The graphical interface is completely decoupled from the simulation engine. The core backtester runs headlessly as an in-process Python library; the presentation layer communicates with the engine exclusively through the validated FastAPI REST interface (\S\ref{sec:impl}, FR-15). To maintain complete auditability, the frontend implements deterministic URL query synchronization (\texttt{?tab=mirage|costs|overfitting|ledger|unified\&theme=abyss|vellum|graphite}), allowing examiners to deep-link directly into any forensic view under any theme.
 
 \begin{figure}[htbp]
 \centering
@@ -1014,7 +1014,7 @@ The primary workstation interface (Figure~\ref{fig:ui_mirage}) exposes the centr
 \begin{itemize}[leftmargin=1.2cm]
     \item \textbf{Gross Equity Curve (Pacific Cyan, \texttt{\#2C8C99}):} Represents the theoretical zero-friction return path typically shown by commercial charting software and retail backtesters.
     \item \textbf{Net Realizable Equity Curve (Turquoise, \texttt{\#42D9C8}):} Represents true cash-in-hand wealth after deducting exact Indian statutory taxes (STT, stamp duty, exchange turnover, SEBI fees, CDSL DP charges) and Almgren--Chriss market impact.
-    \item \textbf{Statutory Friction Area (Deep Crimson, \texttt{\#931621}):} The filled delta between the curves exposes the cumulative capital evaporated by institutional friction (\rupee 8{,}860 in the baseline SMA run).
+    \item \textbf{Statutory Friction Area (Deep Crimson, \texttt{\#931621}):} The filled delta between the curves exposes the cumulative capital evaporated by institutional friction (\rupee 8{,}868 in the baseline SMA run).
 \end{itemize}
 
 \begin{table}[htbp]
@@ -1060,11 +1060,11 @@ Pramaan's academic and engineering contribution rests upon two diagnostic moats:
 
 The \textbf{Statutory Tollgate} (Figure~\ref{fig:ui_tollgate}) decomposes trading friction to the paisa. It reveals that for delivery equities, Securities Transaction Tax (STT) accounts for 44.7\% of total friction, while CDSL Depository Participant (DP) charges (\rupee 13.50 + 18\% GST flat per delivery sell debit) contribute 21.9\%. Because DP charges are fixed per transaction rather than ad valorem, they impose a severe drag on smaller retail capital accounts and active rebalancing strategies.
 
-The \textbf{Overfitting Diagnostics} (Figure~\ref{fig:ui_overfitting}) implements Marcos L{\'o}pez de Prado's Deflated Sharpe Ratio (DSR) and Combinatorial Purged Cross-Validation (CPCV). In a grid of $N=133$ evaluated configurations, Extreme Value Theory dictates an expected maximum Sharpe hurdle $E[\max SR] = 1.105$. The observed active strategy Sharpe of $0.506$ fails to clear this threshold ($p\text{-val} = 0.072$), correctly flagging the result as statistically indistinguishable from luck. The CPCV matrix computes an empirical Probability of Backtest Overfitting $\text{PBO} = 60.0\%$ [44.4\%, 73.3\%] across 45 combinatorial paths ($k=10, g=2$) with a 1\% temporal embargo.
+The \textbf{Overfitting Diagnostics} (Figure~\ref{fig:ui_overfitting}) implements Marcos L{\'o}pez de Prado's Deflated Sharpe Ratio (DSR) and Combinatorial Purged Cross-Validation (CPCV). In a grid of $N=133$ evaluated configurations, Extreme Value Theory dictates an expected maximum Sharpe hurdle $E[\max SR] = 1.105$. The observed active strategy Sharpe of $0.506$ fails to clear this threshold ($p\text{-val} = 0.073$), correctly flagging the result as statistically indistinguishable from luck. The CPCV matrix computes an empirical Probability of Backtest Overfitting $\text{PBO} = 60.0\%$ [44.4\%, 73.3\%] across 45 combinatorial paths ($k=10, g=2$) with a 1\% temporal embargo.
 
-\subsection{Execution Verifiability, Dual-Theme Architecture, and Product Portal}
+\subsection{Execution Verifiability, Tri-Theme Architecture, and Product Portal}
 
-To verify zero-lookahead compliance and accommodate both digital and printed evaluation, the workstation incorporates transaction-level auditability, adaptive theming, and an educational landing portal (Figure~\ref{fig:ui_audit_themes} and Figure~\ref{fig:ui_landing}).
+To verify zero-lookahead compliance and accommodate digital screens, warm-room projection, and printed evaluation, the workstation incorporates transaction-level auditability, a three-surface theme engine, and an educational landing portal (Figure~\ref{fig:ui_audit_themes} and Figure~\ref{fig:ui_landing}).
 
 \begin{figure}[htbp]
 \centering
@@ -1078,16 +1078,16 @@ To verify zero-lookahead compliance and accommodate both digital and printed eva
 \begin{subfigure}[b]{0.485\textwidth}
     \centering
     \fboxrule=0.4pt \fboxsep=0pt \fbox{\includegraphics[width=\textwidth]{charts/screen_terminal_light.png}}
-    \caption{Dual-Theme Institutional Light Mode.}
+    \caption{Vellum Warm-Paper Light Mode.}
     \label{fig:ui_light}
 \end{subfigure}
-\caption[Execution Ledger Audit and Institutional Light Mode]{Verifiable execution and multi-theme workstation architecture: (a) transaction ledger auditing the $t+1$ Open fill invariant, and (b) Institutional Light mode (\emph{Fine Paper \& Teal}) for formal paper presentation.}
+\caption[Execution Ledger Audit and Vellum Light Mode]{Verifiable execution and multi-theme workstation architecture: (a) transaction ledger auditing the $t+1$ Open fill invariant, and (b) the Vellum warm-paper light surface for formal daytime viva evaluation and high-contrast physical printing.}
 \label{fig:ui_audit_themes}
 \end{figure}
 
 The \textbf{T+1 Execution Ledger} (Figure~\ref{fig:ui_ledger}) audits every order fill. It displays the signal timestamp (Day $t$ Close), the execution timestamp (Day $t+1$ Open), executed prices, and Almgren--Chriss slippage, accompanied by a verified \texttt{T+1 ZERO-LOOKAHEAD} invariant assertion badge.
 
-The \textbf{Dual-Theme Engine} (Figure~\ref{fig:ui_light}) supports seamless toggling between Obsidian Dark (\texttt{\#0B0F17}) for low-light workstation monitoring and Institutional Light (\emph{Fine Paper \& Maritime Teal}, \texttt{\#F8FAFC}) for daytime viva evaluation and high-contrast physical printing.
+The \textbf{Tri-Theme Engine} (Figure~\ref{fig:ui_light}) supports seamless cycling between three perceptually calibrated surfaces via a single control in the workstation header: \textbf{Abyss} (deep teal-black instrument canvas, \texttt{\#090E10}) for low-light monitoring, \textbf{Vellum} (warm paper, \texttt{\#F4F2EC}) for daytime evaluation and print, and \textbf{Graphite} (monochrome + pop crimson, \texttt{\#0C0C0D}) for distraction-free numerical review. All three share one tokenized colour system (\texttt{oklch}-calibrated RGB custom properties), so statutory crimson, net-alpha turquoise, and provenance semantics never shift meaning between surfaces.
 
 \begin{figure}[htbp]
 \centering
@@ -1096,7 +1096,7 @@ The \textbf{Dual-Theme Engine} (Figure~\ref{fig:ui_light}) supports seamless tog
 \label{fig:ui_landing}
 \end{figure}
 
-The public-facing product landing page (Figure~\ref{fig:ui_landing}) articulates Pramaan's mission (*"Prove your edge before you deploy a rupee"*), providing interactive sliders where retail practitioners can directly simulate how statutory taxes and depository charges erode compounding over multi-year horizons.
+The public-facing product landing page (Figure~\ref{fig:ui_landing}) articulates Pramaan's mission (``Prove your edge before you deploy a rupee''), providing interactive sliders where retail practitioners can directly simulate how statutory taxes and depository charges erode compounding over multi-year horizons.
 
 \begin{defensebox}{Workstation Implementation \& Forensic Delivery Contract}
 \small
