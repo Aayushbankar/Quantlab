@@ -41,3 +41,6 @@ pramaan_runs.db
 *.synctex.gz
 *.fls
 *.fdb_latexmk
+
+# Python packaging build junk
+*.egg-info/
