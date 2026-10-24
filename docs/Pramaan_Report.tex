@@ -764,7 +764,7 @@ prevent degenerate pricing on thin symbols.
 
 \section{Overfitting Diagnostics}
 
-\subsection{Why ordinary Sharpe is not enough}
+\subsection{Why ordinary Sharpe is not enough}\label{sec:overfit_convention}
 
 The Sharpe ratio is computed on a \emph{selected} sample path. Given $N$ trials,
 the expected maximum of $N$ independent Sharpe estimates is inflated according to
@@ -776,6 +776,16 @@ $N$ trials, adjusted for skewness and kurtosis of the return distribution.
 \begin{equation}
 |\text{E}[\max SR]| \approx \sqrt{V(SR)}\left[(1-\gamma_E)\Phi^{-1}\!\!\left(1-\frac{1}{N}\right) + \gamma_E\Phi^{-1}\!\!\left(1-\frac{1}{Ne}\right)\right]
 \end{equation}
+
+Unless stated otherwise, every Sharpe ratio in this report is annualised
+($\times\sqrt{252}$) and measured as excess return over a 6\% risk-free rate ---
+the convention of \texttt{MetricsEngine} (\texttt{src/analytics/metrics.py})
+behind Table~\ref{tab:full} and every workstation KPI. The generated artifact
+\texttt{experiments/sweep\_summary.json} was produced with a 0\% risk-free
+rate, so its Sharpe statistics are not comparable with report figures; wherever
+this report quotes sweep-derived Sharpe statistics (cross-trial variance,
+$\text{E}[\max SR]$, DSR) they are recomputed from
+\texttt{experiments/sweep\_returns.csv} under the 6\% convention.
 
 \subsection{Combinatorial Purged Cross-Validation}
 
@@ -1088,15 +1098,15 @@ Pramaan's academic and engineering contribution rests upon two diagnostic moats:
 
 The \textbf{Statutory Tollgate} (Figure~\ref{fig:ui_tollgate}) decomposes trading friction to the paisa. It reveals that for delivery equities, Securities Transaction Tax (STT) accounts for 44.7\% of total friction, while CDSL Depository Participant (DP) charges (\rupee 13.50 + 18\% GST flat per delivery sell debit) contribute 21.9\%. Because DP charges are fixed per transaction rather than ad valorem, they impose a severe drag on smaller retail capital accounts and active rebalancing strategies.
 
-The \textbf{Overfitting Diagnostics} (Figure~\ref{fig:ui_overfitting}) implements Marcos L{\'o}pez de Prado's Deflated Sharpe Ratio (DSR) and Combinatorial Purged Cross-Validation (CPCV). Both are recomputed here from the committed sweep artifacts ($N = 133$ evaluated configurations and cross-trial variance $V[\{SR_k\}] = 0.085991$, taken from \texttt{experiments/sweep\_summary.json}, benchmark $SR = 0$, repository function \texttt{expected\_max\_sharpe}). Extreme value theory then sets the expected maximum Sharpe hurdle at $E[\max SR] = 0.771$. \par
-Two deflated figures follow from that hurdle, both computed with the repository's own \texttt{deflated\_sharpe\_ratio\_from\_moments} on real return moments from \texttt{experiments/sweep\_returns.csv}:
+The \textbf{Overfitting Diagnostics} (Figure~\ref{fig:ui_overfitting}) implements Marcos L{\'o}pez de Prado's Deflated Sharpe Ratio (DSR) and Combinatorial Purged Cross-Validation (CPCV). Both are recomputed here from the committed sweep artifacts under the report's Sharpe convention (annualised, excess over 6\%): $N = 133$ evaluated configurations and cross-trial variance $V[\{SR_k\}] = 0.152762$, recomputed from \texttt{experiments/sweep\_returns.csv} with the repository function \texttt{expected\_max\_sharpe} at benchmark $SR = 0$. (The committed \texttt{sweep\_summary.json} stores $V = 0.085991$ because it was generated at a 0\% risk-free rate; see the convention note in \S\ref{sec:overfit_convention}.) Extreme value theory then sets the expected maximum Sharpe hurdle at $\text{E}[\max SR] = 1.028$. \par
+The DSR is a \emph{probability}, not a $p$-value: given the sample moments and the trial count, it is the probability that the strategy's true Sharpe exceeds that hurdle \cite{bailey2014}. (The workstation's runtime \texttt{(p-val:\,\ldots)} label displays this same probability.) Two deflated figures follow from the hurdle, both computed with the repository's own \texttt{deflated\_sharpe\_ratio\_from\_moments} on real return moments from \texttt{experiments/sweep\_returns.csv}:
 
 \begin{itemize}[leftmargin=1.2cm]
-    \item \textbf{Best sweep configuration} (\texttt{sma\_5\_45}, $SR = 1.2697$, skewness $-0.183$, Pearson kurtosis $8.52$, $T = 1{,}479$): $\text{DSR} = \textbf{0.883}$ ($p = 0.117$) --- it approaches but does not clear the conventional $0.95$ level, and \emph{no} configuration among the 133 reaches $0.95$.
-    \item \textbf{The baseline active strategy} the workstation reports at $SR = 0.506$: $\text{DSR} = \textbf{0.260}$ using the same real moments --- statistically indistinguishable from luck under multiple testing.
+    \item \textbf{Best sweep configuration} (\texttt{sma\_15\_200}, $SR = 0.6767$, skewness $-0.420$, Pearson kurtosis $12.95$, $T = 1{,}479$): $\text{DSR} = \textbf{0.200}$ --- it clearly fails the conventional $0.95$ level, and \emph{none} of the 133 configurations reaches $0.95$ (the largest DSR anywhere in the sweep is $0.205$, attained by \texttt{rsi\_14\_35\_75}).
+    \item \textbf{The baseline active strategy} of Table~\ref{tab:full} (SMA(20,50), full period, costs enabled, $SR = 0.527$): $\text{DSR} = \textbf{0.112}$, computed from the moments of that run's own equity curve (skewness $0.079$, Pearson kurtosis $9.52$; the curve is regenerated by the Appendix~\ref{app:repro} scripts and the run is pinned in \texttt{experiments/experiment\_log.csv}) --- statistically indistinguishable from luck under multiple testing.
 \end{itemize}
 
-The DSR values rendered inside the workstation screenshot are produced by the same mathematics at runtime from the local trial ledger and may differ slightly from these committed-artifact figures (see Appendix~\ref{app:repro} on trial-ledger dependence). The CPCV matrix computes an empirical Probability of Backtest Overfitting $\text{PBO} = 60.0\%$ [44.4\%, 73.3\%] across 45 combinatorial paths ($k=10, g=2$) with a 1\% temporal embargo.
+The DSR values rendered inside the workstation screenshot are produced by the same mathematics at runtime from the local trial ledger --- trial count and cross-trial variance differ from the committed sweep, so they may differ substantially from these committed-artifact figures (see Appendix~\ref{app:repro} on trial-ledger dependence). The CPCV matrix computes an empirical Probability of Backtest Overfitting $\text{PBO} = 60.0\%$ [44.4\%, 73.3\%] across 45 combinatorial paths ($k=10, g=2$) with a 1\% temporal embargo.
 
 \subsection{Execution Verifiability, Tri-Theme Architecture, and Product Portal}
 
@@ -1391,8 +1401,13 @@ applied per fill, and selection bias is measured rather than ignored.
 
 The empirical outcome, that four classic strategies failed to beat passive
 ownership once reality was applied, is the result the system was built to
-produce. An honest backtesting tool is not one that tells you your idea works; it
-is one that tells you, with evidence, what your idea actually is worth.
+produce. The overfitting diagnostics agree under one Sharpe convention
+(annualised, excess over 6\%): across the 133-configuration sweep no parameter
+choice clears the multiple-testing correction (best $\text{DSR} = 0.205$), and
+the baseline strategy's $\text{DSR} = 0.112$ is statistically indistinguishable
+from luck under multiple testing. An honest backtesting tool is not one that
+tells you your idea works; it is one that tells you, with evidence, what your
+idea actually is worth.
 
 \section{Future Scope}
 
