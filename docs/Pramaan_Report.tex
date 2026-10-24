@@ -2,14 +2,18 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{charter}
+\usepackage[scaled=0.88]{helvet}
 \usepackage{lmodern}
-\usepackage[left=3.0cm, right=2.2cm, top=2.3cm, bottom=2.3cm]{geometry}
+\renewcommand{\rmdefault}{bch}
+\renewcommand{\ttdefault}{lmtt}
+\usepackage[left=3.0cm, right=2.2cm, top=2.4cm, bottom=2.4cm]{geometry}
 \usepackage{graphicx}
 \usepackage{amsmath, amsfonts, amssymb}
 \usepackage{fancyhdr}
 \usepackage{titlesec}
 \usepackage[table,xcdraw]{xcolor}
-\usepackage[colorlinks=true, linkcolor=blue!70!black, urlcolor=blue!70!black, citecolor=blue!70!black]{hyperref}
+\usepackage[colorlinks=true, linkcolor=gtublue!80!black, urlcolor=gtublue!70!black, citecolor=gtublue!80!black]{hyperref}
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{array}
@@ -32,35 +36,41 @@
 \renewcommand{\bottomfraction}{0.85}
 \renewcommand{\textfraction}{0.10}
 \renewcommand{\floatpagefraction}{0.80}
-\captionsetup{font=small,labelfont={bf,color=gtublue},margin=6pt}
-\captionsetup[sub]{font=footnotesize,labelfont={bf,color=black!85}}
+\captionsetup{font={small,it},labelfont={bf,color=gtublue},margin=6pt,justification=justified}
+\captionsetup[sub]{font={footnotesize,it},labelfont={bf,color=black!85}}
 
-\definecolor{gtublue}{RGB}{0, 51, 102}
-\definecolor{gtured}{RGB}{204, 0, 0}
-\definecolor{codebg}{RGB}{245, 245, 245}
+\definecolor{gtublue}{RGB}{25, 55, 95}
+\definecolor{gtured}{RGB}{160, 30, 30}
+\definecolor{gtudark}{RGB}{45, 45, 48}
+\definecolor{gtugray}{RGB}{100, 100, 105}
+\definecolor{codebg}{RGB}{247, 247, 244}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
 \definecolor{codepurple}{rgb}{0.58,0,0.82}
-\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
-\definecolor{defgreen}{RGB}{22, 122, 60}
-\definecolor{defred}{RGB}{180, 40, 40}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.94}
+\definecolor{defgreen}{RGB}{30, 110, 60}
+\definecolor{defred}{RGB}{165, 35, 35}
 
 \tcbuselibrary{skins,breakable}
 
 \newtcolorbox{defensebox}[1]{
-    colback=blue!5!white, colframe=gtublue, fonttitle=\bfseries,
-    title=#1, boxrule=1pt, arc=4pt, breakable
+    colback=gtublue!3!white, colframe=gtublue!70!black, fonttitle=\bfseries\color{white},
+    coltitle=white, colbacktitle=gtublue, title=#1, boxrule=0.8pt, arc=3pt, breakable,
+    left=6pt, right=6pt, top=4pt, bottom=4pt
 }
 \newtcolorbox{codebox}[1]{
-    colback=backcolour, colframe=black!70, fonttitle=\bfseries,
-    title=#1, boxrule=1pt, arc=2pt, breakable
+    colback=backcolour, colframe=black!50, fonttitle=\bfseries,
+    title=#1, boxrule=0.6pt, arc=2pt, breakable,
+    left=6pt, right=6pt, top=4pt, bottom=4pt
 }
 \newtcolorbox{resultbox}[1]{
-    colback=green!4!white, colframe=defgreen, fonttitle=\bfseries,
-    title=#1, boxrule=1pt, arc=4pt, breakable
+    colback=defgreen!4!white, colframe=defgreen!80!black, fonttitle=\bfseries\color{white},
+    coltitle=white, colbacktitle=defgreen, title=#1, boxrule=0.8pt, arc=3pt, breakable,
+    left=6pt, right=6pt, top=4pt, bottom=4pt
 }
 \newtcolorbox{negativebox}[1]{
-    colback=red!4!white, colframe=defred, fonttitle=\bfseries,
-    title=#1, boxrule=1pt, arc=4pt, breakable
+    colback=defred!4!white, colframe=defred!80!black, fonttitle=\bfseries\color{white},
+    coltitle=white, colbacktitle=defred, title=#1, boxrule=0.8pt, arc=3pt, breakable,
+    left=6pt, right=6pt, top=4pt, bottom=4pt
 }
 
 \lstdefinestyle{mystyle}{
@@ -75,19 +85,21 @@
 
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\textcolor{gtublue}{\textbf{Pramaan - DI05000341}}}
-\fancyhead[R]{\nouppercase{\small\leftmark}}
-\fancyfoot[C]{\thepage}
-\renewcommand{\headrulewidth}{0.6pt}
-\renewcommand{\footrulewidth}{0.6pt}
+\fancyhead[L]{\small\color{gtugray}Pramaan \textbullet{} DI05000341}
+\fancyhead[R]{\small\color{gtugray}\nouppercase{\leftmark}}
+\fancyfoot[C]{\small\color{gtugray}\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\renewcommand{\headrule}{\color{gtublue!40}\hrule height 0.4pt}
 
 \titleformat{\chapter}[display]
-  {\normalfont\Huge\bfseries\color{gtublue}}{\chaptertitlename\ \thechapter}{10pt}{\Huge}[\vspace{1ex}\titlerule]
-\titlespacing*{\chapter}{0pt}{-10pt}{20pt}
-\titleformat{\section}{\normalfont\Large\bfseries\color{black!80}}{\thesection}{1em}{}
-\titlespacing*{\section}{0pt}{12pt plus 3pt minus 2pt}{5pt plus 1pt minus 1pt}
-\titleformat{\subsection}{\normalfont\large\bfseries\color{black!70}}{\thesubsection}{1em}{}
-\titlespacing*{\subsection}{0pt}{10pt plus 2pt minus 1pt}{4pt plus 1pt minus 1pt}
+  {\normalfont\Huge\bfseries\color{gtublue}\raggedright}{\chaptertitlename\ \thechapter}{12pt}{\Huge}[\vspace{0.6ex}{\color{gtublue}\titlerule[1.2pt]}]
+\titlespacing*{\chapter}{0pt}{-5pt}{24pt}
+\titleformat{\section}{\normalfont\Large\bfseries\color{gtudark}}{\thesection}{0.9em}{}
+\titlespacing*{\section}{0pt}{14pt plus 4pt minus 2pt}{6pt plus 2pt minus 1pt}
+\titleformat{\subsection}{\normalfont\large\bfseries\color{gtudark!85!black}}{\thesubsection}{0.9em}{}
+\titlespacing*{\subsection}{0pt}{11pt plus 3pt minus 1pt}{5pt plus 1pt minus 1pt}
+\titleformat{\subsubsection}{\normalfont\normalsize\bfseries\color{gtugray}}{\thesubsubsection}{0.9em}{}
 
 \setstretch{1.18}
 \renewcommand{\arraystretch}{1.20}
