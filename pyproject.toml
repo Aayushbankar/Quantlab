@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "pramaan"
 version = "1.0.0a1"
 description = "Honest backtesting engine for Indian (NSE) equities with full statutory costs and overfitting diagnostics"
+license = { text = "Apache-2.0" }
 requires-python = ">=3.10"
 dependencies = [
     "pandas>=2.2,<3",
