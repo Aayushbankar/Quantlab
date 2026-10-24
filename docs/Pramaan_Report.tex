@@ -21,6 +21,9 @@
 \usepackage{enumitem}
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows, positioning, fit, calc, shadows}
+\usepackage{xurl}
+\sloppy
+\emergencystretch=3em
 
 % Float & whitespace optimizations to fully utilize A4 format
 \setlength{\headheight}{15pt}
@@ -72,8 +75,8 @@
 
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\textcolor{gtublue}{\textbf{Pramaan: Minor Project DI05000341}}}
-\fancyhead[R]{\nouppercase{\leftmark}}
+\fancyhead[L]{\textcolor{gtublue}{\textbf{Pramaan - DI05000341}}}
+\fancyhead[R]{\nouppercase{\small\leftmark}}
 \fancyfoot[C]{\thepage}
 \renewcommand{\headrulewidth}{0.6pt}
 \renewcommand{\footrulewidth}{0.6pt}
@@ -403,7 +406,8 @@ statistics can be modelled with defensible accuracy.
 The project is organised around four research questions.
 
 \begin{center}
-\begin{tabular}{@{}p{0.7cm}p{12cm}@{}}
+\begin{tabular}{@{}p{1.0cm}p{11.7cm}@{}}
+\toprule
 \textbf{RQ1} & Does enforcing a zero look-ahead, next-open execution rule
 materially change backtest outcomes relative to a naive close-price fill? \\
 \textbf{RQ2} & Does applying the full Indian statutory cost stack materially
@@ -414,6 +418,7 @@ realistic costs? \\
 \textbf{RQ4} & Is the probability of backtest overfitting across a small
 parameter family high enough that conventional in-sample selection is
 misleading? \\
+\bottomrule
 \end{tabular}
 \end{center}
 
@@ -568,25 +573,25 @@ headlessly with no streaming or web framework present.
 \begin{figure}[h]
 \centering
 \begin{tikzpicture}[
-    node distance=1.6cm, auto,
-    box/.style={rectangle, rounded corners, minimum width=12.5cm, minimum height=1.05cm,
+    node distance=1.4cm, auto,
+    box/.style={rectangle, rounded corners, minimum width=13.5cm, minimum height=0.95cm,
                 text centered, draw=black, fill=blue!8, font=\small},
-    core/.style={rectangle, rounded corners, minimum width=12.5cm, minimum height=1.05cm,
+    core/.style={rectangle, rounded corners, minimum width=13.5cm, minimum height=0.95cm,
                  text centered, draw=gtured, fill=red!8, font=\small, line width=1.2pt},
     lab/.style={font=\footnotesize\itshape}
 ]
     \node (ui)   [box, fill=blue!12] {\textbf{Presentation} \quad Next.js 15 Workstation $\cdot$ Streamlit fallback $\cdot$ CLI};
-    \node (api)  [box] {\textbf{API (FR-15)} \quad FastAPI REST service $\cdot$ Pydantic validation $\cdot$ Cache/Replay provenance};
-    \node (an)   [box] {\textbf{Analytics} \quad metrics $\cdot$ Deflated Sharpe $\cdot$ CPCV + embargo $\cdot$ grid search};
-    \node (eng)  [core] {\textbf{Engine (the contribution)} \quad BacktestEngine $\cdot$ Portfolio $\cdot$ Position $\cdot$ IndianCostModel};
-    \node (strat)[box] {\textbf{Strategy} \quad SMA $\cdot$ RSI $\cdot$ Momentum $\cdot$ BuyAndHold};
-    \node (data) [box] {\textbf{Data} \quad fetch $\cdot$ clean $\cdot$ universe $\cdot$ Parquet cache};
+    \node (api)  [box, below of=ui] {\textbf{API (FR-15)} \quad FastAPI REST service $\cdot$ Pydantic validation $\cdot$ Cache/Replay provenance};
+    \node (an)   [box, below of=api] {\textbf{Analytics} \quad metrics $\cdot$ Deflated Sharpe $\cdot$ CPCV + embargo $\cdot$ grid search};
+    \node (eng)  [core, below of=an] {\textbf{Engine (the contribution)} \quad BacktestEngine $\cdot$ Portfolio $\cdot$ Position $\cdot$ IndianCostModel};
+    \node (strat)[box, below of=eng] {\textbf{Strategy} \quad SMA $\cdot$ RSI $\cdot$ Momentum $\cdot$ BuyAndHold};
+    \node (data) [box, below of=strat] {\textbf{Data} \quad fetch $\cdot$ clean $\cdot$ universe $\cdot$ Parquet cache};
     \draw [thick,->,>=stealth] (ui) -- (api);
     \draw [thick,->,>=stealth] (api) -- (an);
     \draw [thick,->,>=stealth] (an) -- (eng);
     \draw [thick,->,>=stealth] (strat) -- (eng);
     \draw [thick,->,>=stealth] (data) -- (eng);
-    \node [lab, right=0.25cm of eng, xshift=-6.4cm, yshift=0.55cm] {\textcolor{gtured}{untouched, regression-tested}};
+    \node [lab, right=0.2cm of eng, xshift=-6.8cm, yshift=0.45cm] {\textcolor{gtured}{untouched, regression-tested}};
 \end{tikzpicture}
 \caption[Layered System Architecture]{Layered architecture. The engine is the academic contribution and is never rewritten.}
 \label{fig:layers}
@@ -603,10 +608,10 @@ uses an explicit event loop with a one-bar delay between decision and execution.
 \begin{figure}[h]
 \centering
 \begin{tikzpicture}[
-    node distance=1.4cm, auto,
-    ss/.style={rectangle, rounded corners, minimum width=4.2cm, minimum height=1cm,
+    node distance=1.3cm, auto,
+    ss/.style={rectangle, rounded corners, minimum width=4.5cm, minimum height=1.1cm,
                text centered, draw=black, fill=blue!12, font=\small\bfseries},
-    pr/.style={rectangle, minimum width=4.2cm, minimum height=1cm,
+    pr/.style={rectangle, minimum width=4.5cm, minimum height=1.1cm,
                text centered, draw=black, fill=gray!10, font=\small},
     ar/.style={thick,->,>=stealth}
 ]
@@ -614,7 +619,7 @@ uses an explicit event loop with a one-bar delay between decision and execution.
     \node (slice) [pr, below of=dayT] {Strategy sees data $\le t$ only};
     \node (sig)   [pr, below of=slice] {SignalEvent generated};
     \node (queue) [pr, below of=sig] {OrderEvent $\rightarrow$ \textsc{PendingOrders}};
-    \node (dayT1) [ss, right of=queue, xshift=4.4cm, align=center] {Day $t+1$\\Market Open};
+    \node (dayT1) [ss, right of=queue, xshift=5.0cm, align=center] {Day $t+1$\\Market Open};
     \node (fill)  [pr, above of=dayT1] {Order filled at \textbf{Open}};
     \node (cost)  [pr, above of=fill] {Cost stack + Almgren--Chriss impact};
     \node (ledger)[pr, above of=cost] {FillEvent $\rightarrow$ Portfolio ledger};
@@ -664,7 +669,7 @@ backtesting tools. Every rate below is loaded from a versioned JSON rate card in
 the run, \texttt{unverified: false}), whose statutory rates match the NSE
 exchange rate card and SEBI levies \cite{nse} as of the October 2024
 true-to-label circular (accessed 24 October 2026). For a delivery-equity trade,
-it computes:
+it computes (all formulae use $V$ = executed trade value after market impact):
 
 \begin{equation}
 \text{brokerage} = \min\!\left(20,\; 0.0003 \times V\right)
@@ -842,22 +847,22 @@ one, and it is treated as a first-class requirement:
 \textbf{Module} & \textbf{Responsibility} \\
 \midrule
 \endfirsthead
-\texttt{src/engine/backtest\_engine.py} & Event loop, next-open fill logic, position sizing, pending-order lifecycle. \\
-\texttt{src/engine/portfolio.py} & Cash ledger, position registry, MTM equity history. \\
-\texttt{src/engine/position.py} & Position accounting, realized/unrealized PnL. \\
-\texttt{src/engine/cost\_model.py} & Indian statutory stack, Almgren--Chriss impact. \\
-\texttt{src/engine/events.py} & Immutable event dataclasses (Market, Signal, Order, Fill). \\
-\texttt{src/analytics/metrics.py} & Total return, CAGR, Sharpe, Sortino, Calmar, max drawdown. \\
-\texttt{src/analytics/deflated\_sharpe.py} & Expected max Sharpe and Deflated Sharpe Ratio. \\
-\texttt{src/analytics/cpcv.py} & Purged combinatorial paths, embargo, PBO. \\
-\texttt{src/analytics/validation.py} & Two-dimensional parameter grid search. \\
-\texttt{src/data/fetch.py} & Runtime market data retrieval. \\
-\texttt{src/data/clean.py} & Validation, NaN-drop, de-duplication, ordering. \\
-\texttt{src/data/universe.py} & Symbol universe and benchmark. \\
-\texttt{src/strategies/*.py} & SMA, RSI, momentum, buy-and-hold behind one interface. \\
-\texttt{src/dashboard/} & Streamlit demonstration surface (the legacy fallback UI). \\
-\texttt{scripts/run\_experiments.py} & Real-data matrix producing the results artifact. \\
-\texttt{scripts/generate\_real\_charts.py} & Charts rendered from engine output only. \\
+\texttt{src/\allowbreak engine/\allowbreak backtest\_engine.py} & Event loop, next-open fill logic, position sizing, pending-order lifecycle. \\
+\texttt{src/\allowbreak engine/\allowbreak portfolio.py} & Cash ledger, position registry, MTM equity history. \\
+\texttt{src/\allowbreak engine/\allowbreak position.py} & Position accounting, realized/unrealized PnL. \\
+\texttt{src/\allowbreak engine/\allowbreak cost\_model.py} & Indian statutory stack, Almgren--Chriss impact. \\
+\texttt{src/\allowbreak engine/\allowbreak events.py} & Immutable event dataclasses (Market, Signal, Order, Fill). \\
+\texttt{src/\allowbreak analytics/\allowbreak metrics.py} & Total return, CAGR, Sharpe, Sortino, Calmar, max drawdown. \\
+\texttt{src/\allowbreak analytics/\allowbreak deflated\_sharpe.py} & Expected max Sharpe and Deflated Sharpe Ratio. \\
+\texttt{src/\allowbreak analytics/\allowbreak cpcv.py} & Purged combinatorial paths, embargo, PBO. \\
+\texttt{src/\allowbreak analytics/\allowbreak validation.py} & Two-dimensional parameter grid search. \\
+\texttt{src/\allowbreak data/\allowbreak fetch.py} & Runtime market data retrieval. \\
+\texttt{src/\allowbreak data/\allowbreak clean.py} & Validation, NaN-drop, de-duplication, ordering. \\
+\texttt{src/\allowbreak data/\allowbreak universe.py} & Symbol universe and benchmark. \\
+\texttt{src/\allowbreak strategies/\allowbreak *.py} & SMA, RSI, momentum, buy-and-hold behind one interface. \\
+\texttt{src/\allowbreak dashboard/} & Streamlit demonstration surface (the legacy fallback UI). \\
+\texttt{scripts/\allowbreak run\_experiments.py} & Real-data matrix producing the results artifact. \\
+\texttt{scripts/\allowbreak generate\-\allowbreak real\-\allowbreak charts.py} & Charts rendered from engine output only. \\
 \bottomrule
 \end{longtable}
 \end{center}
@@ -963,7 +968,7 @@ Data integrity & NaN dropped not forward-filled; duplicates rejected; ordering e
 Executed in the project virtual environment:
 \begin{verbatim}
 $ pytest tests/ -q
-........................................................................ [100%]
+........................................ [100%]
 72 passed in 7.22s
 \end{verbatim}
 
@@ -979,6 +984,7 @@ CPCV with 95\% bootstrap CI, performance benchmarks, and byte-level determinism.
 The full suite, with the specific defect or invariant each module guards:
 
 \begin{center}
+\small
 \begin{longtable}{@{}p{4.5cm}cp{7.0cm}@{}}
 \caption[Automated Test Inventory]{Test inventory (72 automated tests across 16 test modules).} \label{tab:tests} \\
 \toprule
@@ -995,7 +1001,7 @@ The full suite, with the specific defect or invariant each module guards:
 \texttt{test\_cpcv.py} & 4 & PBO on random data, genuine signal detection, AR(1) embargo leakage detection, bootstrap 95\% confidence interval. \\
 \texttt{test\_data.py} & 6 & NaN dropped not forward-filled; no forward-fill leakage; chronological sort; duplicate-date rejection; empty frame; date strings. \\
 \texttt{test\_data\_provider.py} & 4 & DataProvider ABC: LocalCSV, Synthetic, SHA-256 manifest integrity, factory resolution. \\
-\texttt{test\_deflated\_sharpe.py} & 10 & True cross-trial variance $V[\{SR_k\}]$, $(T-1)$ degrees of freedom, Bailey \& López de Prado (2014) published worked example. \\
+\texttt{test\_deflated\_sharpe.py} & 10 & True cross-trial variance $V[\{SR_k\}]$, $(T-1)$ degrees of freedom, Bailey \& López de Prado (2014) published worked example.\hfill \\
 \texttt{test\_determinism.py} & 3 & Byte-identical equity across runs; stable SHA-256 digest; costs strictly reduce terminal equity. \\
 \texttt{test\_engine.py} & 2 & Fill at next bar's open; sizing uses total equity. \\
 \texttt{test\_honesty.py} & 9 & Honesty defects D1–D11: absence of hardcoded PBO, strict error envelopes, exposure metrics, rejected order logging, env parsing. \\
@@ -1039,7 +1045,7 @@ that artifact by re-executing the pipeline.
 
 To ensure that research findings are inspectable by examiners, auditors, and practitioners without requiring code execution or terminal interaction, Pramaan delivers an institutional-grade graphical workstation built with Next.js~15, TypeScript, Tailwind~CSS, and custom high-resolution SVG charting engines. In accordance with the project's non-negotiable principle of computational honesty, the interface serves as a transparent delivery vehicle: it never presents an uncomputed metric, always displays dataset and engine provenance, and renders three switchable surfaces (Abyss, Vellum, Graphite) for clear verification under any lighting or printing condition.
 
-The graphical interface is completely decoupled from the simulation engine. The core backtester runs headlessly as an in-process Python library; the presentation layer communicates with the engine exclusively through the validated FastAPI REST interface (\S\ref{sec:impl}, FR-15). To maintain complete auditability, the frontend implements deterministic URL query synchronization (\texttt{?tab=mirage|costs|overfitting|ledger|unified\&theme=abyss|vellum|graphite}), allowing examiners to deep-link directly into any forensic view under any theme.
+The graphical interface is completely decoupled from the simulation engine. The core backtester runs headlessly as an in-process Python library; the presentation layer communicates with the engine exclusively through the validated FastAPI REST interface (\S\ref{sec:impl}, FR-15). To maintain complete auditability, the frontend implements deterministic URL query synchronization (\url{?tab=mirage|costs|overfitting|ledger|unified&theme=abyss|vellum|graphite}), allowing examiners to deep-link directly into any forensic view under any theme.%
 
 \begin{figure}[htbp]
 \centering
@@ -1098,7 +1104,7 @@ Pramaan's academic and engineering contribution rests upon two diagnostic moats:
 
 The \textbf{Statutory Tollgate} (Figure~\ref{fig:ui_tollgate}) decomposes trading friction to the paisa. It reveals that for delivery equities, Securities Transaction Tax (STT) accounts for 44.7\% of total friction, while CDSL Depository Participant (DP) charges (\rupee 13.50 + 18\% GST flat per delivery sell debit) contribute 21.9\%. Because DP charges are fixed per transaction rather than ad valorem, they impose a severe drag on smaller retail capital accounts and active rebalancing strategies.
 
-The \textbf{Overfitting Diagnostics} (Figure~\ref{fig:ui_overfitting}) implements Marcos L{\'o}pez de Prado's Deflated Sharpe Ratio (DSR) and Combinatorial Purged Cross-Validation (CPCV). Both are recomputed here from the committed sweep artifacts under the report's Sharpe convention (annualised, excess over 6\%): $N = 133$ evaluated configurations and cross-trial variance $V[\{SR_k\}] = 0.152762$, recomputed from \texttt{experiments/sweep\_returns.csv} with the repository function \texttt{expected\_max\_sharpe} at benchmark $SR = 0$. (The committed \texttt{sweep\_summary.json} stores $V = 0.085991$ because it was generated at a 0\% risk-free rate; see the convention note in \S\ref{sec:overfit_convention}.) Extreme value theory then sets the expected maximum Sharpe hurdle at $\text{E}[\max SR] = 1.028$. \par
+The \textbf{Overfitting Diagnostics} (Figure~\ref{fig:ui_overfitting}) implements Marcos L{\'o}pez de Prado's Deflated Sharpe Ratio (DSR) and Combinatorial Purged Cross-Validation (CPCV). Both are recomputed here from the committed sweep artifacts under the report's Sharpe convention (annualised, excess over 6\%): $N = 133$ evaluated configurations and cross-trial variance $V[\{SR_k\}] = 0.152762$, recomputed from \texttt{experiments/\allowbreak sweep\_returns.csv} with the repository function \texttt{expected\_max\_sharpe} at benchmark $SR = 0$. (The committed \texttt{sweep\_summary.json} stores $V = 0.085991$ because it was generated at a 0\% risk-free rate; see the convention note in \S\ref{sec:overfit_convention}.) Extreme value theory then sets the expected maximum Sharpe hurdle at $\text{E}[\max SR] = 1.028$. \par
 The DSR is a \emph{probability}, not a $p$-value: given the sample moments and the trial count, it is the probability that the strategy's true Sharpe exceeds that hurdle \cite{bailey2014}. (The workstation's runtime \texttt{(p-val:\,\ldots)} label displays this same probability.) Two deflated figures follow from the hurdle, both computed with the repository's own \texttt{deflated\_sharpe\_ratio\_from\_moments} on real return moments from \texttt{experiments/sweep\_returns.csv}:
 
 \begin{itemize}[leftmargin=1.2cm]
