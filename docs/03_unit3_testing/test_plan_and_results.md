@@ -3,8 +3,8 @@
 **Subject:** GTU DI05000341 Minor Project (Unit 3 — Procure / Implement / Test)  
 **System:** Pramaan (QuantLab) Event-Driven Backtesting Engine  
 **Module Tested:** `src/engine/`, `src/analytics/`, `src/strategies/`, `src/data/`  
-**Test Suite:** `tests/` (12 test modules, 35 automated tests)  
-**Execution Status:** **35 / 35 PASS (100% Pass Rate)**
+**Test Suite:** `tests/` (16 test modules, 72 automated tests)  
+**Execution Status:** **72 / 72 PASS (100% Pass Rate)**
 
 ---
 

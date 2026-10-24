@@ -1,0 +1,25 @@
+profile_id: standard_discount_2024 | unverified: False
+--- BUY 100 x 1000.0 = Rs 100,000.00 ---
+  slippage       = 0.0000
+  fill_price     = 1000.0000
+  commission     = 20.0000
+  stt            = 100.0000
+  stamp_duty     = 15.0000
+  sebi_fee       = 0.1000
+  turnover_fee   = 3.0700
+  dp_charge      = 0.0000
+  gst            = 4.1526
+  total_cost     = 142.2226
+--- SELL 100 x 1000.0 = Rs 100,000.00 ---
+  slippage       = 0.0000
+  fill_price     = 1000.0000
+  commission     = 20.0000
+  stt            = 100.0000
+  stamp_duty     = 0.0000
+  sebi_fee       = 0.1000
+  turnover_fee   = 3.0700
+  dp_charge      = 13.5000
+  gst            = 6.5826
+  total_cost     = 143.1526
+ROUND TRIP = Rs 285.3752 = 28.54 bps of Rs 1,00,000 notional
+GST check: buy 0.18*(20+3.07+0)=4.1526; sell 0.18*(20+3.07+13.50)=6.5826

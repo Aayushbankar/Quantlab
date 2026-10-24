@@ -3,7 +3,7 @@
 [![CI](https://github.com/Aayushbankar/Quantlab/actions/workflows/ci.yml/badge.svg)](https://github.com/Aayushbankar/Quantlab/actions/workflows/ci.yml)
 [![Tests](https://img.shields.io/badge/tests-72%20passed%20offline-2ea44f.svg)](tests/)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.13-blue.svg)](pyproject.toml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 > **"Prove your edge before you deploy a rupee."**
 
@@ -40,10 +40,10 @@ Most backtesters apply flat or nominal international broker commissions (e.g., 0
 - **Headless Core Engine (`src/engine/`):** Discrete event simulation queue, zero look-ahead execution ($Signal_t \to Fill_{t+1}$ Open), cash $\ge 0$ portfolio accounting, rejected trade tracking, and versioned cost profiles (`cost_profiles/`).
 - **Statistical Analytics (`src/analytics/`):** Performance metrics, exposure tracking, benchmark confound controls (alpha, beta, exposure-matched returns), DSR, CPCV, and embargo.
 - **FastAPI REST Backend (`src/api/`):** Full async job worker (`POST /jobs`, `GET /jobs/{id}`), SQLite WAL trial ledger (`GET /trials`), parameter sweep summary (`GET /sweep`), and printable HTML audit report export (`GET /report/{run_id}`).
-- **Next.js 15 Institutional Workstation (`frontend/`):** Expansive 100vw/100vh canvas, dual-theme engine (Abyssal Slate & Institutional Light), interactive SVG Profit Mirage dissector, Statutory Tollgate breakdown, live trial history drawer, and interactive product landing page (`/landing`).
-- **Desktop Application (`frontend/src-tauri/`):** Native Linux desktop binary (`pramaan-desktop`) built with Tauri v2 and WebKit2GTK.
+- **Next.js 15 Institutional Workstation (`frontend/`):** Expansive 100vw/100vh canvas, tri-theme engine (Abyss / Vellum / Graphite), interactive SVG Profit Mirage dissector, Statutory Tollgate breakdown, live trial history drawer, and interactive product landing page (`/landing`).
+- **Desktop Shell (`frontend/src-tauri/`):** Tauri v2 + WebKit2GTK configuration for wrapping the web workstation as a native Linux desktop app. The packaged binary is **not** distributed with this repository; it builds from source with `cargo build` on a machine with the WebKit2GTK development libraries (verified locally: dev-profile build completes, 201 MB ELF).
 - **Legacy Fallback Surface (`src/dashboard/`):** Standalone Streamlit demonstration dashboard (`app.py`).
-- **Academic Deliverables (`docs/`):** 42-page GTU report PDF (`docs/Pramaan_Report.pdf`) with dual per-member submission copies, 10-slide presentation (`Pramaan_Presentation.pptx`), and committed reproducibility logs (`experiments/`).
+- **Academic Deliverables (`docs/`):** 43-page GTU report PDF (`docs/Pramaan_Report.pdf`) with dual per-member submission copies, presentation (`Pramaan_Presentation.pptx`), and committed reproducibility logs (`experiments/`).
 
 ---
 
@@ -53,6 +53,21 @@ Most backtesters apply flat or nominal international broker commissions (e.g., 0
 - **No intraday, tick data, or F&O derivatives:** Daily bars, NSE cash equities, long-only.
 - **No commercial market data redistribution:** Comes with an offline synthetic fixture dataset with SHA-256 manifest verification (`data/manifest.json`). Live fetching uses free public Yahoo Finance APIs.
 - **Not investment advice:** Designed to prevent capital destruction, not promise riches.
+
+---
+
+## Known Limitations
+
+Stated plainly so nobody has to discover them after the fact:
+
+1. **Survivorship bias:** the 10-symbol universe is today's large caps — the companies that survived. No delisting adjustment is applied.
+2. **Daily bars only:** no intraday or tick data; market impact is modelled from daily volume (Almgren–Chriss square-root law), a coarse approximation of intraday participation.
+3. **Long-only, no leverage:** shorting and derivatives are out of scope by design.
+4. **Exposure / cash-yield confound vs buy-and-hold:** active strategies are on average far less invested than the benchmark; idle cash earns 0% while Sharpe subtracts a 6% risk-free rate. "No active strategy beat buy-and-hold" is therefore partly an exposure effect. The engine exposes `average_exposure`, `alpha`, `beta`, and `exposure_matched_return` (MetricsEngine) to quantify it; committed artifacts do not yet contain exposure-matched headline numbers.
+5. **Replay artifacts use the legacy cost model:** committed replay/CSV results carry `cost_model_version = 1.0-indian-delivery-2024` (no DP charge). The live default profile is `standard_discount_2024` (DP ₹13.50 + GST on sells), so replay and live numbers differ slightly — every run stamps its profile.
+6. **DSR depends on the local trial ledger:** expected-max-SR inputs (N, cross-trial variance) come from the local SQLite trial ledger when no committed sweep is loaded, so first-run DSR values are not meaningful. Headline DSR figures in the report are computed from the committed `experiments/sweep_summary.json` instead.
+7. **Market data is not redistributed:** `data/raw/` and `experiments/equity_curves/` are gitignored; results are regenerated by running the Appendix C scripts against freshly fetched Yahoo Finance data. Run provenance and a SHA-256 manifest of the committed demo data are in-repo.
+8. **No live URL, Docker image, desktop binary, or published GitHub release is included in this repository** unless stated otherwise in the release notes.
 
 ---
 
@@ -185,4 +200,4 @@ This project was built for the **Gujarat Technological University (GTU) DI050003
 
 - Report PDF: [`docs/Pramaan_Report.pdf`](docs/Pramaan_Report.pdf)
 - Presentation Slides: [`Pramaan_Presentation.pptx`](Pramaan_Presentation.pptx)
-- Code License: **MIT License** — See [`LICENSE`](LICENSE).
+- Code License: **Apache License 2.0** — See [`LICENSE`](LICENSE).
