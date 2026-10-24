@@ -1,0 +1,15 @@
+configs=133  T=1479  dates 2019-01-02..2024-12-30
+[validate] rf=0 vs sweep_results.csv: max abs diff = 0.000050 (rounding to 4dp explains diff<=5e-5: True)
+[validate] rf=0 mean 0.8116 (summary 0.8116) | var 0.085993 (summary 0.085991) | max 1.2697 (summary 1.2697) argmax=sma_5_45
+[rf=0] mean=0.8116 var=0.085993 std=0.2932 max=1.2697 (sma_5_45) min=-0.1091 E[max]=0.7710
+[rf=6%] mean=0.2197 var=0.152762 std=0.3908 max=0.6767 (sma_15_200) min=-1.6120 E[max]=1.0277
+
+[best config rf=6%] sma_15_200: SR6=0.6767 SR0=1.2321 skew=-0.4201 kurt=12.9468 T=1479 DSR6=0.2004 (1-DSR=0.7996)
+[best config rf=0] sma_5_45: SR0=1.2697 SR6=0.6525 skew=-0.1829 kurt=8.5220 DSR0=0.8834 (old-convention reproduction)
+[counts] rf=6%: DSR>=0.95: 0  DSR>=0.5: 0  max DSR=0.2049 (rsi_14_35_75)
+[counts] rf=0:  DSR>=0.95: 0  max DSR=0.8834 (sma_5_45)
+[sma_5_45] SR0=1.2697 SR6=0.6525 DSR6=0.1830 DSR0=0.8834
+
+[baseline bf3f93a2fb4a] T=1479 SR6=0.5266 (experiment_log 0.5266) SR0=1.1251 skew=0.0790 kurt=9.5151
+[baseline DSR rf=6% hurdle] DSR=0.1124
+[baseline DSR rf=0  hurdle] DSR=0.8038 (old mixed-convention bullet said 0.260 using ANOTHER config's moments)
