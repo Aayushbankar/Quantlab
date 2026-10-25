@@ -107,14 +107,11 @@
 
 \newcommand{\rupee}{Rs.\ }
 \newcommand{\doi}[1]{\texttt{doi:#1}}
-% Per-member printed copies (identical content; only the deposit line differs)
-\newcommand{\memberLead}{Aayush Avinash Bankar}
-\newcommand{\memberEnrol}{246230316006}
-\newcommand{\otherName}{Meet Jayeshbhai Patel}
-\newcommand{\otherEnrol}{246230316133}
-\newcommand{\memberRole}{Team Leader}
-\newcommand{\otherRole}{Team Member}
-\newcommand{\copyNo}{1}
+% ================= REPORT COPY CONFIGURATION =================
+% 0: Team Copy (Master / Department copy with both students)
+% 1: Personal Copy - Aayush Avinash Bankar (Only Aayush on Title & Certificate; Meet on later pages)
+% 2: Personal Copy - Meet Jayeshbhai Patel (Only Meet on Title & Certificate; Aayush on later pages)
+\newcommand{\copyMode}{0}
 \newcommand{\runid}[1]{\texttt{#1}}
 
 \begin{document}
@@ -153,10 +150,20 @@
         \vspace{0.5cm}
 
         \textbf{Submitted by} \\[0.2cm]
-        {\Large \textbf{\memberLead} \quad \memberRole} \\
-        \textbf{Enrolment: \memberEnrol} \\[0.1cm]
-        {\large \textbf{\otherName} \quad \otherRole} \\
-        \textbf{Enrolment: \otherEnrol}
+\ifcase\copyMode
+        {\Large \textbf{Aayush Avinash Bankar} \quad Team Leader} \\
+        \textbf{Enrolment: 246230316006} \\[0.15cm]
+        {\large \textbf{Meet Jayeshbhai Patel} \quad Team Member} \\
+        \textbf{Enrolment: 246230316133}
+\or
+        {\LARGE \textbf{Aayush Avinash Bankar}} \\[0.15cm]
+        \textbf{Enrolment No.: 246230316006} \\[0.1cm]
+        \textit{Team Leader}
+\or
+        {\LARGE \textbf{Meet Jayeshbhai Patel}} \\[0.15cm]
+        \textbf{Enrolment No.: 246230316133} \\[0.1cm]
+        \textit{Team Member}
+\fi
 
         \vspace{0.25cm}
         \normalsize\itshape
@@ -164,10 +171,19 @@
 
         \vspace{0.3cm}
         \normalsize
-        \texttt{Team copy \copyNo\ of 2 --- deposited by \memberLead}
+\ifcase\copyMode
+        \texttt{Department / Team Submission Copy}
+\or
+        \texttt{Individual Student Copy --- Aayush Avinash Bankar}
+\or
+        \texttt{Individual Student Copy --- Meet Jayeshbhai Patel}
+\fi
 
         \vfill
         \large
+        \textbf{Department of Computer Engineering} \\
+        \textbf{Government Polytechnic, Gandhinagar} \\
+        \vspace{0.2cm}
         \textbf{Academic Year 2026--27} \\
         \normalsize
         Gujarat, India
@@ -197,8 +213,16 @@ This is to certify that the minor project entitled
 is a record of the bonafide work carried out and submitted by
 
 \begin{center}
+\ifcase\copyMode
     \textbf{Aayush Avinash Bankar} (246230316006) \\
     \textbf{Meet Jayeshbhai Patel} (246230316133)
+\or
+    \textbf{\Large Aayush Avinash Bankar} \\
+    \textbf{Enrolment No.: 246230316006}
+\or
+    \textbf{\Large Meet Jayeshbhai Patel} \\
+    \textbf{Enrolment No.: 246230316133}
+\fi
 \end{center}
 
 in partial fulfilment of the requirements for the award of the Diploma in Engineering
@@ -235,11 +259,27 @@ Govt. Polytechnic Gandhinagar & Govt. Polytechnic Gandhinagar \\
 
 \vspace{1cm}
 
+\ifcase\copyMode
 We, the undersigned, hereby declare that the project report entitled
 ``\textbf{Pramaan: An Event-Driven Backtesting Engine and Overfitting Diagnostic
 Platform for Indian Equities}'' is the result of our own work. All sources of
 information and materials that have been used in this project are duly
 acknowledged.
+\or
+I, the undersigned, hereby declare that the project report entitled
+``\textbf{Pramaan: An Event-Driven Backtesting Engine and Overfitting Diagnostic
+Platform for Indian Equities}'' is the result of work carried out by me in
+collaboration with team member \textbf{Meet Jayeshbhai Patel} (Enrolment: 246230316133).
+All sources of information and materials that have been used in this project are duly
+acknowledged.
+\or
+I, the undersigned, hereby declare that the project report entitled
+``\textbf{Pramaan: An Event-Driven Backtesting Engine and Overfitting Diagnostic
+Platform for Indian Equities}'' is the result of work carried out by me in
+collaboration with team leader \textbf{Aayush Avinash Bankar} (Enrolment: 246230316006).
+All sources of information and materials that have been used in this project are duly
+acknowledged.
+\fi
 
 We further declare that:
 
@@ -262,12 +302,28 @@ We further declare that:
 \vspace{2cm}
 
 \begin{flushleft}
+\ifcase\copyMode
 \begin{tabular}{@{}p{7cm}p{6cm}@{}}
 \rule{6cm}{0.4pt} & \rule{6cm}{0.4pt} \\
 \textbf{Aayush Avinash Bankar} & \textbf{Meet Jayeshbhai Patel} \\
 246230316006 & 246230316133 \\
 Date: \underline{\hspace{3cm}} & Date: \underline{\hspace{3cm}} \\
 \end{tabular}
+\or
+\begin{tabular}{@{}p{7cm}p{6cm}@{}}
+\rule{6cm}{0.4pt} & \rule{6cm}{0.4pt} \\
+\textbf{Aayush Avinash Bankar} & \textbf{Meet Jayeshbhai Patel} \\
+246230316006 (Submitting Student) & 246230316133 (Team Member) \\
+Date: \underline{\hspace{3cm}} & Date: \underline{\hspace{3cm}} \\
+\end{tabular}
+\or
+\begin{tabular}{@{}p{7cm}p{6cm}@{}}
+\rule{6cm}{0.4pt} & \rule{6cm}{0.4pt} \\
+\textbf{Meet Jayeshbhai Patel} & \textbf{Aayush Avinash Bankar} \\
+246230316133 (Submitting Student) & 246230316006 (Team Leader) \\
+Date: \underline{\hspace{3cm}} & Date: \underline{\hspace{3cm}} \\
+\end{tabular}
+\fi
 \end{flushleft}
 
 % ================= ACKNOWLEDGEMENT =================
@@ -301,6 +357,14 @@ Almgren and Chriss's work on optimal execution and market impact, were the direc
 theoretical foundations of the analytics module. We also acknowledge the
 maintainers of NumPy, pandas, and SciPy, whose libraries formed the numerical
 substrate of our implementation.
+
+\ifcase\copyMode
+We acknowledge the dedicated collaborative efforts across our team: Aayush Avinash Bankar leading the backtesting engine simulation, quantitative models, and testing architecture; and Meet Jayeshbhai Patel leading the interactive frontend workstation, desktop packaging, and user verification.
+\or
+I gratefully acknowledge the dedicated collaboration of my teammate, Meet Jayeshbhai Patel (246230316133), who spearheaded the frontend workstation architecture, desktop packaging, and user interface verification.
+\or
+I gratefully acknowledge the technical mentorship and collaboration of my team leader, Aayush Avinash Bankar (246230316006), who developed the core event-driven simulation engine, Indian statutory cost stack, and statistical diagnostics.
+\fi
 
 Finally, we thank our families and classmates who tested the dashboard, asked the
 questions that exposed our look-ahead assumptions, and refused to accept vague

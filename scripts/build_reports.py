@@ -2,9 +2,9 @@
 """
 Compiles the GTU DI05000341 Pramaan project reports using pdflatex.
 Generates:
-1. docs/Pramaan_Report.pdf (Master report)
-2. docs/Pramaan_Report_Aayush_Avinash_Bankar.pdf (Team copy 1 of 2)
-3. docs/Pramaan_Report_Meet_Jayeshbhai_Patel.pdf (Team copy 2 of 2)
+1. docs/Pramaan_Report_Team.pdf & docs/Pramaan_Report.pdf (Team submission copy)
+2. docs/Pramaan_Report_Aayush_Avinash_Bankar.pdf (Individual student copy - Aayush)
+3. docs/Pramaan_Report_Meet_Jayeshbhai_Patel.pdf (Individual student copy - Meet)
 """
 
 import os
@@ -26,38 +26,52 @@ def compile_latex():
         raise RuntimeError("pdflatex compilation failed")
 
 
-def main():
-    print("[1/4] Reading base Pramaan_Report.tex...")
-    with open(TEX_FILE, "r") as f:
-        content = f.read()
+def set_copy_mode(content: str, mode: int) -> str:
+    import re
+    return re.sub(r"\\newcommand\{\\copyMode\}\{\d+\}", rf"\\newcommand{{\\copyMode}}{{{mode}}}", content)
 
-    # 1. Compile Copy 1 (Aayush)
-    print("[2/4] Compiling Copy 1 (Aayush Avinash Bankar)...")
+
+def main():
+    print("[1/5] Reading base Pramaan_Report.tex...")
+    with open(TEX_FILE, "r") as f:
+        base_content = f.read()
+
+    # 1. Compile Copy 0 (Team Submission Copy)
+    print("[2/5] Compiling Team Copy (Master / Department submission)...")
+    with open(TEX_FILE, "w") as f:
+        f.write(set_copy_mode(base_content, 0))
     compile_latex()
     compile_latex()  # second pass for TOC / references
     shutil.copy(os.path.join(DOCS_DIR, "Pramaan_Report.pdf"),
+                os.path.join(DOCS_DIR, "Pramaan_Report_Team.pdf"))
+
+    # 2. Compile Copy 1 (Aayush Avinash Bankar Individual Copy)
+    print("[3/5] Compiling Individual Copy (Aayush Avinash Bankar)...")
+    with open(TEX_FILE, "w") as f:
+        f.write(set_copy_mode(base_content, 1))
+    compile_latex()
+    compile_latex()
+    shutil.copy(os.path.join(DOCS_DIR, "Pramaan_Report.pdf"),
                 os.path.join(DOCS_DIR, "Pramaan_Report_Aayush_Avinash_Bankar.pdf"))
 
-    # 2. Compile Copy 2 (Meet)
-    print("[3/4] Compiling Copy 2 (Meet Jayeshbhai Patel)...")
-    meet_content = content.replace(
-        r"\texttt{Team copy \copyNo\ of 2 --- deposited by \memberLead}",
-        r"\texttt{Team copy 2 of 2 --- deposited by \otherName}"
-    )
+    # 3. Compile Copy 2 (Meet Jayeshbhai Patel Individual Copy)
+    print("[4/5] Compiling Individual Copy (Meet Jayeshbhai Patel)...")
     with open(TEX_FILE, "w") as f:
-        f.write(meet_content)
-
+        f.write(set_copy_mode(base_content, 2))
     compile_latex()
     compile_latex()
     shutil.copy(os.path.join(DOCS_DIR, "Pramaan_Report.pdf"),
                 os.path.join(DOCS_DIR, "Pramaan_Report_Meet_Jayeshbhai_Patel.pdf"))
 
-    # 3. Restore original content for Master / Copy 1
-    print("[4/4] Restoring Master Pramaan_Report.tex and Pramaan_Report.pdf...")
+    # 4. Restore original base content (Mode 0)
+    print("[5/5] Restoring base Pramaan_Report.tex and master Pramaan_Report.pdf...")
     with open(TEX_FILE, "w") as f:
-        f.write(content)
+        f.write(set_copy_mode(base_content, 0))
     compile_latex()
-    print("All 3 report PDFs compiled and verified successfully.")
+    print("All 3 report versions compiled and verified successfully:")
+    print("  1. Team Copy:       docs/Pramaan_Report_Team.pdf (and docs/Pramaan_Report.pdf)")
+    print("  2. Individual Copy: docs/Pramaan_Report_Aayush_Avinash_Bankar.pdf")
+    print("  3. Individual Copy: docs/Pramaan_Report_Meet_Jayeshbhai_Patel.pdf")
 
 
 if __name__ == "__main__":
