@@ -13,7 +13,7 @@
 \usepackage{fancyhdr}
 \usepackage{titlesec}
 \usepackage[table,xcdraw]{xcolor}
-\usepackage[colorlinks=true, linkcolor=gtublue!80!black, urlcolor=gtublue!70!black, citecolor=gtublue!80!black]{hyperref}
+\usepackage[plainpages=false,pdfpagelabels,colorlinks=true, linkcolor=gtublue!80!black, urlcolor=gtublue!70!black, citecolor=gtublue!80!black]{hyperref}
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{array}
@@ -173,6 +173,8 @@
         Gujarat, India
     \end{center}
 \end{titlepage}
+
+\pagenumbering{roman}
 
 % ================= CERTIFICATE =================
 \chapter*{Certificate}
@@ -352,7 +354,7 @@ Ratio, Combinatorial Purged Cross-Validation, Almgren--Chriss market impact,
 Indian equity market microstructure, STT, NSE.
 
 % ================= FRONT MATTER =================
-\pagenumbering{roman}
+\clearpage
 \tableofcontents
 \clearpage
 \listoffigures
