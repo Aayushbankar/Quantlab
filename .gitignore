@@ -44,3 +44,9 @@ pramaan_runs.db
 
 # Python packaging build junk
 *.egg-info/
+
+# Compiled distribution binaries (published via GitHub Releases)
+dist/*.deb
+dist/*.tar.gz
+dist/pramaan-desktop
+

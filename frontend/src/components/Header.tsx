@@ -34,6 +34,13 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const shortHash = dataHash ? dataHash.slice(0, 8) : "offline";
   const ThemeIcon = theme === "abyss" ? Moon : theme === "vellum" ? Sun : Contrast;
+  const [landingUrl, setLandingUrl] = React.useState("/landing");
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined" && window.location.pathname.includes("/Quantlab")) {
+      setLandingUrl("/Quantlab/index.html");
+    }
+  }, []);
 
   const actionBtn =
     "inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-rule bg-card/70 hover:bg-cardHover hover:border-turquoise/45 text-mutedText hover:text-inkText transition-all duration-micro text-[11px] font-medium cursor-pointer";
@@ -132,7 +139,7 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
 
-          <a href="/landing" className={actionBtn} title="View Product Landing Page & Interactive Cost Calculator">
+          <a href={landingUrl} className={actionBtn} title="View Product Landing Page & Interactive Cost Calculator">
             <Globe className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Overview</span>
           </a>
