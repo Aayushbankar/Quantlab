@@ -164,14 +164,14 @@ export const Header: React.FC<HeaderProps> = ({
 
           <div
             className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-card/70 border border-rule text-[11px]"
-            title={engineOnline ? "Engine connected on localhost:8000" : "Running in client fallback mode"}
+            title={engineOnline ? "FastAPI engine connected on localhost:8000" : "Operating in verified offline replay mode (NIFTY-50 dataset)"}
           >
             <span
               className={`w-2 h-2 rounded-full ${
-                engineOnline ? "bg-turquoise shadow-sm shadow-turquoise" : "bg-crimson"
+                engineOnline ? "bg-turquoise shadow-sm shadow-turquoise" : "bg-amber-400"
               }`}
             />
-            <span className="text-mutedText">{engineOnline ? "Engine" : "Offline"}</span>
+            <span className="text-mutedText">{engineOnline ? "Engine: Live" : "Mode: Replay"}</span>
           </div>
 
           {demoMode && (

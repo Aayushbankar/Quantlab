@@ -21,7 +21,7 @@
 | Field | Finding | Evidence |
 |---|---|---|
 | **Title** | QuantLab: A Realistic Backtesting Engine & Overfitting Diagnostic Platform for Indian Equities | `README.md:1`, `docs/01_unit1_literature/problem_statement.md:3` |
-| **Branch** | Computer Engineering (software) | Python/Streamlit stack; LaTeX report; no hardware scope |
+| **Branch** | Information Technology (software) | Python/Streamlit stack; LaTeX report; no hardware scope |
 | **Course** | GTU DI05000341, Semester 5 Minor Project | `README.md:3`, `QuantLab_Project_Documentation.md:4` |
 | **Project type** | (vii) Development of process/software/application to solve a complex problem + (v) application of emerging technology (syllabus scope §p7–8) | Working simulation + DSR/CPCV methodology |
 | **Hardware vs software** | Pure software; no firmware/microcontroller | `src/` is 100% Python; no Arduino/ESP/AVR code found |
@@ -61,7 +61,7 @@ Status key: **Done** = evidence on disk · **Partial** = exists but incomplete/i
 | # | Syllabus sub-point | Status | Evidence / remark |
 |---|---|---|---|
 | 1.1 | Survey research papers, books, websites; industry visit if necessary | **Done** | `docs/01_unit1_literature/literature_review.md` (14 refs: Bailey, White, Brock, Kissell…), `comprehensive_study.md`, `QUANTLAB_DOMAIN_DEEP_DIVE.md`. No industry-visit record [ASSUMED not done — no penalty for software] |
-| 1.2 | Identify problem related to specific branch | **Done** | "Three Silent Killers" (cost blindness, overfitting, look-ahead) framed for Computer/quant-software branch — `problem_statement.md:51-94` |
+| 1.2 | Identify problem related to specific branch | **Done** | "Three Silent Killers" (cost blindness, overfitting, look-ahead) framed for Information Technology / quant-software branch — `problem_statement.md:51-94` |
 | 1.3 | Identify and gather information on selected problem | **Done** | SEBI Sep 2024 (93%, ₹1.81L Cr) + SEBI Jul 2024 cash study (71%); NSE rate card; universe ADV data — `problem_statement.md:28-48`, `stock_universe.md` |
 | 1.4 | Make appropriate problem statement and abstract (with guide) | **Done** | Formal problem statement + executive summary + RQ1–RQ4 + H₀/H₁ — `problem_statement.md:96-125`. Standalone "Abstract" page exists only inside thesis PDFs — accepted as Done |
 

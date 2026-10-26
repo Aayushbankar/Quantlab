@@ -103,6 +103,7 @@ export type OverfittingDiagnostics = z.infer<typeof OverfittingDiagnosticsSchema
 export const BacktestResponseSchema = z.object({
   run_id: z.string(),
   strategy: z.string(),
+  period: z.string().optional(),
   is_cached: z.boolean().default(false),
   served_from: z.enum(["live", "cache", "replay"]).default("live"),
   replay_reason: z.string().nullable().optional(),

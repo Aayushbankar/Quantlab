@@ -15,7 +15,7 @@
 │       A Realistic Backtesting Engine & Overfitting Diagnostic Platform for Indian Equities   │
 │                                                                                             │
 │  Course Code: GTU DI05000341 (Minor Project)      Team: Aayush Bankar & Meet Patel          │
-│  Academic Milestone: Unit 1 & Unit 2 Defense      Department of Computer Engineering        │
+│  Academic Milestone: Unit 1 & Unit 2 Defense      Department of Information Technology       │
 └─────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
