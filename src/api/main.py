@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -385,6 +386,31 @@ def run_backtest(req: BacktestRequest):
         pass
 
     return BacktestResponse(**response_data)
+
+
+# --------------------------------------------------------------------------
+# Frontend Workstation Static File Serving
+# --------------------------------------------------------------------------
+FRONTEND_OUT = (Path(__file__).resolve().parent.parent.parent / "frontend" / "out").resolve()
+
+if FRONTEND_OUT.is_dir() and (FRONTEND_OUT / "index.html").exists():
+    from fastapi.staticfiles import StaticFiles
+
+    @app.get("/landing", response_class=HTMLResponse)
+    def serve_landing_page():
+        landing_file = FRONTEND_OUT / "landing.html"
+        if landing_file.exists():
+            return HTMLResponse(content=landing_file.read_text(encoding="utf-8"))
+        return HTMLResponse(content="<h1>Landing page not found</h1>", status_code=404)
+
+    @app.get("/app", response_class=HTMLResponse)
+    def serve_app_page():
+        app_file = FRONTEND_OUT / "index.html"
+        if app_file.exists():
+            return HTMLResponse(content=app_file.read_text(encoding="utf-8"))
+        return HTMLResponse(content="<h1>App not found</h1>", status_code=404)
+
+    app.mount("/", StaticFiles(directory=str(FRONTEND_OUT), html=True), name="frontend")
 
 
 if __name__ == "__main__":

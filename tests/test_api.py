@@ -180,3 +180,19 @@ def test_honesty_report_html_generation():
     assert run_id in html
     assert "Statutory Friction Tollgate Waterfall" in html
     assert "Academic &amp; Regulatory Disclaimer" in html
+
+
+def test_frontend_workstation_serving():
+    res_root = client.get("/")
+    assert res_root.status_code == 200
+    assert "text/html" in res_root.headers["content-type"]
+    assert "Pramaan" in res_root.text
+
+    res_landing = client.get("/landing")
+    assert res_landing.status_code == 200
+    assert "text/html" in res_landing.headers["content-type"]
+
+    res_app = client.get("/app")
+    assert res_app.status_code == 200
+    assert "text/html" in res_app.headers["content-type"]
+

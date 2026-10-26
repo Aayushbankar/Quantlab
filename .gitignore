@@ -46,6 +46,7 @@ pramaan_runs.db
 *.egg-info/
 
 # Compiled distribution binaries (published via GitHub Releases)
+target/
 dist/*.deb
 dist/*.tar.gz
 dist/pramaan-desktop
